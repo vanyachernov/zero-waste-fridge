@@ -66,7 +66,7 @@ Notification (user, type, payload, readAt)
 
 ---
 
-## Етап 0 — Фундамент ✅
+## Етап 0 — Фундамент 🟡 (лишилось F-07)
 
 | ID | Задача | Деталі / критерії приймання | Статус |
 |---|---|---|---|
@@ -78,9 +78,9 @@ Notification (user, type, payload, readAt)
 | F-05 | API-клієнт і моки | `http()` з `credentials: include` і CSRF, фасад `api.*`, in-memory моки, конфіг orval | ✅ |
 | F-06 | i18n | Типізовані ключі, українські форми множини, `I18nProvider` | ✅ |
 | F-07 | Доповнити UI-Kit | Варіанти полів «success» з іконкою та «error» з підказкою, сегментований перемикач (г / кг / мл / л / шт, «Таблиця / Картки»), Toggle (Switch), Select з іконкою, Radio-картки (як у модалці «Списати») | ⬜ |
-| B-01 | Каркас бекенду | Spring Boot 3, PostgreSQL, Flyway, springdoc-openapi (`/v3/api-docs`), профілі `dev / prod`, Docker Compose для БД | ⬜ |
-| D-02 | Роздача статики Spring Boot | `web-public/out` → `classpath:/static/`, `web-lms/dist` → `/static/lms/`, SPA fallback для `/lms/**` → `index.html` | ⬜ |
-| D-03 | CI | GitHub Actions: `pnpm install --frozen-lockfile`, typecheck, build, кеш Turborepo; збірка бекенду й тести | ⬜ |
+| B-01 | Каркас бекенду | Spring Boot 4.1 / Java 25, PostgreSQL, Flyway, Spring Session JDBC, springdoc-openapi (`/v3/api-docs`), профілі `dev / prod`, Docker Compose для БД, Testcontainers | ✅ |
+| D-02 | Роздача статики Spring Boot | `web-public/out` → `classpath:/static/`, `web-lms/dist` → `/static/lms/`, SPA fallback для `/lms/**` → `index.html`, кешування асетів, `error/404.html` | ✅ |
+| D-03 | CI | GitHub Actions: `pnpm install --frozen-lockfile`, typecheck, build, кеш Turborepo; збірка бекенду й тести | ✅ |
 
 ---
 

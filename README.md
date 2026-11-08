@@ -1,17 +1,20 @@
-# Zero Waste Fridge — frontend monorepo
+# Zero Waste Fridge — monorepo
 
 Вебзастосунок для відстеження термінів придатності продуктів: показує, що скоро зіпсується, підбирає рецепти з 3–4 обраних продуктів і формує список покупок.
 
 ```
 zero-waste-fridge/
 ├── apps/
+│   ├── api/             # Бекенд: Spring Boot 4 + PostgreSQL + Flyway + Spring Session (Gradle). Роздає обидва фронти
 │   ├── web-public/      # Вітрина: Next.js (App Router) → static export (out/), SEO, без SSR
 │   └── web-lms/         # Кабінет: Vite + React + TanStack Router + TanStack Query, SPA під /lms/
 ├── packages/
 │   ├── ui/              # Дизайн-токени Tailwind v4 (@theme) + спільні React-компоненти
 │   ├── api-client/      # HTTP-клієнт (HttpOnly-cookie + CSRF), моки, конфіг orval
 │   └── i18n/            # Типізовані переклади (uk — основна, en — часткова)
-├── turbo.json           # Пайплайни: dev / build / typecheck / generate
+├── docs/ROADMAP.md      # Задачі B/F/I/D/Q до релізу
+├── .github/workflows/   # CI (D-03)
+├── turbo.json           # Пайплайни: dev / build / test / typecheck / generate
 └── pnpm-workspace.yaml
 ```
 
@@ -19,6 +22,7 @@ zero-waste-fridge/
 
 - Node.js ≥ 20 (рекомендовано 22, див. `.nvmrc`)
 - pnpm (версія закріплена в `packageManager` у кореневому `package.json`; `corepack enable` підтягне її автоматично)
+- Для бекенду: JDK 25 (наприклад, `brew install --cask temurin@25`) і Docker (локальний Postgres і Testcontainers)
 
 ## Швидкий старт (dev-режим обох застосунків одночасно)
 
@@ -49,6 +53,20 @@ pnpm dev:public
 pnpm dev:lms
 ```
 
+### Бекенд
+
+```bash
+pnpm dev:api
+```
+
+Це `./gradlew bootRun` з профілем `dev`: Spring Boot сам піднімає Postgres з `apps/api/compose.yaml` (порт 5433), застосовує Flyway-міграції і стартує на http://localhost:8080.
+
+| URL | Що це |
+|---|---|
+| http://localhost:8080/actuator/health | Health-check |
+| http://localhost:8080/swagger-ui.html | Swagger UI (тільки не в `prod`) |
+| http://localhost:8080/v3/api-docs | OpenAPI-специфікація — джерело для orval |
+
 ### Моки vs реальний бекенд
 
 За замовчуванням кабінет у dev працює з in-memory моками (`VITE_API_MOCK=true` в `apps/web-lms/.env.development`), тож Spring Boot не потрібен.
@@ -58,7 +76,9 @@ pnpm dev:lms
 
 | Команда | Дія |
 |---|---|
-| `pnpm build` | Прод-збірка: `apps/web-public/out/` і `apps/web-lms/dist/` |
+| `pnpm build:web` | Збірка лише фронтів: `apps/web-public/out/` і `apps/web-lms/dist/` (JDK не потрібен) |
+| `pnpm build` | Повна збірка: фронти + `apps/api/build/libs/zwf-api.jar` із вбудованою статикою |
+| `pnpm test` | Тести бекенду (JUnit + Testcontainers, потрібен Docker) |
 | `pnpm typecheck` | `tsc --noEmit` у всіх пакетах |
 | `pnpm api:generate` | Генерація клієнта orval з `packages/api-client/openapi/openapi.yaml` у `src/generated/` |
 
@@ -92,11 +112,43 @@ pnpm dev:lms
 3. **Відмітити 3–4 продукти**: чекбокси в таблиці (на мобільних це картки), понад 4 вибрати не можна. Знизу з'являється панель «Обрано: N з 4».
 4. **Отримати рецепт**: «Підібрати рецепт» відкриває `/lms/recipes?ids=…`, де працює кулінарний конструктор і картки рецептів. Відсутні інгредієнти можна одним кліком додати до списку покупок.
 
-## Інтеграція зі Spring Boot
+## Як бекенд роздає фронтенд (D-02)
 
-- **Збірка**: `apps/web-public/out/**` копіюється в `classpath:/static/`, а `apps/web-lms/dist/**` — у `classpath:/static/lms/`.
-- **SPA fallback**: усі `GET /lms/**`, що не є файлами, повертають `/lms/index.html` (наприклад, через `WebMvcConfigurer` + `PathResourceResolver`).
-- **Автентифікація**: Spring Security із сесією в HttpOnly-cookie. Клієнт шле запити з `credentials: "include"`. Токени в JS не потрапляють.
-- **CSRF**: `CookieCsrfTokenRepository.withHttpOnlyFalse()`. Клієнт сам дзеркалить `XSRF-TOKEN` у заголовок `X-XSRF-TOKEN` (`packages/api-client/src/http.ts`).
-- **401**: клієнт редіректить на `/login?redirect=…`.
-- **OpenAPI**: коли бекенд віддаватиме `/v3/api-docs` (springdoc), змініть `input.target` у `packages/api-client/orval.config.ts` і запустіть `pnpm api:generate`.
+Gradle-таск `syncWebStatic` копіює зібрані бандли в jar:
+
+| Звідки | Куди в `classpath:/static/` |
+|---|---|
+| `apps/web-public/out/**` | `/` |
+| `apps/web-public/out/404.html` | `error/404.html` (Spring Boot віддає її на будь-який HTML-404) |
+| `apps/web-lms/dist/**` | `lms/` |
+
+- **SPA fallback**: `GET /lms/<маршрут>` без розширення віддає `lms/index.html`. Відсутній файл з розширенням (`/lms/assets/x.js`) — це 404, а не HTML.
+- **Вітрина**: `/about/` і `/about` віддають `about/index.html` (Next.js `trailingSlash`).
+- **Кешування**: `/lms/assets/**` і `/_next/static/**` кешуються на рік (`immutable`), HTML — `no-cache`.
+- `-PrequireWeb` (його використовують `pnpm build` і CI) зупиняє збірку, якщо бандлів немає. Без цього прапорця бекенд збирається й окремо, лише з попередженням.
+
+Запуск прод-артефакту:
+
+```bash
+SPRING_PROFILES_ACTIVE=prod DB_URL=jdbc:postgresql://host:5432/zwf DB_USER=zwf DB_PASSWORD=*** java -jar apps/api/build/libs/zwf-api.jar
+```
+
+## Безпека та API-контракт
+
+- **Автентифікація**: Spring Security із сесією Spring Session JDBC у HttpOnly-cookie `ZWF_SESSION` (`Secure` у `prod`). Клієнт шле запити з `credentials: "include"`, токени в JS не потрапляють.
+- **401**: усе під `/api/**` без сесії повертає 401, і клієнт сам редіректить на сторінку входу. Логін і реєстрація — задачі B-02 і B-03.
+- **CSRF** (B-04): `CookieCsrfTokenRepository.withHttpOnlyFalse()`. Клієнт уже дзеркалить `XSRF-TOKEN` у заголовок `X-XSRF-TOKEN` (`packages/api-client/src/http.ts`).
+- **OpenAPI**: `/v3/api-docs`. Щоб генерувати клієнт з бекенду, змініть `input.target` у `packages/api-client/orval.config.ts` і запустіть `pnpm api:generate`.
+
+## CI (D-03)
+
+`.github/workflows/ci.yml` запускається на push і PR у `dev` та `main`:
+
+1. **web** — `pnpm install --frozen-lockfile`, typecheck і build фронтів (з кешем Turborepo), бандли зберігаються як артефакт.
+2. **api** — JDK 25, `./gradlew test` (Testcontainers), `bootJar -PrequireWeb` з бандлами з першого кроку. Готовий `zwf-api.jar` теж зберігається як артефакт.
+
+## Git flow
+
+- `main` — тільки релізи.
+- `dev` — інтеграційна гілка.
+- Задачі робимо в `feature/<ID>-<опис>` від `dev`, PR відкриваємо в `dev`. Список задач — у [docs/ROADMAP.md](docs/ROADMAP.md).
