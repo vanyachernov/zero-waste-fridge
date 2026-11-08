@@ -5,8 +5,13 @@
   "description": "Spring Boot backend (Gradle). Скрипти — обгортки, щоб Turborepo бачив бекенд як звичайний workspace.",
   "scripts": {
     "dev": "./gradlew bootRun --args='--spring.profiles.active=dev'",
-    "build": "./gradlew bootJar",
+    "build": "./gradlew bootJar -PrequireWeb",
     "test": "./gradlew test",
-    "clean": "./gradlew clean && rm -rf .turbo"
+    "clean": "./gradlew clean && rm -rf .turbo",
+    "build:api-only": "./gradlew bootJar"
+  },
+  "devDependencies": {
+    "@zwf/web-lms": "workspace:*",
+    "@zwf/web-public": "workspace:*"
   }
 }

@@ -51,6 +51,49 @@ tasks.withType<Test> {
 	}
 }
 
+// ---------------------------------------------------------------------------
+// D-02: вбудовуємо зібраний фронтенд у jar → classpath:/static/
+//   apps/web-public/out  → static/            (+ 404.html → static/error/404.html)
+//   apps/web-lms/dist    → static/lms/
+// Фронт збирається окремо (`pnpm build:web`); Turborepo робить це автоматично перед `@zwf/api#build`.
+// -PrequireWeb — падати, якщо бандлів немає (CI / реліз). Без нього — лише попередження (локальна розробка API).
+// ---------------------------------------------------------------------------
+val webPublicOut = layout.projectDirectory.dir("../web-public/out")
+val webLmsDist = layout.projectDirectory.dir("../web-lms/dist")
+val requireWeb = providers.gradleProperty("requireWeb").isPresent
+
+val syncWebStatic by tasks.registering(Sync::class) {
+	description = "Copies built frontend bundles into generated static resources."
+	val publicDir = webPublicOut.asFile
+	val lmsDir = webLmsDist.asFile
+	val strict = requireWeb
+	inputs.property("requireWeb", strict)
+
+	into(layout.buildDirectory.dir("generated/web/static"))
+	from(webPublicOut)
+	from(webPublicOut) {
+		include("404.html")
+		into("error")
+	}
+	from(webLmsDist) {
+		into("lms")
+	}
+
+	doFirst {
+		val missing = listOf(publicDir, lmsDir).filterNot { it.resolve("index.html").exists() }
+		if (missing.isNotEmpty()) {
+			val message = "Frontend bundles not found: ${missing.joinToString()} — run `pnpm build:web` first."
+			if (strict) throw GradleException(message) else logger.warn("WARNING: $message")
+		}
+	}
+}
+
+sourceSets {
+	main {
+		resources.srcDir(syncWebStatic.map { layout.buildDirectory.dir("generated/web").get() })
+	}
+}
+
 // Фіксоване ім'я артефакту — зручніше для Docker / CI
 tasks.bootJar {
 	archiveFileName = "zwf-api.jar"
