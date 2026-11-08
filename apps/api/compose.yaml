@@ -1,0 +1,16 @@
+# Локальна БД для dev-профілю. Spring Boot (spring-boot-docker-compose) піднімає її
+# автоматично під час `./gradlew bootRun`, і сам підставляє URL/логін/пароль.
+services:
+  postgres:
+    image: "postgres:17-alpine"
+    environment:
+      POSTGRES_DB: zwf
+      POSTGRES_USER: zwf
+      POSTGRES_PASSWORD: zwf
+    ports:
+      - "5433:5432"
+    volumes:
+      - zwf-pg:/var/lib/postgresql/data
+
+volumes:
+  zwf-pg:

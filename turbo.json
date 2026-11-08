@@ -1,20 +1,45 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalEnv": ["NODE_ENV"],
+  "globalEnv": [
+    "NODE_ENV"
+  ],
   "tasks": {
     "generate": {
-      "inputs": ["openapi/**", "orval.config.ts"],
-      "outputs": ["src/generated/**"],
+      "inputs": [
+        "openapi/**",
+        "orval.config.ts"
+      ],
+      "outputs": [
+        "src/generated/**"
+      ],
       "cache": true
     },
     "build": {
-      "dependsOn": ["^build"],
-      "env": ["NEXT_PUBLIC_*", "VITE_*"],
-      "outputs": ["out/**", "dist/**", ".next/**", "!.next/cache/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "env": [
+        "NEXT_PUBLIC_*",
+        "VITE_*"
+      ],
+      "outputs": [
+        "out/**",
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**",
+        "build/libs/**"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!build/**",
+        "!.gradle/**"
+      ]
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"]
+      "dependsOn": [
+        "^typecheck"
+      ]
     },
     "lint": {},
     "dev": {
@@ -23,6 +48,20 @@
     },
     "clean": {
       "cache": false
+    },
+    "test": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "build/test-results/**",
+        "build/reports/tests/**"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!build/**",
+        "!.gradle/**"
+      ]
     }
   }
 }
