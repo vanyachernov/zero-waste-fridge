@@ -173,6 +173,15 @@ importers:
         specifier: ^5.8.3
         version: 5.9.3
 
+  apps/api:
+    devDependencies:
+      '@zwf/web-lms':
+        specifier: workspace:*
+        version: link:../web-lms
+      '@zwf/web-public':
+        specifier: workspace:*
+        version: link:../web-public
+
   apps/web-lms:
     dependencies:
       '@tanstack/react-query':
