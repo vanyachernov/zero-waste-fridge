@@ -33,28 +33,51 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   );
 });
 
-export function Field({
-  label,
-  hint,
-  error,
-  children,
-  className,
-}: {
+export interface FieldProps {
   label: string;
   hint?: string;
   error?: string;
   children: ReactNode;
   className?: string;
-}) {
+  /**
+   * id поля вводу. Якщо задано — `<label htmlFor>` охоплює лише підпис, а підказка/помилка
+   * доступні через `aria-describedby={fieldMessageId(id)}`. Без id — label обгортає все (як раніше).
+   */
+  htmlFor?: string;
+  /** Елемент праворуч від підпису (напр. посилання «Забули пароль?»). */
+  labelAside?: ReactNode;
+}
+
+export const fieldMessageId = (id: string) => `${id}-message`;
+
+export function Field({ label, hint, error, children, className, htmlFor, labelAside }: FieldProps) {
+  const message = error ?? hint;
+  const messageClass = error ? "text-2xs font-medium text-error" : "text-2xs text-muted";
+
+  if (htmlFor) {
+    return (
+      <div className={cn("flex flex-col gap-1.5", className)}>
+        <div className="flex items-baseline justify-between gap-2">
+          <label htmlFor={htmlFor} className="text-xs font-semibold text-on-surface">
+            {label}
+          </label>
+          {labelAside}
+        </div>
+        {children}
+        {message && (
+          <p id={fieldMessageId(htmlFor)} className={messageClass} role={error ? "alert" : undefined}>
+            {message}
+          </p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <label className={cn("flex flex-col gap-1.5", className)}>
       <span className="text-xs font-semibold text-on-surface">{label}</span>
       {children}
-      {error ? (
-        <span className="text-2xs font-medium text-error">{error}</span>
-      ) : (
-        hint && <span className="text-2xs text-muted">{hint}</span>
-      )}
+      {message && <span className={messageClass}>{message}</span>}
     </label>
   );
 }

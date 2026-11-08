@@ -4,7 +4,7 @@ export { Badge, type BadgeProps, type BadgeTone } from "./components/Badge";
 export { FreshnessBadge, getFreshness, type FreshnessStatus } from "./components/FreshnessBadge";
 export { Card } from "./components/Card";
 export { StatCard, type StatCardProps } from "./components/StatCard";
-export { Input, Field, type InputProps } from "./components/Input";
+export { Input, Field, fieldMessageId, type InputProps, type FieldProps } from "./components/Input";
 export { Checkbox } from "./components/Checkbox";
 export { Chip, type ChipProps } from "./components/Chip";
 export { Logo, LogoMark } from "./components/Logo";

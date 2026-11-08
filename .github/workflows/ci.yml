@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   web:
-    name: Web (typecheck + build)
+    name: Web (typecheck + test + build)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -42,6 +42,9 @@ jobs:
 
       - name: Typecheck
         run: pnpm turbo run typecheck --cache-dir=.turbo/cache
+
+      - name: Frontend tests (unit + integration)
+        run: pnpm turbo run test --filter=@zwf/web-lms-tests --cache-dir=.turbo/cache
 
       - name: Build web apps
         run: pnpm turbo run build --filter=@zwf/web-public --filter=@zwf/web-lms --cache-dir=.turbo/cache

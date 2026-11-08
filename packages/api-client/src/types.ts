@@ -6,10 +6,38 @@ export type Category = "vegetables" | "dairy" | "meat" | "fruits" | "sauces" | "
 export type StorageZone = "fresh" | "middle" | "door" | "freezer";
 export type Unit = "g" | "kg" | "ml" | "l" | "pcs";
 
-export interface User {
+export type HouseholdRole = "OWNER" | "MEMBER";
+
+/** Профіль поточного користувача — відповідь `register`, `login`, `GET /auth/me` (B-02, B-03, B-05). */
+export interface CurrentUser {
   id: string;
   name: string;
-  avatarUrl?: string | null;
+  email: string;
+  avatarUrl: string | null;
+  householdId: string;
+  householdName: string;
+  role: HouseholdRole;
+}
+
+/** @deprecated використовуйте {@link CurrentUser} */
+export type User = CurrentUser;
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+}
+
+export interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
+  rememberMe?: boolean;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  password: string;
 }
 
 export interface ProductCreate {

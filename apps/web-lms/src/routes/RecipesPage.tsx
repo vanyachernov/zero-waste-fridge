@@ -8,7 +8,7 @@ import { useMemo, useState } from "react";
 import { daysLeft, freshnessLabel, sortByUrgency } from "../lib/freshness";
 import { productsQuery, recipesQuery } from "../lib/queries";
 
-const route = getRouteApi("/recipes");
+const route = getRouteApi("/_authenticated/recipes");
 const MAX = 4;
 
 export function RecipesPage() {

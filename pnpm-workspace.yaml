@@ -1,6 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
+  - "tests/web-*"
 
 # pnpm 11+: явний allowlist postinstall-скриптів залежностей
 allowBuilds:
