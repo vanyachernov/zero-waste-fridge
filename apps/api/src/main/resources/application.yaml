@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: zwf-api
+  profiles:
+    default: dev
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/zwf}
+    username: ${DB_USER:zwf}
+    password: ${DB_PASSWORD:zwf}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  session:
+    timeout: 30d
+    jdbc:
+      # Таблиці SPRING_SESSION створює Flyway (V1__spring_session.sql)
+      initialize-schema: never
+  docker:
+    compose:
+      enabled: false
+
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+  forward-headers-strategy: framework
+  compression:
+    enabled: true
+  servlet:
+    session:
+      cookie:
+        name: ZWF_SESSION
+        http-only: true
+        secure: ${COOKIE_SECURE:false}
+        same-site: lax
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

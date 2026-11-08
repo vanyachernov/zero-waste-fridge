@@ -1,0 +1,11 @@
+# Локальна розробка: Postgres піднімається з compose.yaml автоматично
+spring:
+  docker:
+    compose:
+      enabled: true
+      file: ./compose.yaml
+      lifecycle-management: start-only
+
+logging:
+  level:
+    ua.zwf: debug
