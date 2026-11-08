@@ -46,7 +46,8 @@ public class SecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
 				.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-				.requestMatchers("/api/auth/csrf", "/api/auth/register", "/api/auth/login").permitAll()
+				.requestMatchers("/api/auth/csrf", "/api/auth/register", "/api/auth/login", "/api/auth/password/**")
+				.permitAll()
 				.requestMatchers(api).authenticated()
 				.anyRequest().permitAll())
 			.csrf(csrf -> csrf

@@ -51,6 +51,15 @@ management:
       probes:
         enabled: true
 
+zwf:
+  # Адреса сайту для посилань у листах (prod: обов'язково через PUBLIC_URL)
+  public-url: ${PUBLIC_URL:http://localhost:8080}
+  mail:
+    from: ${MAIL_FROM:Zero Waste Fridge <no-reply@zerowastefridge.app>}
+  auth:
+    password-reset-ttl: 1h
+    password-reset-cooldown: 1m
+
 springdoc:
   api-docs:
     path: /v3/api-docs

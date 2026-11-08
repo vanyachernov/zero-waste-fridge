@@ -9,3 +9,16 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
+
+spring:
+  mail:
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail.smtp.auth: ${SMTP_AUTH:true}
+      mail.smtp.starttls.enable: ${SMTP_STARTTLS:true}
+
+zwf:
+  public-url: ${PUBLIC_URL}
