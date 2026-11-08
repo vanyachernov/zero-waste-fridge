@@ -13,6 +13,7 @@ zero-waste-fridge/
 │   ├── api-client/      # HTTP-клієнт (HttpOnly-cookie + CSRF), моки, конфіг orval
 │   └── i18n/            # Типізовані переклади (uk — основна, en — часткова)
 ├── docs/ROADMAP.md      # Задачі B/F/I/D/Q до релізу
+├── tests/               # Тести (зараз — бекенд: unit + integration)
 ├── .github/workflows/   # CI (D-03)
 ├── turbo.json           # Пайплайни: dev / build / test / typecheck / generate
 └── pnpm-workspace.yaml
@@ -59,7 +60,7 @@ pnpm dev:lms
 pnpm dev:api
 ```
 
-Це `./gradlew bootRun` з профілем `dev`: Spring Boot сам піднімає Postgres з `apps/api/compose.yaml` (порт 5433), застосовує Flyway-міграції і стартує на http://localhost:8080.
+Це `./gradlew bootRun` з профілем `dev`: Spring Boot сам піднімає Postgres (порт 5433) і Mailpit (SMTP 1026, UI http://localhost:8026) з `apps/api/compose.yaml`, застосовує Flyway-міграції і стартує на http://localhost:8080.
 
 | URL | Що це |
 |---|---|
@@ -78,7 +79,7 @@ pnpm dev:api
 |---|---|
 | `pnpm build:web` | Збірка лише фронтів: `apps/web-public/out/` і `apps/web-lms/dist/` (JDK не потрібен) |
 | `pnpm build` | Повна збірка: фронти + `apps/api/build/libs/zwf-api.jar` із вбудованою статикою |
-| `pnpm test` | Тести бекенду (JUnit + Testcontainers, потрібен Docker) |
+| `pnpm test` | Тести бекенду: unit + інтеграційні (`./gradlew check`, потрібен Docker) |
 | `pnpm typecheck` | `tsc --noEmit` у всіх пакетах |
 | `pnpm api:generate` | Генерація клієнта orval з `packages/api-client/openapi/openapi.yaml` у `src/generated/` |
 
@@ -133,19 +134,68 @@ Gradle-таск `syncWebStatic` копіює зібрані бандли в jar:
 SPRING_PROFILES_ACTIVE=prod DB_URL=jdbc:postgresql://host:5432/zwf DB_USER=zwf DB_PASSWORD=*** java -jar apps/api/build/libs/zwf-api.jar
 ```
 
-## Безпека та API-контракт
+## Автентифікація та API-контракт (B-02…B-06)
 
-- **Автентифікація**: Spring Security із сесією Spring Session JDBC у HttpOnly-cookie `ZWF_SESSION` (`Secure` у `prod`). Клієнт шле запити з `credentials: "include"`, токени в JS не потрапляють.
-- **401**: усе під `/api/**` без сесії повертає 401, і клієнт сам редіректить на сторінку входу. Логін і реєстрація — задачі B-02 і B-03.
-- **CSRF** (B-04): `CookieCsrfTokenRepository.withHttpOnlyFalse()`. Клієнт уже дзеркалить `XSRF-TOKEN` у заголовок `X-XSRF-TOKEN` (`packages/api-client/src/http.ts`).
-- **OpenAPI**: `/v3/api-docs`. Щоб генерувати клієнт з бекенду, змініть `input.target` у `packages/api-client/orval.config.ts` і запустіть `pnpm api:generate`.
+Сесійна автентифікація: Spring Security + Spring Session JDBC, HttpOnly-cookie `ZWF_SESSION` (`Secure` у `prod`, `SameSite=Lax`). Клієнт шле запити з `credentials: "include"`, токени в JS не потрапляють.
+
+| Метод і шлях | Доступ | Відповідь |
+|---|---|---|
+| `GET /api/auth/csrf` | усі | 204 + cookie `XSRF-TOKEN` |
+| `POST /api/auth/register` `{name, email, password, rememberMe?}` | усі | 201 + профіль. Створює домогосподарство «Сім'я <прізвище>», роль `OWNER`, і одразу відкриває сесію |
+| `POST /api/auth/login` `{email, password, rememberMe}` | усі | 200 + профіль · 401 `INVALID_CREDENTIALS` |
+| `POST /api/auth/logout` | усі | 204, сесія знищена, новий `XSRF-TOKEN` |
+| `GET /api/auth/me` | сесія | 200 + профіль `{id, name, email, avatarUrl, householdId, householdName, role}` · 401 |
+| `POST /api/auth/password/forgot` `{email}` | усі | завжди 202. Лист із посиланням `…/lms/reset-password?token=…` |
+| `POST /api/auth/password/reset` `{token, password}` | усі | 204 · 400 `INVALID_RESET_TOKEN` / `PASSWORD_POLICY` |
+
+- **CSRF** (B-04): для POST/PUT/PATCH/DELETE потрібен заголовок `X-XSRF-TOKEN` зі значенням cookie `XSRF-TOKEN`. Cookie видається на будь-якому першому запиті й оновлюється після входу та виходу.
+- **Сесії** (B-03): з «Запам'ятати мене» сесія живе 30 днів неактивності з постійною cookie. Без нього — 12 годин, а cookie зникає разом із закриттям браузера. Після входу ідентифікатор сесії змінюється (захист від фіксації сесії).
+- **Пароль**: від 8 символів і не більше 72 байт UTF-8 (ліміт BCrypt). У БД зберігається `{bcrypt}…`.
+- **Відновлення пароля** (B-06): токен на 256 біт, одноразовий, діє 1 годину. У БД зберігається лише його SHA-256. Не більше одного листа на хвилину, новий запит анулює старі посилання. Після скидання пароля завершуються всі сесії користувача.
+- **Без перебору акаунтів**: `login` і `forgot` відповідають однаково для невідомого email і для неправильного пароля.
+- **Формат помилок** `/api` — ProblemDetail (`application/problem+json`) з машинним `code`, а для помилок полів ще й `errors: {поле: код}`. Тексти помилок перекладає фронтенд.
+
+  ```json
+  { "status": 400, "detail": "Request validation failed", "code": "VALIDATION_FAILED",
+    "errors": { "email": "Email", "name": "NotBlank" } }
+  ```
+
+- **OpenAPI**: `/v3/api-docs`. Щоб згенерувати клієнт з бекенду, змініть `input.target` у `packages/api-client/orval.config.ts` і запустіть `pnpm api:generate`.
+
+### Пошта
+
+| Оточення | Як відправляються листи |
+|---|---|
+| `dev` | Mailpit з `apps/api/compose.yaml` піднімається разом з Postgres. Усі листи видно на http://localhost:8026 |
+| тести | `RecordingMailer` у пам'яті (`tests/api/integration/.../support`) |
+| `prod` | SMTP зі змінних оточення (див. нижче) |
+| SMTP не налаштовано | лист не відправляється, а лише логується |
+
+### Змінні оточення для `prod`
+
+| Змінна | Обов'язкова | Опис |
+|---|---|---|
+| `DB_URL`, `DB_USER`, `DB_PASSWORD` | так | PostgreSQL |
+| `PUBLIC_URL` | так | Зовнішня адреса сайту для посилань у листах, напр. `https://zerowastefridge.app` |
+| `SMTP_HOST` | так | SMTP-сервер |
+| `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` | ні | За замовчуванням `587`, без авторизації |
+| `SMTP_AUTH`, `SMTP_STARTTLS` | ні | За замовчуванням `true` |
+| `MAIL_FROM` | ні | Відправник, за замовчуванням `Zero Waste Fridge <no-reply@zerowastefridge.app>` |
+
+## Тести
+
+Усі тести лежать у [`/tests`](tests/README.md): `tests/api/unit` (JUnit + Mockito, без Spring і Docker) і `tests/api/integration` (Spring Boot + PostgreSQL у Testcontainers + справжній HTTP з cookie та CSRF).
+
+```bash
+pnpm --filter @zwf/api test
+```
 
 ## CI (D-03)
 
 `.github/workflows/ci.yml` запускається на push і PR у `dev` та `main`:
 
 1. **web** — `pnpm install --frozen-lockfile`, typecheck і build фронтів (з кешем Turborepo), бандли зберігаються як артефакт.
-2. **api** — JDK 25, `gradle test` (Testcontainers), `gradle bootJar -PrequireWeb` з бандлами з першого кроку. Готовий `zwf-api.jar` теж зберігається як артефакт.
+2. **api** — JDK 25, `gradle test` (unit), `gradle integrationTest` (Testcontainers), `gradle bootJar -PrequireWeb` з бандлами з першого кроку. Готовий `zwf-api.jar` теж зберігається як артефакт.
 
 У CI Gradle не завантажується через `./gradlew`: його копіюють з офіційного Docker-образу `gradle:<версія>-jdk25`. Причина — хостинг дистрибутивів (`services.gradle.org` → GitHub Releases) періодично віддає 504, а Docker Hub із раннерів GitHub стабільний. Версію крок бере з `apps/api/gradle/wrapper/gradle-wrapper.properties`, тож CI і локальний `./gradlew` завжди збігаються. Щоб оновити Gradle, достатньо змінити `distributionUrl` у wrapper. Локально все працює через `./gradlew`.
 
