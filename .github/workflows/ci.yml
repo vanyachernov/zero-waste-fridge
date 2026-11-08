@@ -72,6 +72,19 @@ jobs:
           distribution: temurin
           java-version: "25"
 
+      # Gradle беремо з офіційного Docker-образу, а не через ./gradlew:
+      # хостинг дистрибутивів (services.gradle.org → GitHub Releases) буває недоступним (504),
+      # а Docker Hub із раннерів GitHub стабільний. Версія та сама, що у wrapper.
+      - name: Install Gradle (з образу gradle:<version>-jdk25)
+        working-directory: .
+        run: |
+          GRADLE_VERSION=$(sed -n 's#^distributionUrl=.*/gradle-\(.*\)-bin\.zip$#\1#p' apps/api/gradle/wrapper/gradle-wrapper.properties)
+          echo "Gradle ${GRADLE_VERSION}"
+          cid=$(docker create "gradle:${GRADLE_VERSION}-jdk25")
+          docker cp "$cid:/opt/gradle" "$RUNNER_TEMP/gradle"
+          docker rm "$cid" > /dev/null
+          echo "$RUNNER_TEMP/gradle/bin" >> "$GITHUB_PATH"
+
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Download web bundles
@@ -82,10 +95,10 @@ jobs:
 
       # Testcontainers використовує Docker, який уже є на ubuntu-latest
       - name: Test
-        run: ./gradlew test --console=plain
+        run: gradle test --console=plain
 
       - name: Build jar (з вбудованим фронтендом)
-        run: ./gradlew bootJar -PrequireWeb --console=plain
+        run: gradle bootJar -PrequireWeb --console=plain
 
       - name: Upload test reports
         if: failure()
