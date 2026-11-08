@@ -5,8 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -40,7 +40,7 @@ public class SecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
 				.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-				.requestMatchers("/api/auth/csrf").permitAll()
+				.requestMatchers("/api/auth/csrf", "/api/auth/register").permitAll()
 				.requestMatchers(api).authenticated()
 				.anyRequest().permitAll())
 			.csrf(csrf -> csrf
@@ -66,13 +66,10 @@ public class SecurityConfig {
 		return repository;
 	}
 
-	/**
-	 * Порожнє сховище користувачів — щоб Spring Boot не генерував дефолтного user/password.
-	 * Буде замінено на JPA-реалізацію в B-02/B-03.
-	 */
+	/** BCrypt за замовчуванням; префікс {@code {bcrypt}} дозволяє колись мігрувати алгоритм без скидання паролів. */
 	@Bean
-	UserDetailsService userDetailsService() {
-		return new InMemoryUserDetailsManager();
+	PasswordEncoder passwordEncoder() {
+		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 	}
 
 }
