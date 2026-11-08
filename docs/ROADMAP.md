@@ -80,7 +80,7 @@ Notification (user, type, payload, readAt)
 | F-07 | Доповнити UI-Kit | Варіанти полів «success» з іконкою та «error» з підказкою, сегментований перемикач (г / кг / мл / л / шт, «Таблиця / Картки»), Toggle (Switch), Select з іконкою, Radio-картки (як у модалці «Списати») | ⬜ |
 | B-01 | Каркас бекенду | Spring Boot 4.1 / Java 25, PostgreSQL, Flyway, Spring Session JDBC, springdoc-openapi (`/v3/api-docs`), профілі `dev / prod`, Docker Compose для БД, Testcontainers | ✅ |
 | D-02 | Роздача статики Spring Boot | `web-public/out` → `classpath:/static/`, `web-lms/dist` → `/static/lms/`, SPA fallback для `/lms/**` → `index.html`, кешування асетів, `error/404.html` | ✅ |
-| D-03 | CI | GitHub Actions: `pnpm install --frozen-lockfile`, typecheck, build, кеш Turborepo; збірка бекенду й тести | ✅ |
+| D-03 | CI | GitHub Actions: `pnpm install --frozen-lockfile`, typecheck, build, кеш Turborepo; збірка бекенду й тести (Gradle з Docker-образу `gradle:<версія>-jdk25`, бо хостинг дистрибутивів Gradle буває недоступним) | ✅ |
 
 ---
 
