@@ -1,5 +1,6 @@
 package ua.zwf.api.auth;
 
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,11 +15,10 @@ public class CurrentUserService {
 		this.memberships = memberships;
 	}
 
+	/** Свіжі дані з БД (ім'я, роль, домогосподарство могли змінитися після входу). */
 	@Transactional(readOnly = true)
-	public CurrentUserResponse get(UUID userId) {
-		return memberships.findWithHouseholdByUserId(userId)
-			.map(CurrentUserResponse::of)
-			.orElseThrow(() -> new IllegalStateException("User " + userId + " has no household"));
+	public Optional<CurrentUserResponse> find(UUID userId) {
+		return memberships.findWithHouseholdByUserId(userId).map(CurrentUserResponse::of);
 	}
 
 }
