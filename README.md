@@ -70,8 +70,15 @@ pnpm dev:api
 
 ### Моки vs реальний бекенд
 
-За замовчуванням кабінет у dev працює з in-memory моками (`VITE_API_MOCK=true` в `apps/web-lms/.env.development`), тож Spring Boot не потрібен.
-Щоб ходити в реальний бекенд — поставте `VITE_API_MOCK=false`: Vite проксує `/api`, `/login`, `/logout` на `BACKEND_URL` (за замовчуванням `http://localhost:8080`), тому сесійна cookie залишається first-party.
+За замовчуванням кабінет у dev працює з in-memory моками (`VITE_API_MOCK=true` в `apps/web-lms/.env.development`), тож Spring Boot не потрібен. Моки відтворюють ті самі статуси й коди помилок, що й бекенд B-02…B-06.
+
+Демо-акаунт мока: **olena@example.com / Secret-pass-123**. На сторінці входу є кнопка, що підставляє ці дані. Лист «відновлення пароля» в мок-режимі нікуди не надсилається: посилання з нього показується на сторінці «Перевірте пошту» і в консолі браузера.
+
+Щоб ходити в реальний бекенд, поставте `VITE_API_MOCK=false`. Vite проксує `/api` на `BACKEND_URL` (за замовчуванням `http://localhost:8080`), тому сесійна cookie лишається first-party. Зручніше не правити `.env.development`, а створити `apps/web-lms/.env.realapi.local` і запустити Vite з `--mode realapi`:
+
+```bash
+pnpm --filter @zwf/web-lms exec vite --mode realapi
+```
 
 ## Інші команди
 
@@ -79,7 +86,8 @@ pnpm dev:api
 |---|---|
 | `pnpm build:web` | Збірка лише фронтів: `apps/web-public/out/` і `apps/web-lms/dist/` (JDK не потрібен) |
 | `pnpm build` | Повна збірка: фронти + `apps/api/build/libs/zwf-api.jar` із вбудованою статикою |
-| `pnpm test` | Тести бекенду: unit + інтеграційні (`./gradlew check`, потрібен Docker) |
+| `pnpm test` | Усі тести: фронтенд (Vitest) + бекенд (`./gradlew check`, потрібні JDK 25 і Docker) |
+| `pnpm test:web` | Лише тести фронтенду (`tests/web-lms`), без Java і Docker |
 | `pnpm typecheck` | `tsc --noEmit` у всіх пакетах |
 | `pnpm api:generate` | Генерація клієнта orval з `packages/api-client/openapi/openapi.yaml` у `src/generated/` |
 
@@ -112,6 +120,21 @@ pnpm dev:api
 2. **Побачити, що псується**: список відсортовано за терміном, бейджі `Прострочено / Сьогодні / 1–2 дні / Свіже`, статистика вгорі.
 3. **Відмітити 3–4 продукти**: чекбокси в таблиці (на мобільних це картки), понад 4 вибрати не можна. Знизу з'являється панель «Обрано: N з 4».
 4. **Отримати рецепт**: «Підібрати рецепт» відкриває `/lms/recipes?ids=…`, де працює кулінарний конструктор і картки рецептів. Відсутні інгредієнти можна одним кліком додати до списку покупок.
+
+## Автентифікація в кабінеті (F-10…F-13)
+
+| Сторінка | Що робить |
+|---|---|
+| `/lms/login`, `/lms/login?tab=register` | Вхід і реєстрація за макетом Figma. Клієнтська валідація з тими ж правилами й кодами, що й на бекенді. Помилки сервера перекладаються за `code` |
+| `/lms/forgot-password?email=…` | Запит посилання для відновлення. Повторно надіслати можна раз на хвилину |
+| `/lms/reset-password?token=…` | Сторінка з листа: новий пароль і його підтвердження |
+| Меню профілю в хедері | Email, сім'я, роль, тема (Світла / Темна / Системна), вихід |
+
+- **Захист маршрутів**: усі сторінки кабінету перевіряють сесію через `GET /api/auth/me`. Без сесії вони ведуть на `/lms/login?redirect=<звідки>`, і після входу користувач повертається туди ж (приймаються лише внутрішні шляхи — захист від open redirect).
+- **Сесія закінчилась посеред роботи**: будь-який 401 від API очищає кеш і веде на вхід, запам'ятавши поточну сторінку.
+- **HTTP-клієнт** (`packages/api-client/src/http.ts`):
+  - сам отримує cookie `XSRF-TOKEN` перед першим POST і додає заголовок `X-XSRF-TOKEN`;
+  - ProblemDetail перетворюється на `ApiError` з `status`, `code` і `fieldErrors`.
 
 ## Як бекенд роздає фронтенд (D-02)
 
@@ -184,7 +207,18 @@ SPRING_PROFILES_ACTIVE=prod DB_URL=jdbc:postgresql://host:5432/zwf DB_USER=zwf D
 
 ## Тести
 
-Усі тести лежать у [`/tests`](tests/README.md): `tests/api/unit` (JUnit + Mockito, без Spring і Docker) і `tests/api/integration` (Spring Boot + PostgreSQL у Testcontainers + справжній HTTP з cookie та CSRF).
+Усі тести лежать у [`/tests`](tests/README.md):
+
+| Папка | Що всередині |
+|---|---|
+| `tests/api/unit` | JUnit + Mockito, без Spring і Docker |
+| `tests/api/integration` | Spring Boot + PostgreSQL у Testcontainers + справжній HTTP з cookie та CSRF |
+| `tests/web-lms/unit` | Vitest + Testing Library: функції, хуки, окремі компоненти |
+| `tests/web-lms/integration` | Увесь SPA (роутер + Query + i18n) на мок-бекенді: повні сценарії користувача |
+
+```bash
+pnpm test:web
+```
 
 ```bash
 pnpm --filter @zwf/api test
@@ -194,7 +228,7 @@ pnpm --filter @zwf/api test
 
 `.github/workflows/ci.yml` запускається на push і PR у `dev` та `main`:
 
-1. **web** — `pnpm install --frozen-lockfile`, typecheck і build фронтів (з кешем Turborepo), бандли зберігаються як артефакт.
+1. **web** — `pnpm install --frozen-lockfile`, typecheck, тести фронтенду (`tests/web-lms`), build фронтів (з кешем Turborepo), бандли зберігаються як артефакт.
 2. **api** — JDK 25, `gradle test` (unit), `gradle integrationTest` (Testcontainers), `gradle bootJar -PrequireWeb` з бандлами з першого кроку. Готовий `zwf-api.jar` теж зберігається як артефакт.
 
 У CI Gradle не завантажується через `./gradlew`: його копіюють з офіційного Docker-образу `gradle:<версія>-jdk25`. Причина — хостинг дистрибутивів (`services.gradle.org` → GitHub Releases) періодично віддає 504, а Docker Hub із раннерів GitHub стабільний. Версію крок бере з `apps/api/gradle/wrapper/gradle-wrapper.properties`, тож CI і локальний `./gradlew` завжди збігаються. Щоб оновити Gradle, достатньо змінити `distributionUrl` у wrapper. Локально все працює через `./gradlew`.

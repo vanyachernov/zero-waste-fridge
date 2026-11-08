@@ -26,6 +26,10 @@
   --color-on-primary-container: #00513a;
   --color-primary-fixed-dim: #8bd8b2;
 
+  /* Фірмовий зелений, однаковий у світлій і темній темі (панель входу на макетах «— Dark» теж темно-зелена) */
+  --color-brand: #006948;
+  --color-on-brand: #ffffff;
+
   --color-secondary-container: #e3e7f7;     /* банер «Розумна порада дня», вторинні кнопки */
   --color-on-secondary-container: #3a4060;
 

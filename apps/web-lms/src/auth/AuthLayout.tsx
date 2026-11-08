@@ -11,9 +11,9 @@ export function AuthLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="grid min-h-dvh lg:grid-cols-2">
-      <aside className="hidden flex-col justify-between bg-primary p-10 text-on-primary lg:flex xl:p-14">
+      <aside className="hidden flex-col justify-between bg-brand p-10 text-on-brand lg:flex xl:p-14">
         <span className="inline-flex items-center gap-2.5">
-          <LogoMark className="bg-on-primary/15 text-on-primary ring-1 ring-on-primary/25" />
+          <LogoMark className="bg-on-brand/15 text-on-brand ring-1 ring-on-brand/25" />
           <span className="text-base font-bold tracking-tight">{messages.brand.name}</span>
         </span>
 
@@ -25,7 +25,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
               const Icon = BENEFIT_ICONS[i] ?? BellRing;
               return (
                 <li key={text} className="flex items-center gap-3 text-sm">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-on-primary/15 ring-1 ring-on-primary/20">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-on-brand/15 ring-1 ring-on-brand/20">
                     <Icon className="size-4" aria-hidden />
                   </span>
                   {text}

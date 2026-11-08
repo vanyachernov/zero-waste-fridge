@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { getRouteApi } from "@tanstack/react-router";
+import { getRouteApi, Link } from "@tanstack/react-router";
 import { queryKeys, type CurrentUser } from "@zwf/api-client";
 import { useI18n } from "@zwf/i18n/react";
 import { Button } from "@zwf/ui";
@@ -41,7 +41,18 @@ export function LoginPage() {
           <p className="mt-1 text-sm text-on-surface-variant">{tab === "login" ? t("auth.loginSubtitle") : t("auth.registerSubtitle")}</p>
         </header>
 
-        {tab === "login" ? <LoginForm onSuccess={onAuthenticated} /> : <RegisterForm onSuccess={onAuthenticated} />}
+        {tab === "login" ? (
+          <LoginForm
+            onSuccess={onAuthenticated}
+            forgotLink={(email) => (
+              <Link to="/forgot-password" search={email ? { email } : {}} className="text-2xs font-semibold text-primary hover:underline">
+                {t("auth.forgot")}
+              </Link>
+            )}
+          />
+        ) : (
+          <RegisterForm onSuccess={onAuthenticated} />
+        )}
 
         <div className="flex items-center gap-3 text-2xs text-muted" aria-hidden>
           <span className="h-px flex-1 bg-border" />
