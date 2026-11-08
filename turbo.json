@@ -60,7 +60,8 @@
       "inputs": [
         "$TURBO_DEFAULT$",
         "!build/**",
-        "!.gradle/**"
+        "!.gradle/**",
+        "$TURBO_ROOT$/tests/api/**"
       ]
     }
   }

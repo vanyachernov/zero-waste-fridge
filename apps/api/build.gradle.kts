@@ -43,7 +43,43 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-tasks.withType<Test> {
+// ---------------------------------------------------------------------------
+// Тести живуть у корені монорепо: /tests/api/{unit,integration}
+//   test             — unit: чиста Java + Mockito, без Spring-контексту і Docker (секунди)
+//   integrationTest  — Spring Boot на випадковому порту + PostgreSQL у Testcontainers
+// `./gradlew check` запускає обидва.
+// ---------------------------------------------------------------------------
+val testsRoot = layout.projectDirectory.dir("../../tests/api")
+
+sourceSets {
+	test {
+		java.setSrcDirs(listOf(testsRoot.dir("unit/java")))
+		resources.setSrcDirs(listOf(testsRoot.dir("unit/resources")))
+	}
+	create("integrationTest") {
+		java.setSrcDirs(listOf(testsRoot.dir("integration/java")))
+		resources.setSrcDirs(listOf(testsRoot.dir("integration/resources")))
+		compileClasspath += sourceSets.main.get().output
+		runtimeClasspath += sourceSets.main.get().output
+	}
+}
+
+configurations["integrationTestImplementation"].extendsFrom(configurations.testImplementation.get())
+configurations["integrationTestRuntimeOnly"].extendsFrom(configurations.testRuntimeOnly.get())
+
+val integrationTest = tasks.register<Test>("integrationTest") {
+	description = "Runs integration tests (Spring Boot + Testcontainers) from /tests/api/integration."
+	group = LifecycleBasePlugin.VERIFICATION_GROUP
+	testClassesDirs = sourceSets["integrationTest"].output.classesDirs
+	classpath = sourceSets["integrationTest"].runtimeClasspath
+	shouldRunAfter(tasks.test)
+}
+
+tasks.check {
+	dependsOn(integrationTest)
+}
+
+tasks.withType<Test>().configureEach {
 	useJUnitPlatform()
 	testLogging {
 		events("failed", "skipped")
@@ -62,7 +98,7 @@ val webPublicOut = layout.projectDirectory.dir("../web-public/out")
 val webLmsDist = layout.projectDirectory.dir("../web-lms/dist")
 val requireWeb = providers.gradleProperty("requireWeb").isPresent
 
-val syncWebStatic by tasks.registering(Sync::class) {
+val syncWebStatic = tasks.register<Sync>("syncWebStatic") {
 	description = "Copies built frontend bundles into generated static resources."
 	val publicDir = webPublicOut.asFile
 	val lmsDir = webLmsDist.asFile

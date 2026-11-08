@@ -1,33 +1,21 @@
 package ua.zwf.api;
 
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import ua.zwf.api.support.IntegrationTest;
 
-@Import(TestcontainersConfiguration.class)
-@SpringBootTest
-@ActiveProfiles("test")
-class ApiApplicationTests {
-
-	@Autowired
-	WebApplicationContext context;
+class ApiApplicationIT extends IntegrationTest {
 
 	MockMvc mvc;
 
 	@BeforeEach
 	void setUp() {
-		mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+		mvc = mvc();
 	}
 
 	@Test

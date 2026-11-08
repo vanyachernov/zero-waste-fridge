@@ -1,7 +1,6 @@
 package ua.zwf.api;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
@@ -10,29 +9,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import ua.zwf.api.support.IntegrationTest;
 
 /** D-02: використовує фейкову статику з src/test/resources/static. */
-@Import(TestcontainersConfiguration.class)
-@SpringBootTest
-@ActiveProfiles("test")
-class WebStaticConfigTests {
-
-	@Autowired
-	WebApplicationContext context;
+class WebStaticConfigIT extends IntegrationTest {
 
 	MockMvc mvc;
 
 	@BeforeEach
 	void setUp() {
-		mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+		mvc = mvc();
 	}
 
 	@Test
