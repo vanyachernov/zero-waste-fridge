@@ -6,7 +6,7 @@ import { configureApi, mockAuthControl } from "@zwf/api-client";
 import { I18nProvider } from "@zwf/i18n/react";
 import type { ReactElement } from "react";
 import { expect } from "vitest";
-import { AppProviders, createQueryClient } from "@lms/app";
+import { AppProviders, createQueryClient, createUnauthorizedHandler } from "@lms/app";
 import { createAppRouter } from "@lms/router";
 
 /**
@@ -17,13 +17,7 @@ export function renderApp(path = "/", options: { signedIn?: boolean } = {}) {
   if (options.signedIn) mockAuthControl.signIn();
   const queryClient = createQueryClient();
   const router = createAppRouter(queryClient, { history: createMemoryHistory({ initialEntries: [`/lms${path}`] }) });
-  configureApi({
-    mock: true,
-    onUnauthorized: () => {
-      queryClient.clear();
-      void router.navigate({ to: "/login" });
-    },
-  });
+  configureApi({ mock: true, onUnauthorized: createUnauthorizedHandler(router, queryClient) });
   const user = userEvent.setup();
   const view = render(<AppProviders router={router} queryClient={queryClient} />);
   return { ...view, router, queryClient, user, path: () => router.state.location.href };

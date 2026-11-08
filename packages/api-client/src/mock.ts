@@ -1,3 +1,4 @@
+import { requireMockSession } from "./mock-auth";
 import type { Product, ProductCreate, Recipe, ShoppingItem } from "./types";
 
 /** In-memory бекенд для розробки UI без Spring Boot (VITE_API_MOCK=true). */
@@ -64,20 +65,24 @@ const RECIPE_TEMPLATES: Array<Omit<Recipe, "id" | "usedProductIds" | "matchPerce
 
 export const mockApi = {
   async listProducts(): Promise<Product[]> {
+    requireMockSession();
     await delay();
     return [...products];
   },
   async createProduct(input: ProductCreate): Promise<Product> {
+    requireMockSession();
     await delay();
     const product: Product = { ...input, id: `p${++seq}`, addedAt: new Date().toISOString() };
     products = [product, ...products];
     return product;
   },
   async discardProduct(id: string): Promise<void> {
+    requireMockSession();
     await delay(150);
     products = products.filter((p) => p.id !== id);
   },
   async suggestRecipes(productIds: string[]): Promise<Recipe[]> {
+    requireMockSession();
     await delay(700);
     const selected = products.filter((p) => productIds.includes(p.id));
     return RECIPE_TEMPLATES.map((tpl, i) => {
@@ -90,13 +95,16 @@ export const mockApi = {
       .sort((a, b) => b.matchPercent - a.matchPercent);
   },
   async getShoppingList(): Promise<ShoppingItem[]> {
+    requireMockSession();
     await delay();
     return [...shopping];
   },
   async toggleShoppingItem(id: string): Promise<void> {
+    requireMockSession();
     shopping = shopping.map((s) => (s.id === id ? { ...s, done: !s.done } : s));
   },
   async addShoppingItems(names: string[]): Promise<void> {
+    requireMockSession();
     const fresh = names
       .filter((n) => !shopping.some((s) => s.name === n))
       .map((name) => ({ id: `s${++seq}`, name, reason: "recipe" as const, done: false }));

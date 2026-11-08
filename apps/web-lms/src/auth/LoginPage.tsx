@@ -5,6 +5,7 @@ import { useI18n } from "@zwf/i18n/react";
 import { Button } from "@zwf/ui";
 import { Info, Users } from "lucide-react";
 import { useState } from "react";
+import { safeRedirect } from "../lib/redirect";
 import { useDocumentTitle } from "../lib/useDocumentTitle";
 import { AuthLayout } from "./AuthLayout";
 import { AuthTabs, type AuthTab } from "./AuthTabs";
@@ -16,7 +17,7 @@ const route = getRouteApi("/login");
 /** F-10: макет «Вхід / Реєстрація». Вкладка — у URL (`?tab=register`), щоб на неї можна було дати посилання. */
 export function LoginPage() {
   const { t } = useI18n();
-  const { tab = "login" } = route.useSearch();
+  const { tab = "login", redirect } = route.useSearch();
   const navigate = route.useNavigate();
   const queryClient = useQueryClient();
   const [joinNotice, setJoinNotice] = useState(false);
@@ -24,7 +25,8 @@ export function LoginPage() {
 
   const onAuthenticated = (user: CurrentUser) => {
     queryClient.setQueryData(queryKeys.me, user);
-    void navigate({ to: "/" });
+    // F-11: назад на сторінку, з якої guard відправив на вхід
+    void navigate({ href: safeRedirect(redirect), replace: true });
   };
 
   const setTab = (next: AuthTab) => navigate({ search: (prev) => ({ ...prev, tab: next === "login" ? undefined : next }), replace: true });
