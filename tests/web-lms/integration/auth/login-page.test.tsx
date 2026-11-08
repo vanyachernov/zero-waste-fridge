@@ -1,6 +1,7 @@
 import { screen, within } from "@testing-library/react";
+import * as client from "@zwf/api-client";
 import { DEMO_ACCOUNT } from "@zwf/api-client";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { renderApp, waitForPath } from "../../support/render";
 
 /** F-10: сторінка «Вхід / Реєстрація» у складі всього SPA (роутер + Query + мок-бекенд). */
@@ -17,7 +18,8 @@ describe("login page", () => {
     expect(document.title).toBe("Вхід · Zero Waste Fridge");
   });
 
-  it("switching tabs is reflected in the URL and back", async () => {
+  it("switching tabs is reflected in the URL and back — without re-checking the session", async () => {
+    const me = vi.spyOn(client.api.auth, "me");
     const { user, router } = renderApp("/login");
 
     await user.click(await screen.findByRole("tab", { name: "Реєстрація" }));
@@ -29,6 +31,7 @@ describe("login page", () => {
 
     await user.click(screen.getByRole("tab", { name: "Вхід" }));
     await waitForPath(router, "/login");
+    expect(me).toHaveBeenCalledTimes(1);
   });
 
   it("deep link to the register tab", async () => {

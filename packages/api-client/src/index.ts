@@ -1,4 +1,4 @@
-import { configureHttp, http, type ApiError } from "./http";
+import { configureHttp, http, isApiError, notifyUnauthorized, type ApiError } from "./http";
 import { mockApi } from "./mock";
 import { mockAuth } from "./mock-auth";
 import type {
@@ -29,6 +29,14 @@ export function isMockApi() {
 }
 
 const json = (body: unknown) => JSON.stringify(body);
+
+/** Мок-відповіді проходять той самий шлях обробки 401, що й справжні запити через http(). */
+function viaMock<T>(call: () => Promise<T>, options: { skipUnauthorizedHandler?: boolean } = {}): Promise<T> {
+  return call().catch((error: unknown) => {
+    if (isApiError(error, 401) && !options.skipUnauthorizedHandler) notifyUnauthorized(error);
+    throw error;
+  });
+}
 /** 401 від auth-ендпоінтів — очікуваний результат (неправильний пароль, немає сесії), а не «сесія закінчилась». */
 const auth = { skipUnauthorizedHandler: true } as const;
 
@@ -55,22 +63,22 @@ export const api = {
       useMock ? mockAuth.resetPassword(body) : http("/auth/password/reset", { ...auth, method: "POST", body: json(body) }),
   },
   products: {
-    list: (): Promise<Product[]> => (useMock ? mockApi.listProducts() : http("/products")),
+    list: (): Promise<Product[]> => (useMock ? viaMock(() => mockApi.listProducts()) : http("/products")),
     create: (input: ProductCreate): Promise<Product> =>
-      useMock ? mockApi.createProduct(input) : http("/products", { method: "POST", body: json(input) }),
+      useMock ? viaMock(() => mockApi.createProduct(input)) : http("/products", { method: "POST", body: json(input) }),
     discard: (id: string, reason: DiscardReason = "eaten"): Promise<void> =>
-      useMock ? mockApi.discardProduct(id) : http(`/products/${id}?reason=${reason}`, { method: "DELETE" }),
+      useMock ? viaMock(() => mockApi.discardProduct(id)) : http(`/products/${id}?reason=${reason}`, { method: "DELETE" }),
   },
   recipes: {
     suggest: (productIds: string[]): Promise<Recipe[]> =>
-      useMock ? mockApi.suggestRecipes(productIds) : http("/recipes/suggest", { method: "POST", body: json({ productIds }) }),
+      useMock ? viaMock(() => mockApi.suggestRecipes(productIds)) : http("/recipes/suggest", { method: "POST", body: json({ productIds }) }),
   },
   shoppingList: {
-    get: (): Promise<ShoppingItem[]> => (useMock ? mockApi.getShoppingList() : http("/shopping-list")),
+    get: (): Promise<ShoppingItem[]> => (useMock ? viaMock(() => mockApi.getShoppingList()) : http("/shopping-list")),
     toggle: (id: string): Promise<void> =>
-      useMock ? mockApi.toggleShoppingItem(id) : http(`/shopping-list/${id}/toggle`, { method: "POST" }),
+      useMock ? viaMock(() => mockApi.toggleShoppingItem(id)) : http(`/shopping-list/${id}/toggle`, { method: "POST" }),
     addMany: (names: string[]): Promise<void> =>
-      useMock ? mockApi.addShoppingItems(names) : http("/shopping-list", { method: "POST", body: json({ names }) }),
+      useMock ? viaMock(() => mockApi.addShoppingItems(names)) : http("/shopping-list", { method: "POST", body: json({ names }) }),
   },
 };
 

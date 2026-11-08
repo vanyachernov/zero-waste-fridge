@@ -2,9 +2,9 @@ import { queryOptions } from "@tanstack/react-query";
 import { api, queryKeys } from "@zwf/api-client";
 
 /** Поточний користувач (B-05). Без сесії — ApiError 401; не повторюємо. */
-export const meQuery = queryOptions({ queryKey: queryKeys.me, queryFn: api.auth.me, staleTime: Infinity, retry: false });
+export const meQuery = queryOptions({ queryKey: queryKeys.me, queryFn: () => api.auth.me(), staleTime: Infinity, retry: false });
 
-export const productsQuery = queryOptions({ queryKey: queryKeys.products, queryFn: api.products.list });
+export const productsQuery = queryOptions({ queryKey: queryKeys.products, queryFn: () => api.products.list() });
 
 export const recipesQuery = (ids: string[]) =>
   queryOptions({
@@ -14,4 +14,4 @@ export const recipesQuery = (ids: string[]) =>
     staleTime: 5 * 60_000,
   });
 
-export const shoppingQuery = queryOptions({ queryKey: queryKeys.shoppingList, queryFn: api.shoppingList.get });
+export const shoppingQuery = queryOptions({ queryKey: queryKeys.shoppingList, queryFn: () => api.shoppingList.get() });

@@ -171,6 +171,11 @@ export const mockAuth = {
   },
 };
 
+/** Як Spring Security для `/api/**`: без сесії — 401. */
+export function requireMockSession() {
+  if (!session || !accounts.has(session)) throw new ApiError(401, "Unauthorized");
+}
+
 /** Хелпери лише для тестів і dev-інструментів. */
 export const mockAuthControl = {
   reset() {
@@ -181,5 +186,9 @@ export const mockAuthControl = {
   lastResetLink: () => lastResetLink,
   signIn(email: string = DEMO_ACCOUNT.email) {
     writeSession(normalize(email));
+  },
+  /** Імітує завершення сесії на сервері (таймаут, вихід на іншому пристрої). */
+  expireSession() {
+    writeSession(null);
   },
 };

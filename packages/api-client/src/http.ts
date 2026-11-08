@@ -39,6 +39,11 @@ export function configureHttp(options: { baseUrl?: string; onUnauthorized?: (err
   onUnauthorized = options.onUnauthorized;
 }
 
+/** Викликає глобальний обробник 401 (використовує і мок-бекенд, щоб поводитися як справжній). */
+export function notifyUnauthorized(error: ApiError) {
+  onUnauthorized?.(error);
+}
+
 export function readCookie(name: string): string | undefined {
   if (typeof document === "undefined") return undefined;
   const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
