@@ -2,7 +2,9 @@ import type { QueryClient } from "@tanstack/react-query";
 import { createRootRouteWithContext, createRoute, createRouter, Outlet, redirect, type RouterHistory } from "@tanstack/react-router";
 import { isApiError } from "@zwf/api-client";
 import type { AuthTab } from "./auth/AuthTabs";
+import { ForgotPasswordPage } from "./auth/ForgotPasswordPage";
 import { LoginPage } from "./auth/LoginPage";
+import { ResetPasswordPage } from "./auth/ResetPasswordPage";
 import { meQuery, productsQuery } from "./lib/queries";
 import { safeRedirect } from "./lib/redirect";
 import { AppErrorScreen, AppPendingScreen } from "./routes/AppStatusScreens";
@@ -51,6 +53,32 @@ const loginRoute = createRoute({
     if (await isSignedIn(context.queryClient)) throw redirect({ href: safeRedirect(search.redirect) });
   },
   component: LoginPage,
+});
+
+export interface ForgotPasswordSearch {
+  /** Підставляється з форми входу, щоб не вводити email двічі. */
+  email?: string;
+}
+
+const forgotPasswordRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/forgot-password",
+  validateSearch: (search: Record<string, unknown>): ForgotPasswordSearch =>
+    typeof search.email === "string" && search.email.length <= 254 ? { email: search.email } : {},
+  component: ForgotPasswordPage,
+});
+
+export interface ResetPasswordSearch {
+  token?: string;
+}
+
+/** Сторінка з листа B-06. Доступна і з сесією, і без — бекенд однаково завершить усі сесії. */
+const resetPasswordRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/reset-password",
+  validateSearch: (search: Record<string, unknown>): ResetPasswordSearch =>
+    typeof search.token === "string" && search.token.trim() ? { token: search.token.trim() } : {},
+  component: ResetPasswordPage,
 });
 
 // ---------- Кабінет (AppShell) ----------
@@ -109,7 +137,12 @@ const shoppingRoute = createRoute({
   component: ShoppingPage,
 });
 
-const routeTree = rootRoute.addChildren([loginRoute, appRoute.addChildren([fridgeRoute, recipesRoute, shoppingRoute])]);
+const routeTree = rootRoute.addChildren([
+  loginRoute,
+  forgotPasswordRoute,
+  resetPasswordRoute,
+  appRoute.addChildren([fridgeRoute, recipesRoute, shoppingRoute]),
+]);
 
 export function createAppRouter(queryClient: QueryClient, options: { history?: RouterHistory } = {}) {
   return createRouter({

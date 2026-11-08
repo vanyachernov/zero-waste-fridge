@@ -14,8 +14,8 @@ type LoginField = (typeof FIELDS)[number];
 
 export interface LoginFormProps {
   onSuccess: (user: CurrentUser) => void;
-  /** Посилання «Забули пароль?» біля підпису поля (F-13). */
-  forgotLink?: ReactNode;
+  /** Посилання «Забули пароль?» біля підпису поля (F-13); отримує поточний email, щоб передати його далі. */
+  forgotLink?: (email: string) => ReactNode;
   initialEmail?: string;
 }
 
@@ -63,7 +63,7 @@ export function LoginForm({ onSuccess, forgotLink, initialEmail = "" }: LoginFor
         />
       </Field>
 
-      <Field label={t("auth.password")} htmlFor="login-password" error={fieldMessage(errors.password, i18n)} labelAside={forgotLink}>
+      <Field label={t("auth.password")} htmlFor="login-password" error={fieldMessage(errors.password, i18n)} labelAside={forgotLink?.(email.trim())}>
         <PasswordInput
           id="login-password"
           autoComplete="current-password"
