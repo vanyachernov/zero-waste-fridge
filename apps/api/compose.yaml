@@ -1,5 +1,5 @@
-# Локальна БД для dev-профілю. Spring Boot (spring-boot-docker-compose) піднімає її
-# автоматично під час `./gradlew bootRun`, і сам підставляє URL/логін/пароль.
+# Локальна БД і поштовий «перехоплювач» для dev-профілю. Spring Boot (spring-boot-docker-compose) піднімає їх
+# автоматично під час `./gradlew bootRun` і сам підставляє URL/логін/пароль БД.
 services:
   postgres:
     image: "postgres:17-alpine"
@@ -11,6 +11,13 @@ services:
       - "5433:5432"
     volumes:
       - zwf-pg:/var/lib/postgresql/data
+
+  # Перехоплює всі листи в dev (відновлення пароля тощо). Веб-інтерфейс: http://localhost:8026
+  mailpit:
+    image: "axllent/mailpit:v1.33"
+    ports:
+      - "1026:1025"
+      - "8026:8025"
 
 volumes:
   zwf-pg:

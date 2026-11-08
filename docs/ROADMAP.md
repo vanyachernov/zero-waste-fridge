@@ -15,6 +15,8 @@
 | **D-xx** | DevOps та інфраструктура: збірка, деплой, CI, оточення |
 | **Q-xx** | Якість: e2e-тести, доступність, перформанс |
 
+Тести бекенду лежать у [`/tests`](../tests/README.md): кожна B-задача закривається разом з unit- та інтеграційними тестами.
+
 ### Статуси
 
 ✅ готово · 🟡 частково (є заготовка або UI на моках) · ⬜ не розпочато · ❓ потрібне рішення або дизайн
@@ -84,22 +86,22 @@ Notification (user, type, payload, readAt)
 
 ---
 
-## Етап 1 — Автентифікація та сесія
+## Етап 1 — Автентифікація та сесія (бекенд ✅, фронтенд ⬜)
 
 Макет «Вхід / Реєстрація»: ліва панель з УТП («Менше викинутої їжі — більше заощаджених грошей», 3 переваги), справа — таби «Вхід / Реєстрація», email, пароль із показом, «Забули пароль?», «Запам'ятати мене», кнопка «Увійти», «Приєднатися до сім'ї за кодом», примітка про приватність.
 
 | ID | Задача | Деталі / критерії приймання | Залежності | Статус |
 |---|---|---|---|---|
-| B-02 | Реєстрація | `POST /api/auth/register` (ім'я, email, пароль). Хеш BCrypt, унікальний email. Під час реєстрації автоматично створюється Household, а користувач стає OWNER | B-01 | ⬜ |
-| B-03 | Вхід / вихід, сесія | Spring Security form/JSON login, сесія в HttpOnly + Secure + SameSite=Lax cookie (Spring Session JDBC). «Запам'ятати мене» — remember-me cookie на 30 днів. `POST /api/auth/logout` | B-02 | ⬜ |
-| B-04 | CSRF | `CookieCsrfTokenRepository.withHttpOnlyFalse()`: cookie `XSRF-TOKEN` + заголовок `X-XSRF-TOKEN` | B-03 | ⬜ |
-| B-05 | Поточний користувач | `GET /api/auth/me` → `{id, name, email, avatarUrl, householdId, role}`. Без сесії → 401 | B-03 | ⬜ |
-| B-06 | Відновлення пароля | `POST /api/auth/password/forgot` (лист із токеном, TTL 1 год), `POST /api/auth/password/reset` | B-03, B-30 | ⬜ |
+| B-02 | Реєстрація | `POST /api/auth/register` (ім'я, email, пароль, rememberMe). BCrypt (`{bcrypt}`), унікальний email без урахування регістру, PasswordPolicy (8+ символів, ≤ 72 байти). Автоматично створюється Household «Сім'я <прізвище>», користувач — OWNER; одразу відкривається сесія | B-04 | ✅ |
+| B-03 | Вхід / вихід, сесія | JSON `POST /api/auth/login`, `POST /api/auth/logout` (204). Spring Session JDBC, cookie `ZWF_SESSION` HttpOnly + SameSite=Lax (+ Secure у prod). «Запам'ятати мене» — сесія 30 днів і постійна cookie (без нього — 12 год). Захист від фіксації сесії, ротація CSRF, однакова відповідь для невідомого email і неправильного пароля | B-05 | ✅ |
+| B-04 | CSRF | `csrf.spa()` + `CookieCsrfTokenRepository.withHttpOnlyFalse()`: cookie `XSRF-TOKEN` (SameSite=Lax) + заголовок `X-XSRF-TOKEN`; cookie видається на першому ж запиті; `GET /api/auth/csrf` | B-01 | ✅ |
+| B-05 | Поточний користувач | `GET /api/auth/me` → `{id, name, email, avatarUrl, householdId, householdName, role}` (свіжі дані з БД). Без сесії → 401; сесія видаленого користувача → 401 `SESSION_EXPIRED` | B-02 | ✅ |
+| B-06 | Відновлення пароля | `POST /api/auth/password/forgot` (завжди 202; лист з одноразовим токеном на 1 год, у БД лише SHA-256; 1 лист/хв), `POST /api/auth/password/reset` (завершує всі сесії). Мінімальний `Mailer` (SMTP / лог), Mailpit у dev | B-03 | ✅ |
 | F-10 | Сторінка Вхід / Реєстрація | Окремий маршрут `/lms/login` (поза AppShell) за макетом, з табами. Валідація: email, пароль ≥ 8 символів, показ і приховування пароля, стани кнопки, помилки сервера під формою. Адаптив: ліва панель ховається на мобільних | F-07 | ⬜ |
 | F-11 | Захист маршрутів | `beforeLoad` у кореневому маршруті: `ensureQueryData(me)`, за 401 — редірект на `/lms/login?redirect=…`; після входу — повернення на сторінку з `redirect` | F-10 | ⬜ |
 | F-12 | Меню профілю | Аватар з ініціалами або фото, ім'я, підпис «Zero-Waste Герой». Випадаюче меню: «Моя сім'я», «Налаштування», «Тема», «Вийти» | F-11 | ⬜ |
 | F-13 | Забули пароль | Дві форми: «запит на скидання» і «новий пароль» (за токеном з листа) | F-10 | ⬜ |
-| I-01 | Інтеграція auth | Підключити F-10…F-13 до B-02…B-06, вимкнути моки auth, налаштувати Vite proxy на `/api` | B-02…B-06 | ⬜ |
+| I-01 | Інтеграція auth | Підключити F-10…F-13 до B-02…B-06, вимкнути моки auth (Vite proxy на `/api` уже є). `http.ts`: перед першим POST без cookie `XSRF-TOKEN` викликати `GET /api/auth/csrf`; на 401 — перехід на `/lms/login?redirect=…`; мапити `code` з ProblemDetail на тексти з `packages/i18n`. Сторінка `/lms/reset-password?token=` (F-13) | B-02…B-06 ✅ | ⬜ |
 
 ---
 
@@ -218,7 +220,7 @@ Notification (user, type, payload, readAt)
 
 | ID | Задача | Деталі / критерії приймання | Залежності | Статус |
 |---|---|---|---|---|
-| B-30 | Email-сервіс | Spring Mail + шаблони (Thymeleaf): запрошення, скидання пароля, дайджест | B-01 | ⬜ |
+| B-30 | Email-сервіс | Шаблони листів (Thymeleaf) для запрошень і дайджесту; перевести на них лист скидання пароля. Базовий `Mailer` (SMTP / лог) і Mailpit уже є з B-06 | B-06 | 🟡 |
 | B-31 | Планувальник нагадувань | `@Scheduled` щогодини: продукти, де `effectiveExpiresAt - remindBeforeDays ≤ now` і нагадування ще не надіслано → Notification для всіх учасників Household | B-11, B-50 | ⬜ |
 | B-32 | In-app сповіщення | `GET /api/notifications` (непрочитані першими), `POST /{id}/read`, `POST /read-all` | B-31 | ⬜ |
 | B-33 | Канали доставки | Щоденний email-дайджест («3 продукти зіпсуються завтра»), Web Push (VAPID) — за налаштуваннями користувача | B-30, B-32 | ⬜ |
