@@ -1,9 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
-import { Link, Outlet } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, Outlet, useNavigate } from "@tanstack/react-router";
+import { api } from "@zwf/api-client";
 import { useI18n } from "@zwf/i18n/react";
 import { Logo, cn } from "@zwf/ui";
 import { BarChart3, Bell, ChefHat, Leaf, Refrigerator, ShoppingCart } from "lucide-react";
+import { errorMessage } from "../lib/errors";
 import { meQuery } from "../lib/queries";
+import { ProfileMenu } from "./ProfileMenu";
 
 const NAV = [
   { to: "/", key: "nav.fridge", short: "navShort.fridge", icon: Refrigerator, disabled: false },
@@ -13,13 +16,18 @@ const NAV = [
 ] as const;
 
 export function AppShell() {
-  const { t, messages } = useI18n();
+  const i18n = useI18n();
+  const { t, messages } = i18n;
   const { data: me } = useQuery(meQuery);
-  const initials = me?.name
-    .split(" ")
-    .map((s) => s[0])
-    .join("")
-    .slice(0, 2);
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const logout = useMutation({
+    mutationFn: () => api.auth.logout(),
+    onSuccess: () => {
+      queryClient.clear();
+      void navigate({ to: "/login", replace: true });
+    },
+  });
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -58,15 +66,14 @@ export function AppShell() {
               <Bell className="size-5" />
               <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-warning ring-2 ring-surface-container-lowest" />
             </button>
-            <div className="hidden text-right sm:block lg:hidden xl:block">
-              <p className="text-sm leading-tight font-semibold">{me?.name ?? "…"}</p>
-              <p className="inline-flex items-center gap-1 text-2xs font-medium text-primary">
-                Zero-Waste Герой <Leaf className="size-3" />
-              </p>
-            </div>
-            <span className="flex size-9 items-center justify-center rounded-full bg-primary-container text-xs font-bold text-on-primary-container">
-              {initials}
-            </span>
+            {me && (
+              <ProfileMenu
+                user={me}
+                onLogout={() => logout.mutate()}
+                logoutPending={logout.isPending}
+                logoutError={logout.isError ? errorMessage(logout.error, i18n) : null}
+              />
+            )}
           </div>
         </div>
       </header>

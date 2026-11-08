@@ -7,12 +7,14 @@ import { ArrowLeft, Check, CheckCircle2, Clock, Flame, Gauge, Lightbulb, Shoppin
 import { useMemo, useState } from "react";
 import { daysLeft, freshnessLabel, sortByUrgency } from "../lib/freshness";
 import { productsQuery, recipesQuery } from "../lib/queries";
+import { useDocumentTitle } from "../lib/useDocumentTitle";
 
 const route = getRouteApi("/_authenticated/recipes");
 const MAX = 4;
 
 export function RecipesPage() {
   const i18n = useI18n();
+  useDocumentTitle(i18n.t("nav.recipes"));
   const { t } = i18n;
   const { ids = [] } = route.useSearch();
   const navigate = route.useNavigate();

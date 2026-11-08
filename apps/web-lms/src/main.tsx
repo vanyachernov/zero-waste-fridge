@@ -2,8 +2,11 @@ import { configureApi } from "@zwf/api-client";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { AppProviders, createQueryClient, createUnauthorizedHandler } from "./app";
+import { initTheme } from "./lib/theme";
 import { createAppRouter } from "./router";
 import "./styles.css";
+
+initTheme();
 
 const queryClient = createQueryClient();
 const router = createAppRouter(queryClient);

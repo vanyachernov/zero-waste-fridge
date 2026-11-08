@@ -3,11 +3,13 @@ import { api, queryKeys, type ShoppingItem } from "@zwf/api-client";
 import { useI18n } from "@zwf/i18n/react";
 import { Badge, Card, Checkbox, cn } from "@zwf/ui";
 import { shoppingQuery } from "../lib/queries";
+import { useDocumentTitle } from "../lib/useDocumentTitle";
 
 const reasonTone = { recipe: "primary", "low-stock": "warning", manual: "neutral" } as const;
 
 export function ShoppingPage() {
   const { t, messages } = useI18n();
+  useDocumentTitle(t("shopping.title"));
   const qc = useQueryClient();
   const { data, isPending } = useQuery(shoppingQuery);
 
