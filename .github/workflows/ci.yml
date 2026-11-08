@@ -94,8 +94,11 @@ jobs:
           path: apps
 
       # Testcontainers використовує Docker, який уже є на ubuntu-latest
-      - name: Test
+      - name: Unit tests
         run: gradle test --console=plain
+
+      - name: Integration tests
+        run: gradle integrationTest --console=plain
 
       - name: Build jar (з вбудованим фронтендом)
         run: gradle bootJar -PrequireWeb --console=plain
@@ -105,7 +108,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: api-test-reports
-          path: apps/api/build/reports/tests
+          path: apps/api/build/reports/tests/
 
       - name: Upload jar
         uses: actions/upload-artifact@v4
