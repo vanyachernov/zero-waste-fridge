@@ -145,7 +145,9 @@ SPRING_PROFILES_ACTIVE=prod DB_URL=jdbc:postgresql://host:5432/zwf DB_USER=zwf D
 `.github/workflows/ci.yml` запускається на push і PR у `dev` та `main`:
 
 1. **web** — `pnpm install --frozen-lockfile`, typecheck і build фронтів (з кешем Turborepo), бандли зберігаються як артефакт.
-2. **api** — JDK 25, `./gradlew test` (Testcontainers), `bootJar -PrequireWeb` з бандлами з першого кроку. Готовий `zwf-api.jar` теж зберігається як артефакт.
+2. **api** — JDK 25, `gradle test` (Testcontainers), `gradle bootJar -PrequireWeb` з бандлами з першого кроку. Готовий `zwf-api.jar` теж зберігається як артефакт.
+
+У CI Gradle не завантажується через `./gradlew`: його копіюють з офіційного Docker-образу `gradle:<версія>-jdk25`. Причина — хостинг дистрибутивів (`services.gradle.org` → GitHub Releases) періодично віддає 504, а Docker Hub із раннерів GitHub стабільний. Версію крок бере з `apps/api/gradle/wrapper/gradle-wrapper.properties`, тож CI і локальний `./gradlew` завжди збігаються. Щоб оновити Gradle, достатньо змінити `distributionUrl` у wrapper. Локально все працює через `./gradlew`.
 
 ## Git flow
 
