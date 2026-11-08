@@ -7,6 +7,15 @@
     <meta name="robots" content="noindex" />
     <link rel="icon" type="image/svg+xml" href="/lms/favicon.svg" />
     <title>Мій холодильник · Zero Waste Fridge</title>
+    <script>
+      // F-12: тема до першого рендеру (без спалаху світлої теми). Логіка — як у src/lib/theme.ts
+      try {
+        var t = localStorage.getItem("zwf.theme");
+        var dark = t === "dark" || (t !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+        if (dark) document.documentElement.classList.add("dark");
+        document.documentElement.style.colorScheme = dark ? "dark" : "light";
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

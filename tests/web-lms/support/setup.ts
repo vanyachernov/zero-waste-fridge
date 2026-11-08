@@ -15,18 +15,25 @@ if (!HTMLDialogElement.prototype.showModal) {
   };
 }
 
-if (!window.matchMedia) {
-  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  }));
+/** Керована заглушка matchMedia: тести можуть перемикати системну тему через `setSystemDark()`. */
+const mediaListeners = new Set<() => void>();
+let systemDark = false;
+export function setSystemDark(value: boolean) {
+  systemDark = value;
+  mediaListeners.forEach((listener) => listener());
 }
+window.matchMedia = ((query: string) => ({
+  get matches() {
+    return query.includes("prefers-color-scheme: dark") ? systemDark : false;
+  },
+  media: query,
+  onchange: null,
+  addEventListener: (_: string, listener: () => void) => mediaListeners.add(listener),
+  removeEventListener: (_: string, listener: () => void) => mediaListeners.delete(listener),
+  addListener: (listener: () => void) => mediaListeners.add(listener),
+  removeListener: (listener: () => void) => mediaListeners.delete(listener),
+  dispatchEvent: () => false,
+})) as unknown as typeof window.matchMedia;
 
 window.scrollTo = vi.fn() as unknown as typeof window.scrollTo;
 
@@ -71,6 +78,9 @@ beforeEach(() => {
     document.cookie = `${c.split("=")[0]!.trim()}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
   });
   document.documentElement.className = "";
+  document.documentElement.style.colorScheme = "";
+  systemDark = false;
+  mediaListeners.clear();
   mockAuthControl.reset();
   configureApi({ mock: true });
 });

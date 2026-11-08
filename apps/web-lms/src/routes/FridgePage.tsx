@@ -25,6 +25,7 @@ import { AddProductModal } from "../components/AddProductModal";
 import { ProductIcon } from "../components/ProductIcon";
 import { daysLeft, formatQty, freshnessLabel, sortByUrgency } from "../lib/freshness";
 import { productsQuery } from "../lib/queries";
+import { useDocumentTitle } from "../lib/useDocumentTitle";
 
 const MAX_SELECTED = 4;
 const CATEGORY_ORDER: Category[] = ["vegetables", "dairy", "meat", "fruits", "sauces"];
@@ -33,6 +34,7 @@ type View = "table" | "cards";
 
 export function FridgePage() {
   const i18n = useI18n();
+  useDocumentTitle(i18n.t("fridge.title"));
   const { t, messages, formatDate } = i18n;
   const navigate = useNavigate();
   const qc = useQueryClient();
