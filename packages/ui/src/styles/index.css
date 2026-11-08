@@ -1,0 +1,62 @@
+/*
+ * Підключення в застосунку:
+ *   @import "tailwindcss";
+ *   @import "@zwf/ui/styles.css";
+ */
+@import "@fontsource-variable/inter";
+@import "./theme.css";
+
+/* Сканувати класи у спільних компонентах */
+@source "../";
+
+/* ---------- Dark theme (макети «— Dark») ---------- */
+@custom-variant dark (&:where(.dark, .dark *));
+
+.dark {
+  --color-primary: #5fd8a4;
+  --color-on-primary: #00382a;
+  --color-primary-hover: #7ff0bd;
+  --color-primary-pressed: #a5f5cf;
+  --color-primary-container: #0d3a2b;
+  --color-on-primary-container: #a2f2cb;
+
+  --color-secondary-container: #232a3d;
+  --color-on-secondary-container: #d3d9f0;
+
+  --color-error: #ff8f9a;
+  --color-error-container: #4a0f1b;
+  --color-on-error-container: #ffb3b8;
+  --color-warning-container: #47290a;
+  --color-on-warning-container: #ffc48f;
+  --color-caution-container: #3d3108;
+  --color-on-caution-container: #f5d77a;
+
+  --color-background: #0f141a;
+  --color-surface: #0f141a;
+  --color-surface-container-lowest: #161c24;
+  --color-surface-container-low: #1b222b;
+  --color-surface-container: #212a34;
+  --color-surface-container-high: #29333e;
+  --color-surface-container-highest: #323d49;
+
+  --color-on-surface: #e6eaef;
+  --color-on-surface-variant: #b7c2bb;
+  --color-muted: #8c9891;
+  --color-outline: #8c9891;
+  --color-outline-variant: #3c4842;
+  --color-border: #263039;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-background font-sans text-on-surface antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}

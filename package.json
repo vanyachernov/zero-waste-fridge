@@ -1,0 +1,22 @@
+{
+  "name": "zero-waste-fridge",
+  "private": true,
+  "packageManager": "pnpm@12.15.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "turbo run dev --filter=@zwf/web-public --filter=@zwf/web-lms",
+    "dev:public": "turbo run dev --filter=@zwf/web-public",
+    "dev:lms": "turbo run dev --filter=@zwf/web-lms",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "api:generate": "turbo run generate --filter=@zwf/api-client",
+    "clean": "turbo run clean && rm -rf node_modules .turbo"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,148 @@
+openapi: 3.0.3
+info:
+  title: Zero Waste Fridge API (stub)
+  version: 0.1.0
+  description: |
+    Заглушка контракту. Автентифікація — сесійна HttpOnly-cookie (JSESSIONID / SESSION),
+    яку встановлює Spring Security. Клієнт завжди шле запити з `credentials: "include"`.
+servers:
+  - url: /api
+tags:
+  - name: products
+  - name: recipes
+  - name: shopping-list
+  - name: auth
+paths:
+  /auth/me:
+    get:
+      tags: [auth]
+      operationId: getCurrentUser
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "401": { description: Unauthorized }
+  /products:
+    get:
+      tags: [products]
+      operationId: listProducts
+      responses:
+        "200":
+          description: OK
+          content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Product" } } } }
+    post:
+      tags: [products]
+      operationId: createProduct
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: "#/components/schemas/ProductCreate" } } }
+      responses:
+        "201": { description: Created, content: { application/json: { schema: { $ref: "#/components/schemas/Product" } } } }
+  /products/{id}:
+    delete:
+      tags: [products]
+      operationId: discardProduct
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+        - { name: reason, in: query, required: false, schema: { type: string, enum: [eaten, spoiled, donated] } }
+      responses:
+        "204": { description: No Content }
+  /recipes/suggest:
+    post:
+      tags: [recipes]
+      operationId: suggestRecipes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productIds]
+              properties:
+                productIds: { type: array, minItems: 1, maxItems: 4, items: { type: string } }
+      responses:
+        "200":
+          description: OK
+          content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Recipe" } } } }
+  /shopping-list:
+    get:
+      tags: [shopping-list]
+      operationId: getShoppingList
+      responses:
+        "200":
+          description: OK
+          content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/ShoppingItem" } } } }
+    post:
+      tags: [shopping-list]
+      operationId: addShoppingItems
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [names], properties: { names: { type: array, items: { type: string } } } }
+      responses:
+        "204": { description: No Content }
+  /shopping-list/{id}/toggle:
+    post:
+      tags: [shopping-list]
+      operationId: toggleShoppingItem
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "204": { description: No Content }
+components:
+  schemas:
+    User:
+      type: object
+      required: [id, name]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        avatarUrl: { type: string, nullable: true }
+    Category:
+      type: string
+      enum: [vegetables, dairy, meat, fruits, sauces, other]
+    StorageZone:
+      type: string
+      enum: [fresh, middle, door, freezer]
+    ProductCreate:
+      type: object
+      required: [name, category, quantity, unit, expiresAt]
+      properties:
+        name: { type: string }
+        brand: { type: string }
+        category: { $ref: "#/components/schemas/Category" }
+        zone: { $ref: "#/components/schemas/StorageZone" }
+        quantity: { type: number }
+        unit: { type: string, enum: [g, kg, ml, l, pcs] }
+        expiresAt: { type: string, format: date }
+    Product:
+      allOf:
+        - $ref: "#/components/schemas/ProductCreate"
+        - type: object
+          required: [id, addedAt]
+          properties:
+            id: { type: string }
+            addedAt: { type: string, format: date-time }
+    Recipe:
+      type: object
+      required: [id, title, minutes, kcal, difficulty, matchPercent, ingredients, steps]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        imageUrl: { type: string }
+        minutes: { type: integer }
+        kcal: { type: integer }
+        difficulty: { type: string, enum: [easy, medium, hard] }
+        matchPercent: { type: integer }
+        usedProductIds: { type: array, items: { type: string } }
+        ingredients: { type: array, items: { type: string } }
+        missing: { type: array, items: { type: string } }
+        steps: { type: array, items: { type: string } }
+    ShoppingItem:
+      type: object
+      required: [id, name, done]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        quantity: { type: string }
+        reason: { type: string, enum: [recipe, low-stock, manual] }
+        done: { type: boolean }
