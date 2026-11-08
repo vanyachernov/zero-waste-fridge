@@ -78,6 +78,14 @@ public final class ApiClient {
 		return cookie(CSRF_COOKIE);
 	}
 
+	/** Підкласти cookie вручну (напр., старий ідентифікатор сесії для перевірки захисту від фіксації). */
+	public void setCookie(String name, String value) {
+		var cookie = new HttpCookie(name, value);
+		cookie.setPath("/");
+		cookie.setVersion(0);
+		cookies.getCookieStore().add(URI.create(baseUrl), cookie);
+	}
+
 	/** Імітує закриття браузера: лишаються тільки persistent cookie (з Max-Age). */
 	public void dropSessionCookies(List<String> names) {
 		var store = cookies.getCookieStore();

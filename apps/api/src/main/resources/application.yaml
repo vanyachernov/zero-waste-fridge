@@ -17,7 +17,9 @@ spring:
   flyway:
     enabled: true
   session:
-    timeout: 30d
+    # Звичайна сесія: 12 год неактивності, cookie до закриття браузера.
+    # «Запам'ятати мене» (B-03) подовжує конкретну сесію до 30 днів і робить cookie постійною.
+    timeout: 12h
     jdbc:
       # Таблиці SPRING_SESSION створює Flyway (V1__spring_session.sql)
       initialize-schema: never
