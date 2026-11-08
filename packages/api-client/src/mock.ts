@@ -1,4 +1,4 @@
-import type { Product, ProductCreate, Recipe, ShoppingItem, User } from "./types";
+import type { Product, ProductCreate, Recipe, ShoppingItem } from "./types";
 
 /** In-memory бекенд для розробки UI без Spring Boot (VITE_API_MOCK=true). */
 
@@ -63,10 +63,6 @@ const RECIPE_TEMPLATES: Array<Omit<Recipe, "id" | "usedProductIds" | "matchPerce
 ];
 
 export const mockApi = {
-  async me(): Promise<User> {
-    await delay(100);
-    return { id: "u1", name: "Олена Кравченко" };
-  },
   async listProducts(): Promise<Product[]> {
     await delay();
     return [...products];

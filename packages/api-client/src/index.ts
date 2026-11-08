@@ -1,26 +1,58 @@
-import { configureHttp, http } from "./http";
+import { configureHttp, http, type ApiError } from "./http";
 import { mockApi } from "./mock";
-import type { DiscardReason, Product, ProductCreate, Recipe, ShoppingItem, User } from "./types";
+import { mockAuth } from "./mock-auth";
+import type {
+  CurrentUser,
+  DiscardReason,
+  LoginRequest,
+  Product,
+  ProductCreate,
+  Recipe,
+  RegisterRequest,
+  ResetPasswordRequest,
+  ShoppingItem,
+} from "./types";
 
 export * from "./types";
-export { ApiError, http } from "./http";
+export { ApiError, CSRF_COOKIE, CSRF_HEADER, http, isApiError, readCookie } from "./http";
+export { DEMO_ACCOUNT, mockAuthControl } from "./mock-auth";
 
 let useMock = false;
 
-export function configureApi(options: { baseUrl?: string; mock?: boolean; onUnauthorized?: () => void }) {
+export function configureApi(options: { baseUrl?: string; mock?: boolean; onUnauthorized?: (error: ApiError) => void }) {
   useMock = options.mock ?? false;
   configureHttp(options);
 }
 
+export function isMockApi() {
+  return useMock;
+}
+
 const json = (body: unknown) => JSON.stringify(body);
+/** 401 від auth-ендпоінтів — очікуваний результат (неправильний пароль, немає сесії), а не «сесія закінчилась». */
+const auth = { skipUnauthorizedHandler: true } as const;
 
 /**
- * Ручний фасад над API. Сигнатури відповідають operationId в openapi.yaml,
+ * Фасад над API. Сигнатури відповідають operationId в openapi.yaml / контролерам Spring,
  * тож після генерації orval можна безболісно перейти на `./generated`.
  */
 export const api = {
   auth: {
-    me: (): Promise<User> => (useMock ? mockApi.me() : http("/auth/me")),
+    /** B-05. Без сесії — ApiError 401. */
+    me: (): Promise<CurrentUser> => (useMock ? mockAuth.me() : http("/auth/me", auth)),
+    /** B-03. Неправильні дані — ApiError 401 `INVALID_CREDENTIALS`. */
+    login: (body: LoginRequest): Promise<CurrentUser> =>
+      useMock ? mockAuth.login(body) : http("/auth/login", { ...auth, method: "POST", body: json(body) }),
+    /** B-02. Зайнятий email — 409 `EMAIL_TAKEN`; слабкий пароль — 400 `PASSWORD_POLICY`. */
+    register: (body: RegisterRequest): Promise<CurrentUser> =>
+      useMock ? mockAuth.register(body) : http("/auth/register", { ...auth, method: "POST", body: json(body) }),
+    logout: (): Promise<void> => (useMock ? mockAuth.logout() : http("/auth/logout", { ...auth, method: "POST" })),
+    /** B-06. Завжди успіх (202), навіть для невідомого email. */
+    forgotPassword: (email: string): Promise<void> =>
+      useMock ? mockAuth.forgotPassword(email) : http("/auth/password/forgot", { ...auth, method: "POST", body: json({ email }) }),
+    /** B-06. Невалідний/прострочений токен — 400 `INVALID_RESET_TOKEN`. */
+    resetPassword: (body: ResetPasswordRequest): Promise<void> =>
+      useMock ? mockAuth.resetPassword(body) : http("/auth/password/reset", { ...auth, method: "POST", body: json(body) }),
   },
   products: {
     list: (): Promise<Product[]> => (useMock ? mockApi.listProducts() : http("/products")),
@@ -31,9 +63,7 @@ export const api = {
   },
   recipes: {
     suggest: (productIds: string[]): Promise<Recipe[]> =>
-      useMock
-        ? mockApi.suggestRecipes(productIds)
-        : http("/recipes/suggest", { method: "POST", body: json({ productIds }) }),
+      useMock ? mockApi.suggestRecipes(productIds) : http("/recipes/suggest", { method: "POST", body: json({ productIds }) }),
   },
   shoppingList: {
     get: (): Promise<ShoppingItem[]> => (useMock ? mockApi.getShoppingList() : http("/shopping-list")),

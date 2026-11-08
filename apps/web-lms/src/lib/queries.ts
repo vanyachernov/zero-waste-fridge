@@ -1,7 +1,8 @@
 import { queryOptions } from "@tanstack/react-query";
 import { api, queryKeys } from "@zwf/api-client";
 
-export const meQuery = queryOptions({ queryKey: queryKeys.me, queryFn: api.auth.me, staleTime: Infinity });
+/** Поточний користувач (B-05). Без сесії — ApiError 401; не повторюємо. */
+export const meQuery = queryOptions({ queryKey: queryKeys.me, queryFn: api.auth.me, staleTime: Infinity, retry: false });
 
 export const productsQuery = queryOptions({ queryKey: queryKeys.products, queryFn: api.products.list });
 

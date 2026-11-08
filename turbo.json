@@ -61,7 +61,9 @@
         "$TURBO_DEFAULT$",
         "!build/**",
         "!.gradle/**",
-        "$TURBO_ROOT$/tests/api/**"
+        "$TURBO_ROOT$/tests/api/**",
+        "$TURBO_ROOT$/apps/web-lms/src/**",
+        "$TURBO_ROOT$/packages/*/src/**"
       ]
     }
   }
