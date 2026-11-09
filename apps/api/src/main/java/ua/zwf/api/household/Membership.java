@@ -50,6 +50,17 @@ public class Membership {
 		this.joinedAt = now;
 	}
 
+	public void changeRole(HouseholdRole role) {
+		this.role = Objects.requireNonNull(role);
+	}
+
+	/** Перехід в інше домогосподарство (вступ за запрошенням, видалення з сім'ї). */
+	public void moveTo(Household household, HouseholdRole role, Instant now) {
+		this.household = Objects.requireNonNull(household);
+		this.role = Objects.requireNonNull(role);
+		this.joinedAt = now;
+	}
+
 	public UUID getId() {
 		return id;
 	}
