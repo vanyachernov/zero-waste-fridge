@@ -153,7 +153,9 @@ function RecipeCard({
   const { t, messages } = useI18n();
   const qc = useQueryClient();
   const addMissing = useMutation({
-    mutationFn: () => api.shoppingList.addMany(recipe.missing),
+    mutationFn: async () => {
+      for (const name of recipe.missing) await api.shoppingList.add({ name });
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.shoppingList }),
   });
 

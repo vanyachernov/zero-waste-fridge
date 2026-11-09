@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup, configure } from "@testing-library/react";
-import { configureApi, mockAuthControl, mockFridgeControl } from "@zwf/api-client";
+import { configureApi, mockAuthControl, mockFridgeControl, mockShoppingControl } from "@zwf/api-client";
 import { afterEach, beforeEach, vi } from "vitest";
 
 // ---------- Поліфіли того, чого немає в jsdom ----------
@@ -83,6 +83,7 @@ beforeEach(() => {
   mediaListeners.clear();
   mockAuthControl.reset();
   mockFridgeControl.reset();
+  mockShoppingControl.reset();
   configureApi({ mock: true });
 });
 
