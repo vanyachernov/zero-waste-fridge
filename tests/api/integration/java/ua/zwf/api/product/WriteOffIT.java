@@ -57,7 +57,8 @@ class WriteOffIT extends IntegrationTest {
 
 		assertThat(map(rest.json(), "product")).containsEntry("status", "CONSUMED").containsEntry("quantity", 250);
 		assertThat(map(rest.json(), "writtenOff")).containsEntry("quantity", 250).containsEntry("closed", true);
-		assertThat(rest.json()).containsEntry("addedToShoppingList", false);
+		// B-40: «Додати до списку покупок» створює позицію WRITE_OFF
+		assertThat(rest.json()).containsEntry("addedToShoppingList", true);
 
 		// Зникає з холодильника, але лишається в історії
 		assertThat(ProductsIT.items(client.get("/api/products"))).isEmpty();

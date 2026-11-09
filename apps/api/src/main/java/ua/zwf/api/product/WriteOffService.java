@@ -25,8 +25,11 @@ public class WriteOffService {
 
 	private final Today today;
 
+	private final WriteOffListener listener;
+
 	public WriteOffService(ProductService products, ProductEventRepository events, UserRepository users, Clock clock,
-			Today today) {
+			Today today, WriteOffListener listener) {
+		this.listener = listener;
 		this.products = products;
 		this.events = events;
 		this.users = users;
@@ -46,9 +49,12 @@ public class WriteOffService {
 		BigDecimal written = product.writeOff(request.outcome(), amount, now);
 		events.save(ProductEvent.writtenOff(product, users.getReferenceById(userId), request.outcome(), written, now));
 
+		boolean inShoppingList = listener.afterWriteOff(product, userId, request.outcome(), written,
+				Boolean.TRUE.equals(request.addToShoppingList()));
+
 		var writtenOff = new WriteOffResponse.WrittenOff(request.outcome(), ProductResponse.plain(written),
 				product.getUnit(), !product.isActive());
-		return new WriteOffResponse(ProductResponse.of(product, today.date()), writtenOff, false);
+		return new WriteOffResponse(ProductResponse.of(product, today.date()), writtenOff, inShoppingList);
 	}
 
 	/** {@code null} — списати все. */
