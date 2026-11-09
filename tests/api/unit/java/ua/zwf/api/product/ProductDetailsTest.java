@@ -68,6 +68,15 @@ class ProductDetailsTest {
 	}
 
 	@Test
+	void timestampsAreTruncatedToDatabasePrecision() {
+		var now = Instant.parse("2026-11-09T10:00:00.123456789Z");
+		var product = new Product(new Household("Сім'я", now), null, yogurt(), now);
+
+		assertThat(product.getCreatedAt()).isEqualTo(Instant.parse("2026-11-09T10:00:00.123456Z"));
+		assertThat(product.getUpdatedAt()).isEqualTo(Instant.parse("2026-11-09T10:00:00.123456Z"));
+	}
+
+	@Test
 	void applyReplacesEditableFields() {
 		var created = Instant.parse("2026-11-09T10:00:00Z");
 		var product = new Product(new Household("Сім'я", created), null, yogurt(), created);
