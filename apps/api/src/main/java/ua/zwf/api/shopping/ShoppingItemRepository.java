@@ -11,10 +11,10 @@ import org.springframework.data.repository.query.Param;
 
 public interface ShoppingItemRepository extends JpaRepository<ShoppingItem, UUID> {
 
-	@EntityGraph(attributePaths = { "addedBy", "boughtBy", "sourceProduct" })
+	@EntityGraph(attributePaths = { "addedBy", "boughtBy", "sourceProduct", "store" })
 	List<ShoppingItem> findByHouseholdId(UUID householdId);
 
-	@EntityGraph(attributePaths = { "addedBy", "boughtBy", "sourceProduct" })
+	@EntityGraph(attributePaths = { "addedBy", "boughtBy", "sourceProduct", "store" })
 	Optional<ShoppingItem> findByIdAndHouseholdId(UUID id, UUID householdId);
 
 	/** Не дублюємо: та сама назва (без регістру) уже чекає на покупку. */

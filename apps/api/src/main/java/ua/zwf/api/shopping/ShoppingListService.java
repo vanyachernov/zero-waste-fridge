@@ -33,23 +33,34 @@ public class ShoppingListService implements WriteOffListener {
 
 	private final ShoppingItemRepository items;
 
+	private final StoreRepository stores;
+
 	private final HouseholdRepository households;
 
 	private final UserRepository users;
 
 	private final Clock clock;
 
-	public ShoppingListService(ShoppingItemRepository items, HouseholdRepository households, UserRepository users,
-			Clock clock) {
+	public ShoppingListService(ShoppingItemRepository items, StoreRepository stores, HouseholdRepository households,
+			UserRepository users, Clock clock) {
 		this.items = items;
+		this.stores = stores;
 		this.households = households;
 		this.users = users;
 		this.clock = clock;
 	}
 
+	/**
+	 * Фільтри екрана «Всі / Сільпо / З холодильника»: {@code storeId} — позиції магазину,
+	 * {@code fromFridge} — ті, що з'явились після списання (Smart Sync або «Додати до списку»).
+	 */
 	@Transactional(readOnly = true)
-	public ShoppingListResponse list(UUID householdId) {
-		var all = items.findByHouseholdId(householdId);
+	public ShoppingListResponse list(UUID householdId, UUID storeId, boolean fromFridge) {
+		var all = items.findByHouseholdId(householdId)
+			.stream()
+			.filter(i -> storeId == null || (i.getStore() != null && storeId.equals(i.getStore().getId())))
+			.filter(i -> !fromFridge || i.getSource() == ShoppingSource.AUTO || i.getSource() == ShoppingSource.WRITE_OFF)
+			.toList();
 		var toBuy = all.stream().filter(i -> !i.isBought()).sorted(TO_BUY).map(ShoppingItemResponse::of).toList();
 		var bought = all.stream().filter(ShoppingItem::isBought).sorted(BOUGHT).map(ShoppingItemResponse::of).toList();
 		return new ShoppingListResponse(toBuy, bought);
@@ -59,8 +70,10 @@ public class ShoppingListService implements WriteOffListener {
 	public ShoppingItemResponse create(UUID householdId, UUID userId, ShoppingItemInput input) {
 		var details = new Values(input.getName(), input.getQuantity(), input.getUnit(), input.getCategory(),
 				input.getPriority(), input.getPriceEstimate()).validate();
-		var item = items.save(new ShoppingItem(households.getReferenceById(householdId), users.getReferenceById(userId),
-				ShoppingSource.MANUAL, null, details, clock.instant()));
+		var item = new ShoppingItem(households.getReferenceById(householdId), users.getReferenceById(userId),
+				ShoppingSource.MANUAL, null, details, clock.instant());
+		item.moveTo(store(householdId, input.getStoreId()), clock.instant());
+		items.save(item);
 		items.flush();
 		return ShoppingItemResponse.of(find(householdId, item.getId()));
 	}
@@ -77,6 +90,9 @@ public class ShoppingListService implements WriteOffListener {
 				input.has("priority") ? input.getPriority() : current.priority(),
 				input.has("priceEstimate") ? input.getPriceEstimate() : current.priceEstimate()).validate();
 		item.apply(details, clock.instant());
+		if (input.has("storeId")) {
+			item.moveTo(store(householdId, input.getStoreId()), clock.instant());
+		}
 		items.flush();
 		return ShoppingItemResponse.of(item);
 	}
@@ -123,6 +139,15 @@ public class ShoppingListService implements WriteOffListener {
 				product.getCategory(), ShoppingPriority.NORMAL, null);
 		return items.save(new ShoppingItem(product.getHousehold(), userId == null ? null : users.getReferenceById(userId),
 				source, product, details, clock.instant()));
+	}
+
+	/** Магазин має належати тому самому домогосподарству — інакше помилка поля, а не 404. */
+	private Store store(UUID householdId, UUID storeId) {
+		if (storeId == null) {
+			return null;
+		}
+		return stores.findByIdAndHouseholdId(storeId, householdId)
+			.orElseThrow(() -> new ValidationException(Map.of("storeId", "INVALID")));
 	}
 
 	ShoppingItem find(UUID householdId, UUID itemId) {

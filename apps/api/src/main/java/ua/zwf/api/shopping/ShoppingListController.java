@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ua.zwf.api.auth.AppUserPrincipal;
 import ua.zwf.api.household.CurrentHousehold;
@@ -31,10 +32,12 @@ class ShoppingListController {
 		this.household = household;
 	}
 
-	@Operation(summary = "Shared shopping list: to buy and bought")
+	@Operation(summary = "Shared shopping list: to buy and bought; filters by store or items from the fridge")
 	@GetMapping
-	ShoppingListResponse list(@AuthenticationPrincipal AppUserPrincipal principal) {
-		return service.list(household.idOf(principal.id()));
+	ShoppingListResponse list(@AuthenticationPrincipal AppUserPrincipal principal,
+			@RequestParam(required = false) UUID store,
+			@RequestParam(defaultValue = "false") boolean fromFridge) {
+		return service.list(household.idOf(principal.id()), store, fromFridge);
 	}
 
 	@Operation(summary = "Add an item")
