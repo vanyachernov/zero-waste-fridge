@@ -176,6 +176,8 @@ class ShoppingListIT extends IntegrationTest {
 		assertThat(source).containsEntry("id", yogurt).containsEntry("name", "Грецький йогурт");
 		assertThat(source.get("closedAt")).isNotNull();
 
+		// Без прапорця і з вимкненим Smart Sync (B-43) — нічого не додається
+		client.send("PUT", "/api/shopping-list/settings", Map.of("autoRefill", false));
 		var withoutFlag = Products.create(client, Products.product("Кефір", "dairy", 2)).get("id");
 		assertThat(client.post("/api/products/" + withoutFlag + "/write-off", Map.of("outcome", "EATEN")).json())
 			.containsEntry("addedToShoppingList", false);
