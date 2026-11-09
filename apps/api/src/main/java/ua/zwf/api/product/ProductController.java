@@ -26,10 +26,13 @@ class ProductController {
 
 	private final ProductService service;
 
+	private final WriteOffService writeOffs;
+
 	private final CurrentHousehold household;
 
-	ProductController(ProductService service, CurrentHousehold household) {
+	ProductController(ProductService service, WriteOffService writeOffs, CurrentHousehold household) {
 		this.service = service;
+		this.writeOffs = writeOffs;
 		this.household = household;
 	}
 
@@ -67,7 +70,14 @@ class ProductController {
 	@PatchMapping("/{id}")
 	ProductResponse update(@AuthenticationPrincipal AppUserPrincipal principal, @PathVariable UUID id,
 			@RequestBody ProductInput input) {
-		return service.update(household.idOf(principal.id()), id, input);
+		return service.update(household.idOf(principal.id()), principal.id(), id, input);
+	}
+
+	@Operation(summary = "Write off a product: eaten, cooked or wasted; all or part of it")
+	@PostMapping("/{id}/write-off")
+	WriteOffResponse writeOff(@AuthenticationPrincipal AppUserPrincipal principal, @PathVariable UUID id,
+			@RequestBody WriteOffRequest request) {
+		return writeOffs.writeOff(household.idOf(principal.id()), principal.id(), id, request);
 	}
 
 }
