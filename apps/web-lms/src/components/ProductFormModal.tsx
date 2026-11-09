@@ -207,7 +207,7 @@ export function ProductFormModal({ open, onClose, product }: ProductFormModalPro
             <div className="flex gap-2">
               <Input
                 id={`${formId}-quantity`}
-                className="w-24 shrink-0"
+                className="w-[84px] shrink-0"
                 inputMode="decimal"
                 value={form.quantity}
                 invalid={Boolean(errors.quantity)}
