@@ -127,6 +127,24 @@ class ProductPersistenceIT extends IntegrationTest {
 	}
 
 	@Test
+	void openedProductKeepsShelfLifeSnapshot() {
+		var f = fixture();
+		var id = save(f, milk());
+
+		tx.executeWithoutResult(status -> products.findById(id).orElseThrow().open(TODAY.plusDays(1), 3, NOW));
+
+		var row = jdbc.queryForMap("select opened_at, opened_shelf_life_days, effective_expires_at from product where id = ?",
+				id);
+		assertThat(row.get("opened_at")).hasToString("2026-11-10");
+		assertThat(row.get("opened_shelf_life_days")).isEqualTo(3);
+		assertThat(row.get("effective_expires_at")).hasToString("2026-11-13");
+
+		// Дата відкриття без терміну (і навпаки) — неузгоджений рядок
+		assertThatThrownBy(() -> jdbc.update("update product set opened_shelf_life_days = null where id = ?", id))
+			.isInstanceOf(DataIntegrityViolationException.class);
+	}
+
+	@Test
 	void activeExpiryIndexExists() {
 		var indexes = jdbc.queryForList("select indexname from pg_indexes where tablename = 'product'", String.class);
 		assertThat(indexes).contains("product_household_expiry_ix", "product_household_created_ix");

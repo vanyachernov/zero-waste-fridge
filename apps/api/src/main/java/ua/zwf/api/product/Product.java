@@ -72,6 +72,9 @@ public class Product {
 	@Column(name = "opened_at")
 	private LocalDate openedAt;
 
+	@Column(name = "opened_shelf_life_days")
+	private Short openedShelfLifeDays;
+
 	@Column(name = "effective_expires_at", nullable = false)
 	private LocalDate effectiveExpiresAt;
 
@@ -114,8 +117,52 @@ public class Product {
 		this.purchasedAt = details.purchasedAt();
 		this.expiresAt = details.expiresAt();
 		this.remindBeforeDays = (short) details.remindBeforeDays();
-		this.effectiveExpiresAt = details.expiresAt();
+		if (openedAt != null && purchasedAt != null && openedAt.isBefore(purchasedAt)) {
+			throw new IllegalArgumentException("openedAt must not be before purchasedAt");
+		}
+		recalculateEffectiveExpiry();
 		this.updatedAt = now;
+	}
+
+	/**
+	 * B-12: упаковку відкрито. Термін скорочується до {@code min(expiresAt, openedAt + shelfLifeDays)};
+	 * якщо на упаковці дата раніша — лишається вона.
+	 */
+	public void open(LocalDate openedAt, int shelfLifeDays, Instant now) {
+		Objects.requireNonNull(openedAt, "openedAt");
+		if (shelfLifeDays < 1 || shelfLifeDays > 365) {
+			throw new IllegalArgumentException("shelfLifeDays must be 1..365");
+		}
+		if (purchasedAt != null && openedAt.isBefore(purchasedAt)) {
+			throw new IllegalArgumentException("openedAt must not be before purchasedAt");
+		}
+		this.openedAt = openedAt;
+		this.openedShelfLifeDays = (short) shelfLifeDays;
+		recalculateEffectiveExpiry();
+		this.updatedAt = now;
+	}
+
+	/** Позначку «відкрито» знято (помилково поставили) — знову діє дата з упаковки. */
+	public void unopen(Instant now) {
+		this.openedAt = null;
+		this.openedShelfLifeDays = null;
+		recalculateEffectiveExpiry();
+		this.updatedAt = now;
+	}
+
+	public boolean isOpened() {
+		return openedAt != null;
+	}
+
+	private void recalculateEffectiveExpiry() {
+		LocalDate effective = expiresAt;
+		if (openedAt != null) {
+			LocalDate afterOpening = openedAt.plusDays(openedShelfLifeDays);
+			if (afterOpening.isBefore(effective)) {
+				effective = afterOpening;
+			}
+		}
+		this.effectiveExpiresAt = effective;
 	}
 
 	public ProductDetails details() {
@@ -172,6 +219,10 @@ public class Product {
 
 	public LocalDate getOpenedAt() {
 		return openedAt;
+	}
+
+	public Integer getOpenedShelfLifeDays() {
+		return openedShelfLifeDays == null ? null : openedShelfLifeDays.intValue();
 	}
 
 	public LocalDate getEffectiveExpiresAt() {
