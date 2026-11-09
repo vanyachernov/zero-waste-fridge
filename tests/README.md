@@ -66,6 +66,7 @@ pnpm --filter @zwf/api test
 - Інтеграційні тести рендерять увесь застосунок через `renderApp(path, { signedIn })`: справжній роутер з `basepath /lms`, TanStack Query, i18n і `@zwf/api-client` у режимі мока. Стан мок-бекенду скидається перед кожним тестом.
 - Шукаємо елементи так, як їх бачить користувач (`getByRole`, `getByLabelText`). Це заодно перевіряє доступність.
 - Моки зобов'язані поводитися як бекенд (`tests/web-lms/unit/api-client/mock-auth.test.ts`), інакше UI, перевірений на моках, зламається з реальним API.
+- Режим «справжній auth + моки даних» (`VITE_API_MOCK=data`) перевіряється через `support/fake-auth-backend.ts`: підмінений `fetch` відповідає як Spring Boot (CSRF-cookie, `X-XSRF-TOKEN`, сесія, ProblemDetail з `code`). Рендер: `renderApp(path, { mock: ["data"] })`.
 
 ### Бекенд
 

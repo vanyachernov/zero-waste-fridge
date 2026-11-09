@@ -171,8 +171,19 @@ export const mockAuth = {
   },
 };
 
+/**
+ * Коли auth справжній, а дані на моках (`VITE_API_MOCK=data`), сесію перевіряє Spring Boot:
+ * мок-сесії тоді немає, і моки даних не повинні вимагати її.
+ */
+let sessionRequired = true;
+
+export function setMockSessionRequired(required: boolean) {
+  sessionRequired = required;
+}
+
 /** Як Spring Security для `/api/**`: без сесії — 401. */
 export function requireMockSession() {
+  if (!sessionRequired) return;
   if (!session || !accounts.has(session)) throw new ApiError(401, "Unauthorized");
 }
 

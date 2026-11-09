@@ -2,7 +2,7 @@ import { createMemoryHistory } from "@tanstack/react-router";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { configureApi, mockAuthControl } from "@zwf/api-client";
+import { configureApi, mockAuthControl, type MockMode } from "@zwf/api-client";
 import { I18nProvider } from "@zwf/i18n/react";
 import type { ReactElement } from "react";
 import { expect } from "vitest";
@@ -13,11 +13,11 @@ import { createAppRouter } from "@lms/router";
  * Інтеграційний рендер усього SPA: справжній роутер (basepath /lms, memory history), TanStack Query,
  * i18n і api-client у режимі мок-бекенду — той самий шлях, що й `pnpm dev` з `VITE_API_MOCK=true`.
  */
-export function renderApp(path = "/", options: { signedIn?: boolean } = {}) {
+export function renderApp(path = "/", options: { signedIn?: boolean; mock?: MockMode } = {}) {
   if (options.signedIn) mockAuthControl.signIn();
   const queryClient = createQueryClient();
   const router = createAppRouter(queryClient, { history: createMemoryHistory({ initialEntries: [`/lms${path}`] }) });
-  configureApi({ mock: true, onUnauthorized: createUnauthorizedHandler(router, queryClient) });
+  configureApi({ mock: options.mock ?? true, onUnauthorized: createUnauthorizedHandler(router, queryClient) });
   const user = userEvent.setup();
   const view = render(<AppProviders router={router} queryClient={queryClient} />);
   return { ...view, router, queryClient, user, path: () => router.state.location.href };
