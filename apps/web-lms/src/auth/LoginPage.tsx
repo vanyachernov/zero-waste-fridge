@@ -61,7 +61,16 @@ export function LoginPage() {
         </div>
 
         <div className="flex flex-col gap-3">
-          <Button variant="outline" className="w-full" aria-expanded={joinNotice} onClick={() => setJoinNotice((v) => !v)}>
+          <Button
+            variant="outline"
+            className="w-full"
+            aria-expanded={joinNotice}
+            onClick={() => {
+              setJoinNotice(true);
+              // Після входу чи реєстрації одразу відкриється форма коду (F-61)
+              void navigate({ search: (prev) => ({ ...prev, redirect: "/join" }), replace: true });
+            }}
+          >
             <Users className="size-4" aria-hidden /> {t("auth.joinCode")}
           </Button>
           {joinNotice && (

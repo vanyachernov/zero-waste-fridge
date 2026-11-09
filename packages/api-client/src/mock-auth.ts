@@ -11,34 +11,33 @@ export const DEMO_ACCOUNT = { email: "olena@example.com", password: "Secret-pass
 const SESSION_KEY = "zwf.mock.session";
 const delay = (ms = 200) => new Promise((r) => setTimeout(r, ms));
 
-interface Account {
+export interface MockAccount {
   user: CurrentUser;
   password: string;
+  joinedAt: string;
 }
+type Account = MockAccount;
 
 let accounts = new Map<string, Account>();
 let session: string | null = null;
 let resetTokens = new Map<string, string>();
 let lastResetLink: string | null = null;
-let seq = 1;
+let seq = 100;
 
+/** Демо-сім'я «Кравченки» з макета «Моя сім'я»: Олена — власниця, Максим і Софія — члени сім'ї. */
 function seed() {
+  const member = (id: string, name: string, email: string, role: CurrentUser["role"], joinedAt: string): [string, Account] => [
+    email,
+    {
+      password: DEMO_ACCOUNT.password,
+      joinedAt,
+      user: { id, name, email, avatarUrl: null, householdId: "h1", householdName: "Сім'я Кравченко", role },
+    },
+  ];
   accounts = new Map([
-    [
-      DEMO_ACCOUNT.email,
-      {
-        password: DEMO_ACCOUNT.password,
-        user: {
-          id: "u1",
-          name: "Олена Кравченко",
-          email: DEMO_ACCOUNT.email,
-          avatarUrl: null,
-          householdId: "h1",
-          householdName: "Сім'я Кравченко",
-          role: "OWNER",
-        },
-      },
-    ],
+    member("u1", "Олена Кравченко", DEMO_ACCOUNT.email, "OWNER", "2026-01-10T09:00:00Z"),
+    member("u2", "Максим Кравченко", "maksym@example.com", "MEMBER", "2026-01-11T09:00:00Z"),
+    member("u3", "Софія Кравченко", "sofia@example.com", "MEMBER", "2026-01-12T09:00:00Z"),
   ]);
   resetTokens = new Map();
   lastResetLink = null;
@@ -135,7 +134,7 @@ export const mockAuth = {
       householdName: householdName(cleanName),
       role: "OWNER",
     };
-    accounts.set(key, { user, password });
+    accounts.set(key, { user, password, joinedAt: new Date().toISOString() });
     writeSession(key);
     return { ...user };
   },
@@ -196,11 +195,23 @@ export function mockSessionUser(): CurrentUser | null {
   return account ? { ...account.user } : null;
 }
 
+/** Доступ до акаунтів для моку сім'ї (B-50…B-55): учасники, ролі, переходи між домогосподарствами. */
+export const mockAccounts = {
+  all: () => [...accounts.values()],
+  byId: (id: string) => [...accounts.values()].find((a) => a.user.id === id),
+  byEmail: (email: string) => accounts.get(normalize(email)),
+  nextHouseholdId: () => `h${++seq}`,
+  /** Видалений або переміщений користувач і далі залогінений — як і на бекенді. */
+  endSessionsOf: (email: string) => {
+    if (session === email) writeSession(null);
+  },
+};
+
 /** Хелпери лише для тестів і dev-інструментів. */
 export const mockAuthControl = {
   reset() {
     writeSession(null);
-    seq = 1;
+    seq = 100;
     seed();
   },
   lastResetLink: () => lastResetLink,

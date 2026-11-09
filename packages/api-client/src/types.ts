@@ -246,4 +246,79 @@ export interface ShoppingSummary {
   autoCount: number;
 }
 
+// ---------- Сім'я (B-50…B-55) ----------
+
+/** Дії з матриці «Ролі та права доступу». */
+export type HouseholdPermission =
+  | "VIEW_FRIDGE"
+  | "EDIT_PRODUCTS"
+  | "GENERATE_RECIPES"
+  | "SHOPPING_LIST"
+  | "RECEIVE_REMINDERS"
+  | "MANAGE_MEMBERS"
+  | "CHANGE_ROLES"
+  | "DELETE_HOUSEHOLD"
+  | "RENAME_HOUSEHOLD";
+
+export interface Household {
+  id: string;
+  name: string;
+  createdAt: string;
+  memberCount: number;
+  role: HouseholdRole;
+  /** Фронтенд ховає недоступні дії за правами, а не за назвою ролі (F-62). */
+  permissions: HouseholdPermission[];
+}
+
+export type ActivityType = "PRODUCT_ADDED" | "PRODUCT_UPDATED" | "PRODUCT_OPENED" | "PRODUCT_WRITTEN_OFF" | "SHOPPING_ADDED" | "SHOPPING_BOUGHT";
+
+/** Запис стрічки «Остання дія» (B-53). */
+export interface ActivityEntry {
+  type: ActivityType;
+  at: string;
+  actor: Person | null;
+  subject: { kind: "PRODUCT" | "SHOPPING_ITEM"; id: string | null; name: string };
+  outcome: WriteOffOutcome | null;
+  quantity: number | null;
+  unit: Unit | null;
+}
+
+export interface ActivityPage {
+  items: ActivityEntry[];
+  /** Передати як `before`, щоб отримати старіші; `null` — кінець. */
+  nextBefore: string | null;
+}
+
+export interface Member {
+  /** id користувача. */
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl: string | null;
+  role: HouseholdRole;
+  joinedAt: string;
+  me: boolean;
+  lastActivity: ActivityEntry | null;
+}
+
+export interface Invite {
+  id: string;
+  email: string;
+  role: HouseholdRole;
+  invitedBy: string | null;
+  createdAt: string;
+  expiresAt: string;
+  /** Лист не дійшов — запрошення все одно створено. */
+  emailSent: boolean;
+}
+
+/** Код сім'ї `ZWF-XXXX-XX`; `code = null` — коду немає або він прострочений. */
+export interface FamilyCode {
+  code: string | null;
+  expiresAt: string | null;
+}
+
+/** Вступ: або код сім'ї, або токен із посилання в листі. */
+export type JoinRequest = { code: string; invite?: never } | { invite: string; code?: never };
+
 export type DiscardReason = "eaten" | "spoiled" | "donated";

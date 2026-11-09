@@ -22,9 +22,9 @@ describe("parseMockMode", () => {
     expect(parseMockMode(" recipes , auth,recipes ")).toEqual(["recipes", "auth"]);
   });
 
-  it("data means everything except auth", () => {
-    expect(parseMockMode("data")).toEqual(["fridge", "shopping", "household", "recipes"]);
-    expect(parseMockMode("auth,data")).toEqual(["auth", "fridge", "shopping", "household", "recipes"]);
+  it("data means products, shopping list and recipes (auth and family stay real)", () => {
+    expect(parseMockMode("data")).toEqual(["fridge", "shopping", "recipes"]);
+    expect(parseMockMode("auth,data,household")).toEqual(["auth", "fridge", "shopping", "recipes", "household"]);
   });
 
   it("fails loudly on a typo instead of silently hitting the real backend", () => {

@@ -1,7 +1,8 @@
 import type { CurrentUser } from "@zwf/api-client";
 import { useI18n } from "@zwf/i18n/react";
 import { Badge, cn } from "@zwf/ui";
-import { Leaf, Loader2, LogOut, Monitor, Moon, Settings, Sun, Users } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Leaf, Loader2, LogOut, Monitor, Moon, Settings, Sun, UserPlus, Users } from "lucide-react";
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { useTheme, type ThemePreference } from "../lib/theme";
 
@@ -127,10 +128,25 @@ export function ProfileMenu({ user, onLogout, logoutPending = false, logoutError
           </div>
 
           <div className="py-1">
-            {[
-              { icon: Users, label: t("profile.family") },
-              { icon: Settings, label: t("profile.settings") },
-            ].map(({ icon: Icon, label }) => (
+            <Link
+              to="/family"
+              role="menuitem"
+              tabIndex={-1}
+              onClick={() => close(false)}
+              className="flex items-center gap-3 px-4 py-2 text-sm text-on-surface outline-none hover:bg-surface-container-low focus:bg-surface-container-low"
+            >
+              <Users className="size-4" aria-hidden /> {t("profile.family")}
+            </Link>
+            <Link
+              to="/join"
+              role="menuitem"
+              tabIndex={-1}
+              onClick={() => close(false)}
+              className="flex items-center gap-3 px-4 py-2 text-sm text-on-surface outline-none hover:bg-surface-container-low focus:bg-surface-container-low"
+            >
+              <UserPlus className="size-4" aria-hidden /> {t("profile.joinFamily")}
+            </Link>
+            {[{ icon: Settings, label: t("profile.settings") }].map(({ icon: Icon, label }) => (
               <div
                 key={label}
                 role="menuitem"

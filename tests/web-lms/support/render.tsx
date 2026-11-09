@@ -1,4 +1,4 @@
-import { createMemoryHistory } from "@tanstack/react-router";
+import { createMemoryHistory, createRootRoute, createRouter, RouterProvider } from "@tanstack/react-router";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -33,6 +33,22 @@ export function renderWithProviders(ui: ReactElement) {
     </I18nProvider>,
   );
   return { ...view, queryClient, user };
+}
+
+/** Компонент, якому потрібні `<Link>` (меню профілю): мінімальний роутер навколо нього. */
+export function renderInRouter(ui: ReactElement) {
+  const queryClient = createQueryClient();
+  const rootRoute = createRootRoute({ component: () => ui });
+  const router = createRouter({ routeTree: rootRoute, history: createMemoryHistory({ initialEntries: ["/"] }) });
+  const user = userEvent.setup();
+  const view = render(
+    <I18nProvider locale="uk">
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </I18nProvider>,
+  );
+  return { ...view, router, user };
 }
 
 export async function waitForPath(router: { state: { location: { href: string } } }, expected: string) {

@@ -2,7 +2,7 @@ import { screen, within } from "@testing-library/react";
 import type { CurrentUser } from "@zwf/api-client";
 import { describe, expect, it, vi } from "vitest";
 import { initials, ProfileMenu } from "@lms/routes/ProfileMenu";
-import { renderWithProviders } from "../support/render";
+import { renderInRouter as renderWithProviders } from "../support/render";
 
 const user: CurrentUser = {
   id: "u1",
@@ -24,9 +24,9 @@ describe("initials", () => {
 });
 
 describe("ProfileMenu", () => {
-  it("shows name, hero badge and initials on the trigger", () => {
+  it("shows name, hero badge and initials on the trigger", async () => {
     renderWithProviders(<ProfileMenu user={user} onLogout={vi.fn()} />);
-    const trigger = screen.getByRole("button", { name: "Меню профілю" });
+    const trigger = await screen.findByRole("button", { name: "Меню профілю" });
 
     expect(trigger).toHaveAttribute("aria-haspopup", "menu");
     expect(trigger).toHaveAttribute("aria-expanded", "false");
@@ -35,34 +35,35 @@ describe("ProfileMenu", () => {
     expect(trigger).toHaveTextContent("ОК");
   });
 
-  it("opens with email, household and role; unfinished sections are disabled", async () => {
+  it("opens with email, household and role; family links work, settings are still disabled", async () => {
     const { user: u } = renderWithProviders(<ProfileMenu user={user} onLogout={vi.fn()} />);
 
-    await u.click(screen.getByRole("button", { name: "Меню профілю" }));
+    await u.click(await screen.findByRole("button", { name: "Меню профілю" }));
 
     const menu = screen.getByRole("menu", { name: "Меню профілю" });
     expect(within(menu).getByText("olena@example.com")).toBeVisible();
     expect(within(menu).getByText("Сім'я Кравченко")).toBeVisible();
     expect(within(menu).getByText("Власник")).toBeVisible();
-    expect(within(menu).getByRole("menuitem", { name: /Моя сім'я/ })).toHaveAttribute("aria-disabled", "true");
+    expect(within(menu).getByRole("menuitem", { name: /Моя сім'я/ })).toHaveAttribute("href", "/family");
+    expect(within(menu).getByRole("menuitem", { name: /Приєднатися до сім'ї/ })).toHaveAttribute("href", "/join");
     expect(within(menu).getByRole("menuitem", { name: /Налаштування/ })).toHaveAttribute("aria-disabled", "true");
-    expect(screen.getByRole("button", { name: "Меню профілю" })).toHaveAttribute("aria-expanded", "true");
+    expect((await screen.findByRole("button", { name: "Меню профілю" }))).toHaveAttribute("aria-expanded", "true");
   });
 
   it("member role is labelled as Член сім'ї", async () => {
     const { user: u } = renderWithProviders(<ProfileMenu user={{ ...user, role: "MEMBER" }} onLogout={vi.fn()} />);
-    await u.click(screen.getByRole("button", { name: "Меню профілю" }));
+    await u.click(await screen.findByRole("button", { name: "Меню профілю" }));
     expect(screen.getByText("Член сім'ї")).toBeVisible();
   });
 
   it("keyboard: ArrowDown opens and focuses the first enabled item, arrows cycle, Escape returns focus", async () => {
     const { user: u } = renderWithProviders(<ProfileMenu user={user} onLogout={vi.fn()} />);
-    const trigger = screen.getByRole("button", { name: "Меню профілю" });
+    const trigger = await screen.findByRole("button", { name: "Меню профілю" });
 
     trigger.focus();
     await u.keyboard("{ArrowDown}");
 
-    expect(screen.getByRole("menuitemradio", { name: "Світла" })).toHaveFocus();
+    expect(screen.getByRole("menuitem", { name: /Моя сім'я/ })).toHaveFocus();
     await u.keyboard("{ArrowUp}");
     expect(screen.getByRole("menuitem", { name: "Вийти" })).toHaveFocus();
     await u.keyboard("{Escape}");
@@ -77,7 +78,7 @@ describe("ProfileMenu", () => {
         <p>outside</p>
       </div>,
     );
-    await u.click(screen.getByRole("button", { name: "Меню профілю" }));
+    await u.click((await screen.findByRole("button", { name: "Меню профілю" })));
 
     await u.click(screen.getByText("outside"));
 
@@ -86,7 +87,7 @@ describe("ProfileMenu", () => {
 
   it("theme radios switch the theme", async () => {
     const { user: u } = renderWithProviders(<ProfileMenu user={user} onLogout={vi.fn()} />);
-    await u.click(screen.getByRole("button", { name: "Меню профілю" }));
+    await u.click((await screen.findByRole("button", { name: "Меню профілю" })));
 
     expect(screen.getByRole("menuitemradio", { name: "Системна" })).toHaveAttribute("aria-checked", "true");
     await u.click(screen.getByRole("menuitemradio", { name: "Темна" }));
@@ -98,7 +99,7 @@ describe("ProfileMenu", () => {
   it("logout item calls the handler", async () => {
     const onLogout = vi.fn();
     const { user: u } = renderWithProviders(<ProfileMenu user={user} onLogout={onLogout} />);
-    await u.click(screen.getByRole("button", { name: "Меню профілю" }));
+    await u.click((await screen.findByRole("button", { name: "Меню профілю" })));
 
     await u.click(screen.getByRole("menuitem", { name: "Вийти" }));
 
@@ -109,7 +110,7 @@ describe("ProfileMenu", () => {
     const { user: u } = renderWithProviders(
       <ProfileMenu user={user} onLogout={vi.fn()} logoutPending logoutError="Немає з'єднання" />,
     );
-    await u.click(screen.getByRole("button", { name: "Меню профілю" }));
+    await u.click((await screen.findByRole("button", { name: "Меню профілю" })));
 
     expect(screen.getByRole("menuitem", { name: "Вийти" })).toBeDisabled();
     expect(screen.getByRole("alert")).toHaveTextContent("Немає з'єднання");
