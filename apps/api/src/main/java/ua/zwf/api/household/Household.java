@@ -33,6 +33,10 @@ public class Household {
 		this.createdAt = now;
 	}
 
+	public void rename(String name) {
+		this.name = Objects.requireNonNull(name);
+	}
+
 	public UUID getId() {
 		return id;
 	}
