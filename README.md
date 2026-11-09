@@ -205,7 +205,7 @@ SPRING_PROFILES_ACTIVE=prod DB_URL=jdbc:postgresql://host:5432/zwf DB_USER=zwf D
 | `POST /api/products` | 201 + продукт. Обов'язкові `name`, `category`, `quantity`, `unit`, `expiresAt`; `zone` за замовчуванням — типова для категорії, `remindBeforeDays` — 2 |
 | `GET /api/products/{id}` | продукт · 404 `PRODUCT_NOT_FOUND` |
 | `PATCH /api/products/{id}` | продукт. Відсутнє поле не змінюється, `null` очищує `brand` / `purchasedAt` / `openedAt` · 409 `PRODUCT_CLOSED` для списаного |
-| `POST /api/products/{id}/write-off` `{outcome, quantity?, addToShoppingList?}` | `{product, writtenOff, addedToShoppingList}`. `outcome`: `EATEN`, `COOKED`, `WASTED`; `quantity`: `"all"` (за замовчуванням) або число · 400 `EXCEEDS_REMAINING` |
+| `POST /api/products/{id}/write-off` `{outcome, quantity?, addToShoppingList?}` | `{product, writtenOff, addedToShoppingList}`. `outcome`: `EATEN`, `COOKED`, `WASTED`; `quantity`: `"all"` (за замовчуванням) або число · 400 `EXCEEDS_REMAINING`. `addedToShoppingList: true`, якщо продукт тепер у списку покупок (за прапорцем або через Smart Sync) |
 | `GET /api/products/summary` | `{total, addedThisWeek, soon, today, expired}` |
 | `GET /api/tips/today` | `{date, kind, products, hint}` — продукти, що закінчуються сьогодні або завтра, та ідея страви |
 | `GET /api/dictionaries` | категорії, зони з температурою, одиниці, варіанти нагадування, терміни після відкриття |
@@ -215,6 +215,23 @@ SPRING_PROFILES_ACTIVE=prod DB_URL=jdbc:postgresql://host:5432/zwf DB_USER=zwf D
 - **Відкрита упаковка** (B-12): `effectiveExpiresAt = min(expiresAt, openedAt + днів після відкриття)`. Дні беруться з правил за назвою (йогурт — 5, молоко — 3), інакше з типового терміну категорії.
 - **Клієнт для фронтенду**: ручний `packages/api-client/openapi/openapi.yaml` застарів. В I-10 типи краще згенерувати orval з `/v3/api-docs` (там є всі ендпоінти вище).
 - **Помилки полів**: `NotNull`, `NotBlank`, `Size`, `Positive`, `Digits`, `NOT_ALLOWED`, `IN_FUTURE`, `BEFORE_PURCHASE`, `INVALID` (невідомий код, неправильна дата або query-параметр). Зламаний JSON — `MALFORMED_REQUEST`.
+
+## Список покупок (B-40…B-45)
+
+Спільний для всього домогосподарства. Позиції чужого домогосподарства — 404.
+
+| Метод і шлях | Відповідь |
+|---|---|
+| `GET /api/shopping-list?store=&fromFridge=` | `{toBuy, bought}`: спочатку високий пріоритет, далі в порядку додавання; куплені — останні зверху |
+| `POST /api/shopping-list` `{name, quantity?, unit?, category?, priority?, priceEstimate?, storeId?}` | 201 + позиція. Кількість і одиниця — разом або жодної |
+| `PATCH /api/shopping-list/{id}` | позиція (відсутнє поле — без змін, `null` — очистити) |
+| `DELETE /api/shopping-list/{id}` | 204 |
+| `POST /api/shopping-list/{id}/toggle` | позиція: куплено ↔ треба купити, з `boughtBy` |
+| `DELETE /api/shopping-list/bought` | `{deleted}` |
+| `POST /api/shopping-list/move-to-fridge` `{items?: [{id, expiresAt?, zone?, category?}]}` | `{moved, products}`. Без `items` — усі куплені. Термін за замовчуванням — `defaultShelfLifeDays` категорії. Усе або нічого |
+| `GET / PUT /api/shopping-list/settings` `{autoRefill, excludedCategories}` | Smart Sync: повністю списаний продукт → позиція `AUTO`. За замовчуванням увімкнено |
+| `GET / POST / DELETE /api/shopping-list/stores` | магазини домогосподарства · 409 `STORE_EXISTS` |
+| `GET /api/shopping-list/summary` | `{bought, total, estimatedTotal, autoCount}` |
 
 ### Пошта
 

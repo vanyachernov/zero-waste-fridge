@@ -105,6 +105,19 @@ public class ShoppingListService implements WriteOffListener {
 		items.delete(find(householdId, itemId));
 	}
 
+	/** B-45: одним запитом з умовними лічильниками. */
+	@Transactional(readOnly = true)
+	public ShoppingSummary summary(UUID householdId) {
+		// Агрегат без GROUP BY завжди дає рівно один рядок
+		Object[] row = items.summary(householdId).getFirst();
+		BigDecimal estimate = row[2] == null ? BigDecimal.ZERO : (BigDecimal) row[2];
+		return new ShoppingSummary(count(row[0]), count(row[1]), ShoppingItemResponse.plain(estimate), count(row[3]));
+	}
+
+	private static long count(Object value) {
+		return value == null ? 0 : ((Number) value).longValue();
+	}
+
 	/** B-41: повертає, скільки позицій прибрано. */
 	@Transactional
 	public int clearBought(UUID householdId) {
