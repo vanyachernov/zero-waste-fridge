@@ -112,6 +112,28 @@ const ICONS = {
   eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
   eyeOff:
     '<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/>',
+  bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  trash: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>',
+  scan: '<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/>',
+  list: '<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>',
+  grid: '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+  chevronDown: '<path d="m6 9 6 6 6-6"/>',
+  chevronRight: '<path d="m9 18 6-6-6-6"/>',
+  leaf: '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
+  package: '<path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
+  more: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+  sparkles: '<path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"/><path d="M19 3v4"/><path d="M21 5h-4"/>',
+  flame: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+  gauge: '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>',
+  cart: '<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>',
+  arrowRight: '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+  image: '<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/>',
+  bulb: '<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
+  checkCircle: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+  close: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98"/><path d="m15.41 6.51-6.82 3.98"/>',
 };
 
 // ---------------------------------------------------------------------------
@@ -214,22 +236,44 @@ function wrapText(t, w) {
   return t;
 }
 
-function icon(key, size, color, name) {
+const ICON_COMP = {}; // key → компонент-варіант набору «Icon»
+
+/** Компонент іконки 24×24 з векторів lucide; штрихи привʼязані до змінної on-surface. */
+function makeIconComponent(key) {
   const svg =
     '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
     ICONS[key] +
     "</svg>";
-  const n = figma.createNodeFromSvg(svg);
-  n.name = name || "Icon";
-  n.fills = [];
-  n.clipsContent = false;
-  n.rescale(size / 24);
-  n.findAll(function (x) {
+  const src = figma.createNodeFromSvg(svg);
+  const c = figma.createComponent();
+  c.name = "Name=" + key;
+  c.resize(24, 24);
+  c.fills = [];
+  c.clipsContent = false;
+  src.children.slice().forEach(function (ch) {
+    c.appendChild(ch);
+    if ("constraints" in ch) ch.constraints = { horizontal: "SCALE", vertical: "SCALE" };
+  });
+  src.remove();
+  recolor(c, "on-surface");
+  return c;
+}
+
+function recolor(node, color) {
+  node.findAll(function (x) {
     return "strokes" in x && x.strokes.length > 0;
   }).forEach(function (x) {
     x.strokes = [paint(color)];
   });
-  return n;
+}
+
+/** Екземпляр іконки потрібного розміру й кольору. */
+function icon(key, size, color, name) {
+  const inst = ICON_COMP[key].createInstance();
+  inst.name = name || "Icon";
+  inst.rescale(size / 24);
+  recolor(inst, color);
+  return inst;
 }
 
 function spacer() {
@@ -557,9 +601,9 @@ const FRESHNESS = [
 ];
 
 const STAT_TONES = {
-  Neutral: { title: "Усього продуктів", value: "24", unit: "шт.", hint: "+3 за тиждень", valueColor: "on-surface", hintColor: "primary" },
-  Warning: { title: "Скоро зіпсуються", value: "5", unit: "шт.", hint: "Використайте першими", valueColor: "on-warning-container", hintColor: "on-warning-container" },
-  Error: { title: "Прострочено", value: "2", unit: "шт.", hint: "Списати зі складу", valueColor: "error", hintColor: "error" },
+  Neutral: { title: "Усього продуктів", value: "24", unit: "шт.", hint: "+3 за тиждень", valueColor: "on-surface", hintColor: "primary", icon: "package" },
+  Warning: { title: "Скоро зіпсуються", value: "5", unit: "шт.", hint: "Використайте першими", valueColor: "on-warning-container", hintColor: "on-warning-container", icon: "clock" },
+  Error: { title: "Прострочено", value: "2", unit: "шт.", hint: "Списати зі складу", valueColor: "error", hintColor: "error", icon: "trash" },
 };
 
 async function makeStatCard(toneKey) {
@@ -570,7 +614,22 @@ async function makeStatCard(toneKey) {
   c.fills = [paint("surface-container-lowest")];
   stroke(c, "border");
   await c.setEffectStyleIdAsync(EFFECT_STYLE["Shadow/Card"].id);
-  c.appendChild(await text(t.title, "Label/Medium", "on-surface-variant", "Title"));
+  const head = stack("HORIZONTAL", "Header", 8, 0);
+  head.counterAxisAlignItems = "CENTER";
+  c.appendChild(head);
+  const title = await text(t.title, "Label/Medium", "on-surface-variant", "Title");
+  head.appendChild(title);
+  title.layoutGrow = 1;
+  const box = stack("HORIZONTAL", "Icon box", 0, 0);
+  box.primaryAxisAlignItems = "CENTER";
+  box.counterAxisAlignItems = "CENTER";
+  radius(box, "md");
+  stroke(box, "border");
+  box.appendChild(icon(t.icon, 16, "on-surface-variant", "Icon"));
+  box.resize(32, 32);
+  box.primaryAxisSizingMode = "FIXED";
+  box.counterAxisSizingMode = "FIXED";
+  head.appendChild(box);
   const row = stack("HORIZONTAL", "Value", 6, 0);
   row.counterAxisAlignItems = "BASELINE";
   row.appendChild(await text(t.value, "Heading/H1", t.valueColor, "Value"));
@@ -578,6 +637,7 @@ async function makeStatCard(toneKey) {
   c.appendChild(row);
   c.appendChild(await text(t.hint, "Caption/Strong", t.hintColor, "Hint"));
   fixWidth(c, 240);
+  head.layoutSizingHorizontal = "FILL";
   return c;
 }
 
@@ -646,6 +706,24 @@ function bindProp(set, nodeName, field, propId, skip) {
 async function buildComponents(page) {
   const entries = [];
 
+  // Icon (lucide) — один набір, Name = ключ іконки
+  {
+    const keys = Object.keys(ICONS);
+    const perRow = 12;
+    const cells = keys.map(function (k, i) {
+      const node = makeIconComponent(k);
+      ICON_COMP[k] = node;
+      return { node: node, r: Math.floor(i / perRow), c: i % perRow };
+    });
+    const set = combine(
+      "Icon",
+      cells,
+      "Іконки lucide 24×24, stroke 2. Колір — змінна on-surface (у кнопках/картках перевизначається). Розмір: 14/16/18/24.",
+      page,
+    );
+    entries.push({ title: "Icon", node: set, grid: arrange(set, cells, 20), rows: [], cols: [], note: set.description + "\nНабір: " + keys.join(", ") });
+  }
+
   // Button
   {
     const cells = [];
@@ -667,8 +745,10 @@ async function buildComponents(page) {
     );
     const label = set.addComponentProperty("Label", "TEXT", "Додати продукт");
     const showIcon = set.addComponentProperty("Icon", "BOOLEAN", true);
+    const glyph = set.addComponentProperty("Icon glyph", "INSTANCE_SWAP", ICON_COMP.plus.id);
     bindProp(set, "Label", "characters", label);
     bindProp(set, "Icon", "visible", showIcon);
+    bindProp(set, "Icon", "mainComponent", glyph);
     const rows = [];
     BTN_VARIANTS.forEach(function (v) { Object.keys(BTN_SIZES).forEach(function (s) { rows.push(v + " · " + s); }); });
     entries.push({ title: "Button", node: set, grid: arrange(set, cells, 24), rows: rows, cols: BTN_STATES, note: set.description });
@@ -1025,6 +1105,807 @@ function applyTheme(node, theme) {
 }
 
 // ---------------------------------------------------------------------------
+// 4. Мокапи екранів (за сірими вайрфреймами сторінки «Мокап»)
+// ---------------------------------------------------------------------------
+const MOCKUP_PAGE = "Мокап";
+const SCREEN_W = 1280;
+const SETS = {}; // назва набору → COMPONENT_SET
+
+function variantOf(setName, props) {
+  const set = SETS[setName];
+  const keys = Object.keys(props);
+  for (let i = 0; i < set.children.length; i++) {
+    const c = set.children[i];
+    const parsed = {};
+    c.name.split(",").forEach(function (pair) {
+      const kv = pair.split("=");
+      parsed[kv[0].trim()] = (kv[1] || "").trim();
+    });
+    if (keys.every(function (k) { return parsed[k] === String(props[k]); })) return c;
+  }
+  throw new Error("Не знайдено варіант " + setName + " " + JSON.stringify(props));
+}
+
+function propKey(setName, name) {
+  const defs = SETS[setName].componentPropertyDefinitions;
+  const keys = Object.keys(defs);
+  for (let i = 0; i < keys.length; i++) if (keys[i].split("#")[0] === name) return keys[i];
+  throw new Error("Немає властивості " + name + " у " + setName);
+}
+
+function setText(node, layerName, value) {
+  const t = node.findOne(function (x) { return x.type === "TEXT" && x.name === layerName; });
+  if (t) t.characters = value;
+  return t;
+}
+
+function add(parent, child, opts) {
+  parent.appendChild(child);
+  const o = opts || {};
+  if (o.fill) child.layoutSizingHorizontal = "FILL";
+  if (o.grow) child.layoutGrow = 1;
+  return child;
+}
+
+function hbox(name, gap, pad) {
+  const f = stack("HORIZONTAL", name, gap, pad);
+  f.counterAxisAlignItems = "CENTER";
+  return f;
+}
+
+function vbox(name, gap, pad) {
+  return stack("VERTICAL", name, gap, pad);
+}
+
+function surface(node, bg, border, rad) {
+  node.fills = bg ? [paint(bg)] : [];
+  if (border) stroke(node, border);
+  if (rad) radius(node, rad);
+  return node;
+}
+
+function bottomBorder(node, token) {
+  node.strokes = [paint(token || "border")];
+  node.strokeAlign = "INSIDE";
+  node.strokeTopWeight = 0;
+  node.strokeLeftWeight = 0;
+  node.strokeRightWeight = 0;
+  node.strokeBottomWeight = 1;
+}
+
+function square(node, size) {
+  node.primaryAxisAlignItems = "CENTER";
+  node.counterAxisAlignItems = "CENTER";
+  node.resize(size, size);
+  node.primaryAxisSizingMode = "FIXED";
+  node.counterAxisSizingMode = "FIXED";
+  return node;
+}
+
+async function t(chars, style, color, name) {
+  return text(chars, style, color, name);
+}
+
+/** Текст, що займає всю ширину батька й переноситься. */
+async function para(parent, chars, style, color) {
+  const n = await text(chars, style, color, chars.slice(0, 30));
+  parent.appendChild(n);
+  n.layoutSizingHorizontal = "FILL";
+  n.textAutoResize = "HEIGHT";
+  return n;
+}
+
+function iconBox(key, size, box, bg, fg, rad) {
+  const b = hbox("Icon box", 0, 0);
+  surface(b, bg, null, rad || "md");
+  b.appendChild(icon(key, size, fg));
+  return square(b, box);
+}
+
+// ---------- Екземпляри компонентів ----------
+function btn(label, variant, size, iconKey) {
+  const v = variant || "Primary";
+  const inst = variantOf("Button", { Variant: v, State: "Default", Size: size || "md" }).createInstance();
+  const props = {};
+  props[propKey("Button", "Label")] = label;
+  props[propKey("Button", "Icon")] = Boolean(iconKey);
+  if (iconKey && iconKey !== "plus") props[propKey("Button", "Icon glyph")] = ICON_COMP[iconKey].id;
+  inst.setProperties(props);
+  if (iconKey) {
+    const ic = inst.findOne(function (x) { return x.type === "INSTANCE"; });
+    if (ic) recolor(ic, BTN_LOOK[v].fg);
+  }
+  inst.name = "Button · " + label;
+  return inst;
+}
+
+function chip(label, count, active) {
+  const inst = variantOf("Chip", { State: active ? "Active" : "Default" }).createInstance();
+  setText(inst, "Label", label);
+  setText(inst, "Count", "(" + count + ")");
+  return inst;
+}
+
+function freshness(days, label) {
+  const status = days < 0 ? "Expired" : days === 0 ? "Today" : days <= 2 ? "Soon" : "Fresh";
+  const inst = variantOf("FreshnessBadge", { Status: status }).createInstance();
+  setText(inst, "Label", label);
+  return inst;
+}
+
+function badge(label, tone, dot) {
+  const inst = variantOf("Badge", { Tone: tone, Dot: dot ? "true" : "false" }).createInstance();
+  setText(inst, "Label", label);
+  return inst;
+}
+
+function checkbox(checked) {
+  return variantOf("Checkbox", { Checked: checked ? "true" : "false", State: "Default" }).createInstance();
+}
+
+function statCard(tone, title, value, unit, hint, iconKey) {
+  const inst = variantOf("StatCard", { Tone: tone }).createInstance();
+  setText(inst, "Title", title);
+  setText(inst, "Value", value);
+  setText(inst, "Unit", unit);
+  setText(inst, "Hint", hint);
+  const ic = inst.findOne(function (x) { return x.type === "INSTANCE" && x.name === "Icon"; });
+  if (ic && iconKey) {
+    ic.swapComponent(ICON_COMP[iconKey]);
+    recolor(ic, "on-surface-variant");
+  }
+  return inst;
+}
+
+// ---------- Спільні частини екрана ----------
+const NAV = ["Мій холодильник", "Рецепти із залишків", "Статистика & Екологія", "Список покупок"];
+
+async function appHeader(active) {
+  const h = hbox("Header", 24, [0, 32]);
+  h.fills = [paint("surface-container-lowest")];
+  bottomBorder(h);
+
+  const logo = hbox("Logo", 10, 0);
+  logo.appendChild(iconBox("leaf", 18, 32, "primary", "on-primary"));
+  logo.appendChild(await t("Zero Waste Fridge", "Heading/H3", "on-surface", "Name"));
+  h.appendChild(logo);
+
+  const nav = hbox("Nav", 4, 0);
+  for (const item of NAV) {
+    const on = item === active;
+    const tab = hbox(item, 0, [8, 14]);
+    radius(tab, "md");
+    tab.fills = on ? [paint("primary-container")] : [];
+    tab.appendChild(await t(item, on ? "Body/Strong" : "Body/Regular", on ? "on-primary-container" : "on-surface-variant", "Label"));
+    nav.appendChild(tab);
+  }
+  h.appendChild(nav);
+  add(h, spacer(), { grow: true });
+
+  const bell = iconBox("bell", 18, 36, "surface-container-lowest", "on-surface-variant");
+  stroke(bell, "border");
+  const dot = figma.createEllipse();
+  dot.name = "Unread";
+  dot.resize(8, 8);
+  dot.fills = [paint("error")];
+  bell.appendChild(dot);
+  dot.layoutPositioning = "ABSOLUTE";
+  dot.x = 24;
+  dot.y = 6;
+  h.appendChild(bell);
+
+  const user = vbox("User", 0, 0);
+  user.counterAxisAlignItems = "MAX";
+  user.appendChild(await t("Олена Кравченко", "Label/Strong", "on-surface", "Name"));
+  user.appendChild(await t("Zero-Waste Герой ★", "Caption/Regular", "muted", "Role"));
+  h.appendChild(user);
+
+  const avatar = hbox("Avatar", 0, 0);
+  surface(avatar, "primary-container", null, "pill");
+  avatar.appendChild(await t("ОК", "Label/Strong", "on-primary-container", "Initials"));
+  h.appendChild(square(avatar, 36));
+  return h;
+}
+
+async function appFooter() {
+  const f = hbox("Footer", 16, [16, 32]);
+  f.fills = [paint("surface-container-lowest")];
+  f.strokes = [paint("border")];
+  f.strokeAlign = "INSIDE";
+  f.strokeTopWeight = 1;
+  f.strokeBottomWeight = 0;
+  f.strokeLeftWeight = 0;
+  f.strokeRightWeight = 0;
+  const dot = figma.createEllipse();
+  dot.name = "Status dot";
+  dot.resize(8, 8);
+  dot.fills = [paint("primary")];
+  f.appendChild(dot);
+  f.appendChild(await t("Zero Waste Fridge © 2026. Збережи їжу — врятуй ресурси планети.", "Caption/Regular", "muted", "Copyright"));
+  add(f, spacer(), { grow: true });
+  f.appendChild(await t("Статус свіжості: В нормі", "Caption/Regular", "muted", "Status"));
+  f.appendChild(await t("•", "Caption/Regular", "muted", "Sep"));
+  f.appendChild(await t("Скан-модуль активний", "Caption/Regular", "muted", "Scanner"));
+  return f;
+}
+
+async function breadcrumb(items) {
+  const b = hbox("Breadcrumb", 6, 0);
+  for (let i = 0; i < items.length; i++) {
+    b.appendChild(await t(items[i], "Caption/Regular", i === items.length - 1 ? "on-surface-variant" : "muted", items[i]));
+    if (i < items.length - 1) b.appendChild(icon("chevronRight", 12, "muted", "Sep"));
+  }
+  return b;
+}
+
+async function pageTitle(parent, eyebrowNode, title, subtitle, actions) {
+  const row = add(parent, hbox("Title row", 24, 0), { fill: true });
+  row.counterAxisAlignItems = "MAX";
+  const left = add(row, vbox("Title", 6, 0), { grow: true });
+  if (eyebrowNode) left.appendChild(eyebrowNode);
+  left.appendChild(await t(title, "Heading/H1", "on-surface", "Title"));
+  await para(left, subtitle, "Body/Regular", "on-surface-variant");
+  if (actions && actions.length) {
+    const a = hbox("Actions", 12, 0);
+    actions.forEach(function (n) { a.appendChild(n); });
+    row.appendChild(a);
+  }
+  return row;
+}
+
+/** Сегментований перемикач (Таблиця / Картки тощо). */
+async function segmented(items, activeIndex) {
+  const s = hbox("Segmented", 2, 3);
+  surface(s, "surface-container", "border", "md");
+  for (let i = 0; i < items.length; i++) {
+    const on = i === activeIndex;
+    const it = hbox(items[i][0], 6, [5, 10]);
+    radius(it, "sm");
+    it.fills = on ? [paint("surface-container-lowest")] : [];
+    if (on) await it.setEffectStyleIdAsync(EFFECT_STYLE["Shadow/Card"].id);
+    if (items[i][1]) it.appendChild(icon(items[i][1], 14, on ? "on-surface" : "muted"));
+    it.appendChild(await t(items[i][0], "Label/Medium", on ? "on-surface" : "on-surface-variant", "Label"));
+    s.appendChild(it);
+  }
+  return s;
+}
+
+/** Поле-«фейк» (пошук, випадний список) з іконками. */
+async function field(placeholder, leadIcon, trailing, grow) {
+  const f = hbox("Field · " + placeholder.slice(0, 20), 8, [0, 12]);
+  surface(f, "surface-container-lowest", "border", "md");
+  if (leadIcon) f.appendChild(icon(leadIcon, 16, "muted"));
+  const ph = await t(placeholder, "Body/Regular", leadIcon === "search" || leadIcon === "plus" ? "muted" : "on-surface", "Value");
+  f.appendChild(ph);
+  if (grow) add(f, spacer(), { grow: true });
+  if (trailing === "kbd") {
+    const k = hbox("Kbd", 0, [1, 6]);
+    surface(k, "surface-container", "border", "sm");
+    k.appendChild(await t("⌘K", "Caption/Strong", "muted", "Keys"));
+    f.appendChild(k);
+  } else if (trailing) {
+    f.appendChild(icon(trailing, 16, "muted"));
+  }
+  f.resize(Math.max(f.width, 1), 40);
+  f.counterAxisSizingMode = "FIXED";
+  return f;
+}
+
+function iconButton(key) {
+  const b = iconBox(key, 18, 32, null, "muted");
+  b.name = "Icon button · " + key;
+  return b;
+}
+
+async function screenShell(name, active) {
+  const s = vbox(name, 0, 0);
+  s.fills = [paint("background")];
+  s.clipsContent = true;
+  fixWidth(s, SCREEN_W);
+  add(s, await appHeader(active), { fill: true });
+  const header = s.children[0];
+  header.resize(SCREEN_W, 64);
+  header.counterAxisSizingMode = "FIXED";
+  header.layoutSizingHorizontal = "FILL";
+  const main = add(s, vbox("Content", 28, [28, 32]), { fill: true });
+  return { screen: s, main: main };
+}
+
+async function finishShell(shell) {
+  add(shell.screen, await appFooter(), { fill: true });
+  return shell.screen;
+}
+
+// ---------- Дані ----------
+const FRIDGE_ROWS = [
+  ["Фарш яловичий свіжий", "Фермерське м'ясо, охолоджене", "500 г", "07.11.2026", -1, "Прострочено (1 дн.)"],
+  ["Шпинат Baby свіжий", "Органічна зелень, митий", "150 г", "08.11.2026", 0, "Сьогодні"],
+  ["Грецький йогурт 5%", "ТМ Галичина, банка", "350 г", "09.11.2026", 1, "Завтра"],
+  ["Філе куряче охолоджене", "Еко-пакування", "650 г", "10.11.2026", 2, "2 дні"],
+  ["Кабачки / Цукіні", "Місцевий фермер", "2 шт", "11.11.2026", 3, "Свіже (3 дні)"],
+  ["Полуниця солодка", "Лоток, локальний збір", "300 г", "12.11.2026", 4, "Свіже (4 дні)"],
+  ["Яйця фермерські С0", "10 шт в упаковці", "6 шт", "12.11.2026", 4, "Свіже (4 дні)"],
+];
+
+const RECIPES = [
+  ["Зелений вітамінний смузі зі шпинатом та йогуртом", "10 хв", "Легко", "180 ккал", "95%", ["Шпинат", "Йогурт", "Полуниця"]],
+  ["Запечене куряче філе з овочами та сирною скоринкою", "40 хв", "Середньо", "520 ккал", "88%", ["Куряче філе", "Кабачки", "Гауда"]],
+  ["Паста з фаршем, кабачком і песто", "25 хв", "Легко", "610 ккал", "82%", ["Фарш", "Кабачки", "Песто"]],
+];
+
+// ---------- Екран 1: Мій холодильник ----------
+async function fridgeScreen() {
+  const sh = await screenShell("Мій холодильник", "Мій холодильник");
+  const main = sh.main;
+
+  // Порада дня
+  const tip = add(main, hbox("Порада дня", 16, [14, 16]), { fill: true });
+  surface(tip, "secondary-container", null, "lg");
+  tip.appendChild(iconBox("bulb", 20, 40, "warning-container", "on-warning-container"));
+  const tipText = add(tip, vbox("Text", 2, 0), { grow: true });
+  tipText.appendChild(await t("Розумна порада дня", "Body/Strong", "on-secondary-container", "Title"));
+  await para(tipText, "Шпинат і грецький йогурт зіпсуються за 24 години — з них вийде вітамінний смузі на 2 порції.", "Label/Regular", "on-secondary-container");
+  tip.appendChild(btn("Підібрати рецепт", "Outline", "sm", "sparkles"));
+  tip.appendChild(iconButton("close"));
+
+  // Заголовок
+  const crumbs = await breadcrumb(["Сховище", "Холодильне відділення #1"]);
+  await pageTitle(main, crumbs, "Мій холодильник", "Слідкуйте за свіжістю продуктів, запобігайте псуванню та зберігайте сімейний бюджет.", [
+    btn("Сканувати чек", "Outline", "md", "scan"),
+    btn("Додати продукт", "Primary", "md", "plus"),
+  ]);
+
+  // Показники
+  const stats = add(main, hbox("Stats", 16, 0), { fill: true });
+  stats.counterAxisAlignItems = "MIN";
+  [
+    statCard("Neutral", "ВСЬОГО В ХОЛОДИЛЬНИКУ", "28", "од.", "+3 за цей тиждень", "package"),
+    statCard("Warning", "СКОРО ЗІПСУЮТЬСЯ", "4", "продукти", "Термін: ≤ 48 годин", "clock"),
+    statCard("Error", "ПРОСТРОЧЕНІ", "2", "продукти", "Потребують компосту або утилізації", "trash"),
+  ].forEach(function (c) { add(stats, c, { grow: true }); });
+
+  // Панель інструментів
+  const tools = add(main, hbox("Toolbar", 12, 0), { fill: true });
+  add(tools, await field("Пошук продуктів (наприклад: йогурт, шпинат, фарш...)", "search", "kbd", true), { grow: true });
+  tools.appendChild(await segmented([["Таблиця", "list"], ["Картки", "grid"]], 0));
+  tools.appendChild(await field("Сортування: Термін (спочатку критичні)", null, "chevronDown", false));
+
+  const chips = add(main, hbox("Categories", 8, 0), { fill: true });
+  chips.layoutWrap = "WRAP";
+  chips.counterAxisSpacing = 8;
+  [["Всі продукти", 28, true], ["Овочі & Зелень", 8], ["Молочні продукти", 6], ["М'ясо & Риба", 4], ["Фрукти & Ягоди", 5], ["Соуси & Готове", 5]].forEach(function (c) {
+    chips.appendChild(chip(c[0], c[1], c[2]));
+  });
+
+  // Таблиця
+  const table = add(main, vbox("Table", 0, 0), { fill: true });
+  surface(table, "surface-container-lowest", "border", "lg");
+  table.clipsContent = true;
+  await table.setEffectStyleIdAsync(EFFECT_STYLE["Shadow/Card"].id);
+  const COLS = [["ПРОДУКТ", 420], ["КІЛЬКІСТЬ", 140], ["ТЕРМІН ПРИДАТНОСТІ", 190], ["СТАТУС СВІЖОСТІ", 220]];
+  const head = add(table, hbox("Head", 0, [12, 20]), { fill: true });
+  head.fills = [paint("surface-container-low")];
+  bottomBorder(head);
+  for (const c of COLS) {
+    const cell = hbox(c[0], 0, 0);
+    cell.appendChild(await t(c[0], "Caption/Strong", "muted", "Label"));
+    head.appendChild(cell);
+    fixWidth(cell, c[1]);
+  }
+  const actionsHead = add(head, hbox("ДІЇ", 0, 0), { grow: true });
+  actionsHead.primaryAxisAlignItems = "MAX";
+  actionsHead.appendChild(await t("ДІЇ", "Caption/Strong", "muted", "Label"));
+
+  for (let i = 0; i < FRIDGE_ROWS.length; i++) {
+    const r = FRIDGE_ROWS[i];
+    const row = add(table, hbox("Row · " + r[0], 0, [12, 20]), { fill: true });
+    if (i < FRIDGE_ROWS.length - 1) bottomBorder(row);
+    const prod = hbox("Product", 12, 0);
+    prod.appendChild(iconBox("package", 18, 36, "surface-container", "on-surface-variant"));
+    const names = vbox("Names", 2, 0);
+    names.appendChild(await t(r[0], "Body/Strong", "on-surface", "Name"));
+    names.appendChild(await t(r[1], "Caption/Regular", "muted", "Brand"));
+    prod.appendChild(names);
+    row.appendChild(prod);
+    fixWidth(prod, COLS[0][1]);
+    const qty = hbox("Qty", 0, 0);
+    qty.appendChild(await t(r[2], "Body/Regular", "on-surface", "Qty"));
+    row.appendChild(qty);
+    fixWidth(qty, COLS[1][1]);
+    const date = vbox("Date", 2, 0);
+    date.appendChild(await t(r[3], "Body/Regular", "on-surface", "Date"));
+    date.appendChild(await t(r[4] < 0 ? "вчора" : r[4] === 0 ? "сьогодні" : "через " + r[4] + " дн.", "Caption/Regular", r[4] <= 0 ? "error" : "muted", "Relative"));
+    row.appendChild(date);
+    fixWidth(date, COLS[2][1]);
+    const st = hbox("Status", 0, 0);
+    st.appendChild(freshness(r[4], r[5]));
+    row.appendChild(st);
+    fixWidth(st, COLS[3][1]);
+    const act = add(row, hbox("Actions", 0, 0), { grow: true });
+    act.primaryAxisAlignItems = "MAX";
+    act.appendChild(iconButton("more"));
+  }
+
+  const pager = add(table, hbox("Pagination", 8, [12, 20]), { fill: true });
+  pager.strokes = [paint("border")];
+  pager.strokeAlign = "INSIDE";
+  pager.strokeTopWeight = 1;
+  pager.strokeBottomWeight = 0;
+  pager.strokeLeftWeight = 0;
+  pager.strokeRightWeight = 0;
+  pager.appendChild(await t("Показано 7 із 28 продуктів у холодильнику", "Label/Regular", "on-surface-variant", "Summary"));
+  add(pager, spacer(), { grow: true });
+  pager.appendChild(btn("Попередня", "Outline", "sm"));
+  pager.appendChild(btn("1", "Primary", "sm"));
+  pager.appendChild(btn("2", "Outline", "sm"));
+  pager.appendChild(btn("3", "Outline", "sm"));
+  pager.appendChild(btn("Наступна", "Outline", "sm"));
+
+  // Що приготувати
+  const quick = add(main, vbox("Quick recipes", 12, 0), { fill: true });
+  const qh = add(quick, hbox("Heading", 8, 0), { fill: true });
+  qh.appendChild(await t("Що приготувати з продуктів, які скоро зіпсуються", "Heading/H2", "on-surface", "Title"));
+  qh.appendChild(badge("AI-підбір", "Primary", true));
+  const qrow = add(quick, hbox("Cards", 16, 0), { fill: true });
+  for (const r of RECIPES) {
+    const c = add(qrow, hbox("Card · " + r[0].slice(0, 20), 12, 16), { grow: true });
+    surface(c, "surface-container-lowest", "border", "lg");
+    c.counterAxisAlignItems = "MIN";
+    c.appendChild(iconBox("sparkles", 18, 40, "primary-container", "on-primary-container"));
+    const tx = add(c, vbox("Text", 4, 0), { grow: true });
+    await para(tx, r[0], "Body/Strong", "on-surface");
+    tx.appendChild(await t(r[1] + " · використовує " + r[5].length + " продукти", "Caption/Regular", "muted", "Meta"));
+  }
+  return finishShell(sh);
+}
+
+// ---------- Екран 2: Розумні рецепти ----------
+async function recipeCard(r, idx) {
+  const c = vbox("Recipe · " + r[0].slice(0, 24), 0, 0);
+  surface(c, "surface-container-lowest", "border", "lg");
+  c.clipsContent = true;
+  await c.setEffectStyleIdAsync(EFFECT_STYLE["Shadow/Card"].id);
+
+  const img = add(c, vbox("Image", 0, 12), { fill: true });
+  img.fills = [paint(idx === 0 ? "primary-container" : idx === 1 ? "warning-container" : "caution-container")];
+  const top = add(img, hbox("Badges", 8, 0), { fill: true });
+  top.appendChild(badge(r[4] + " збіг", "Primary", true));
+  add(top, spacer(), { grow: true });
+  top.appendChild(badge(r[1], "Neutral", false));
+  const pic = add(img, hbox("Picture", 0, 0), { fill: true });
+  pic.primaryAxisAlignItems = "CENTER";
+  pic.paddingTop = 36;
+  pic.paddingBottom = 36;
+  pic.appendChild(icon("image", 32, "on-surface-variant", "Placeholder"));
+
+  const body = add(c, vbox("Body", 12, 16), { fill: true });
+  const meta = add(body, hbox("Meta", 12, 0), { fill: true });
+  for (const m of [["clock", r[1]], ["gauge", r[2]], ["flame", r[3]]]) {
+    const it = hbox(m[1], 4, 0);
+    it.appendChild(icon(m[0], 14, "muted"));
+    it.appendChild(await t(m[1], "Caption/Regular", "on-surface-variant", "Label"));
+    meta.appendChild(it);
+  }
+  await para(body, r[0], "Heading/H3", "on-surface");
+  const used = add(body, vbox("From fridge", 8, 12), { fill: true });
+  surface(used, "surface-container-low", null, "md");
+  const uh = hbox("Label", 4, 0);
+  uh.appendChild(icon("checkCircle", 12, "primary"));
+  uh.appendChild(await t("З вашого холодильника", "Caption/Strong", "primary", "Label"));
+  used.appendChild(uh);
+  const tags = add(used, hbox("Tags", 6, 0), { fill: true });
+  tags.layoutWrap = "WRAP";
+  tags.counterAxisSpacing = 6;
+  r[5].forEach(function (n) { tags.appendChild(badge(n, "Warning", false)); });
+  add(body, btn("Переглянути рецепт", "Primary", "md"), { fill: true });
+  return c;
+}
+
+async function recipesScreen() {
+  const sh = await screenShell("Розумні рецепти", "Рецепти із залишків");
+  const main = sh.main;
+  await pageTitle(
+    main,
+    badge("РОЗУМНІ РЕЦЕПТИ", "Primary", true),
+    "Рецепти із залишків",
+    "Оберіть продукти, термін яких спливає, — AI підбере страви, щоб нічого не викинути. Рецепти оновлюються автоматично.",
+    [btn("Історія рецептів", "Outline", "md", "clock")],
+  );
+
+  // Рекомендовані
+  const rec = add(main, vbox("Recommended", 16, 0), { fill: true });
+  const rh = add(rec, hbox("Heading", 8, 0), { fill: true });
+  rh.appendChild(await t("Рекомендовані рецепти", "Heading/H2", "on-surface", "Title"));
+  rh.appendChild(badge("3 картки", "Neutral", false));
+  add(rh, spacer(), { grow: true });
+  rh.appendChild(await segmented([["За відповідністю", null], ["За часом", null]], 0));
+  const cards = add(rec, hbox("Cards", 16, 0), { fill: true });
+  cards.counterAxisAlignItems = "MIN";
+  for (let i = 0; i < RECIPES.length; i++) add(cards, await recipeCard(RECIPES[i], i), { grow: true });
+
+  // Конструктор
+  const ctor = add(main, vbox("Constructor", 16, 24), { fill: true });
+  surface(ctor, "surface-container-lowest", "border", "lg");
+  const ch = add(ctor, hbox("Heading", 12, 0), { fill: true });
+  ch.counterAxisAlignItems = "MIN";
+  const cht = add(ch, vbox("Text", 4, 0), { grow: true });
+  cht.appendChild(await t("Кулінарний конструктор", "Heading/H2", "on-surface", "Title"));
+  cht.appendChild(await t("Оберіть від 3 до 4 продуктів, що скоро зіпсуються", "Label/Regular", "on-surface-variant", "Subtitle"));
+  ch.appendChild(badge("3 / 4 обрано", "Primary", true));
+  const items = [
+    ["Шпинат Baby", 0, "Сьогодні", true], ["Грецький йогурт", 1, "Завтра", false], ["Філе куряче", 2, "2 дні", false], ["Кабачки / Цукіні", 3, "3 дні", false],
+    ["Яйця фермерські", 4, "4 дні", true], ["Полуниця", 4, "4 дні", false], ["Молоко 2.5%", 5, "5 днів", false], ["Сир Гауда", 14, "14 днів", true],
+  ];
+  for (let r = 0; r < 2; r++) {
+    const row = add(ctor, hbox("Row " + (r + 1), 12, 0), { fill: true });
+    for (let ci = 0; ci < 4; ci++) {
+      const it = items[r * 4 + ci];
+      const cell = add(row, hbox(it[0], 10, [10, 12]), { grow: true });
+      surface(cell, it[3] ? "primary-container" : "surface-container-low", it[3] ? "primary" : "border", "md");
+      cell.appendChild(checkbox(it[3]));
+      const nm = add(cell, await t(it[0], "Label/Strong", "on-surface", "Name"), { grow: true });
+      nm.textAutoResize = "HEIGHT";
+      cell.appendChild(freshness(it[1], it[2]));
+    }
+  }
+  const cf = add(ctor, hbox("Footer", 12, 0), { fill: true });
+  const hint = add(cf, hbox("Hint", 8, [8, 12]), { grow: true });
+  surface(hint, "secondary-container", null, "md");
+  hint.appendChild(icon("bulb", 16, "on-warning-container"));
+  await para(hint, "Чудово! Ви обрали 3 складники. Можна додати ще один або одразу згенерувати рецепт.", "Label/Regular", "on-secondary-container");
+  cf.appendChild(btn("Згенерувати рецепт", "Primary", "md", "sparkles"));
+
+  // Обраний AI-рецепт
+  const det = add(main, vbox("AI recipe", 24, 24), { fill: true });
+  surface(det, "surface-container-lowest", "border", "lg");
+  await det.setEffectStyleIdAsync(EFFECT_STYLE["Shadow/Card"].id);
+  const top = add(det, hbox("Top", 24, 0), { fill: true });
+  top.counterAxisAlignItems = "MIN";
+  const info = add(top, vbox("Info", 14, 0), { grow: true });
+  info.appendChild(badge("AI-рецепт", "Primary", true));
+  await para(info, "Омлет фриттата зі шпинатом, яйцями та сиром Гауда", "Heading/H1", "on-surface");
+  const meta = add(info, hbox("Meta", 16, 0), { fill: true });
+  meta.layoutWrap = "WRAP";
+  meta.counterAxisSpacing = 8;
+  for (const m of [["clock", "20 хв"], ["gauge", "Легко"], ["flame", "410 ккал"]]) {
+    const it = hbox(m[1], 6, 0);
+    it.appendChild(icon(m[0], 16, "muted"));
+    it.appendChild(await t(m[1], "Label/Medium", "on-surface-variant", "Label"));
+    meta.appendChild(it);
+  }
+  meta.appendChild(badge("Використовує 3 продукти", "Warning", true));
+  const ia = hbox("Actions", 12, 0);
+  ia.appendChild(btn("Почати готувати", "Primary", "md", "arrowRight"));
+  ia.appendChild(btn("Зберегти", "Outline", "md"));
+  info.appendChild(ia);
+  const pic = vbox("Picture", 8, 0);
+  surface(pic, "surface-container", "outline-variant", "lg");
+  pic.dashPattern = [6, 4];
+  pic.primaryAxisAlignItems = "CENTER";
+  pic.counterAxisAlignItems = "CENTER";
+  pic.appendChild(icon("image", 32, "muted", "Placeholder"));
+  pic.appendChild(await t("Фото страви", "Caption/Regular", "muted", "Caption"));
+  pic.resize(380, 220);
+  pic.primaryAxisSizingMode = "FIXED";
+  pic.counterAxisSizingMode = "FIXED";
+  top.appendChild(pic);
+
+  // Інгредієнти
+  const ing = add(det, vbox("Ingredients", 12, 0), { fill: true });
+  ing.appendChild(await t("Інгредієнти", "Heading/H3", "on-surface", "Title"));
+  const lists = add(ing, hbox("Lists", 16, 0), { fill: true });
+  lists.counterAxisAlignItems = "MIN";
+  const groups = [
+    ["З холодильника", "3 / 3", "Primary", "checkCircle", "primary", [["Шпинат Baby", "150 г"], ["Яйця фермерські С0", "4 шт"], ["Сир твердий Гауда", "80 г"]]],
+    ["Докупити", "+2", "Neutral", "plus", "muted", [["Лимон", "1 шт"], ["Кріп свіжий", "1 пучок"]]],
+  ];
+  for (const g of groups) {
+    const box = add(lists, vbox(g[0], 10, 16), { grow: true });
+    surface(box, "surface-container-low", "border", "md");
+    const gh = add(box, hbox("Heading", 8, 0), { fill: true });
+    gh.appendChild(await t(g[0], "Body/Strong", "on-surface", "Title"));
+    add(gh, spacer(), { grow: true });
+    gh.appendChild(badge(g[1], g[2], false));
+    for (const it of g[5]) {
+      const line = add(box, hbox(it[0], 8, 0), { fill: true });
+      line.appendChild(icon(g[3], 16, g[4]));
+      add(line, await t(it[0], "Body/Regular", "on-surface", "Name"), { grow: true });
+      line.appendChild(await t(it[1], "Label/Regular", "muted", "Amount"));
+    }
+    if (g[0] === "Докупити") box.appendChild(btn("Додати в список покупок", "Outline", "sm", "cart"));
+  }
+
+  // Кроки
+  const steps = add(det, vbox("Steps", 10, 0), { fill: true });
+  steps.appendChild(await t("Покрокова інструкція", "Heading/H3", "on-surface", "Title"));
+  const STEPS = [
+    ["Підготуйте інгредієнти", "Промийте шпинат, натріть сир, збийте яйця з дрібкою солі та перцю."],
+    ["Обсмажте шпинат", "На розігрітій сковороді з краплею олії 2 хвилини, доки листя не зів'яне."],
+    ["Залийте яйцями", "Додайте яєчну суміш, посипте сиром і готуйте 5 хвилин на середньому вогні."],
+    ["Запечіть", "Поставте сковороду в духовку на 180 °C на 8–10 хвилин до золотистої скоринки."],
+  ];
+  for (let i = 0; i < STEPS.length; i++) {
+    const st = add(steps, hbox("Step " + (i + 1), 14, 14), { fill: true });
+    st.counterAxisAlignItems = "MIN";
+    surface(st, "surface-container-low", null, "md");
+    const num = hbox("Number", 0, 0);
+    surface(num, "primary", null, "pill");
+    num.appendChild(await t(String(i + 1), "Label/Strong", "on-primary", "N"));
+    st.appendChild(square(num, 28));
+    const tx = add(st, vbox("Text", 2, 0), { grow: true });
+    tx.appendChild(await t(STEPS[i][0], "Body/Strong", "on-surface", "Title"));
+    await para(tx, STEPS[i][1], "Body/Regular", "on-surface-variant");
+  }
+  const df = add(det, hbox("Footer", 12, 0), { fill: true });
+  add(df, spacer(), { grow: true });
+  df.appendChild(btn("Поділитися", "Ghost", "md", "share"));
+  df.appendChild(btn("Списати використані продукти", "Primary", "md", "checkCircle"));
+  return finishShell(sh);
+}
+
+// ---------- Екран 3: Список покупок ----------
+const SHOP_TODO = [
+  ["Лимон", "1 шт", "Для рецепту", "Primary"],
+  ["Молоко пастеризоване 2.5%", "1 л", "Закінчується", "Warning"],
+  ["Шпинат Baby свіжий", "150 г", "Закінчується", "Warning"],
+  ["Яйця фермерські С0", "10 шт", "Для рецепту", "Primary"],
+  ["Цільнозерновий хліб", "1 шт", "Вручну", "Neutral"],
+  ["Вівсяне молоко Barista", "1 л", "Вручну", "Neutral"],
+];
+const SHOP_DONE = [["Гречка ядриця", "1 кг"], ["Банани", "6 шт"], ["Сир кисломолочний 5%", "400 г"], ["Огірки", "500 г"]];
+
+async function shopRow(item, done) {
+  const row = hbox("Item · " + item[0], 12, [12, 16]);
+  surface(row, "surface-container-lowest", "border", "md");
+  row.appendChild(checkbox(done));
+  const tx = add(row, vbox("Text", 2, 0), { grow: true });
+  const name = await t(item[0], "Body/Strong", done ? "muted" : "on-surface", "Name");
+  if (done) name.textDecoration = "STRIKETHROUGH";
+  tx.appendChild(name);
+  tx.appendChild(await t(item[1], "Caption/Regular", "muted", "Qty"));
+  if (!done) row.appendChild(badge(item[2], item[3], true));
+  row.appendChild(iconButton(done ? "close" : "more"));
+  if (done) row.opacity = 0.75;
+  return row;
+}
+
+async function shoppingScreen() {
+  const sh = await screenShell("Список покупок", "Список покупок");
+  const main = sh.main;
+  const crumbs = await breadcrumb(["Сховище", "Список покупок"]);
+  const auto = hbox("Auto refill", 8, [8, 12]);
+  surface(auto, "surface-container-lowest", "border", "md");
+  auto.appendChild(checkbox(true));
+  auto.appendChild(await t("Автопоповнення", "Label/Strong", "on-surface", "Label"));
+  await pageTitle(main, crumbs, "Розумний список покупок", "Спільний список сім'ї з автоматичним поповненням продуктів, що закінчуються або скоро зіпсуються.", [
+    auto,
+    btn("Поділитися", "Outline", "md", "share"),
+  ]);
+
+  const two = add(main, hbox("Layout", 24, 0), { fill: true });
+  two.counterAxisAlignItems = "MIN";
+  const left = add(two, vbox("List", 16, 0), { grow: true });
+  const right = vbox("Sidebar", 16, 0);
+  two.appendChild(right);
+  fixWidth(right, 320);
+
+  // AI-пропозиція
+  const ai = add(left, hbox("AI suggestion", 12, [14, 16]), { fill: true });
+  surface(ai, "primary-container", "primary", "lg");
+  ai.dashPattern = [6, 4];
+  ai.appendChild(iconBox("sparkles", 18, 36, "surface-container-lowest", "primary"));
+  const at = add(ai, vbox("Text", 2, 0), { grow: true });
+  at.appendChild(await t("AI пропонує додати «Лимон»", "Body/Strong", "on-primary-container", "Title"));
+  await para(at, "Потрібен для рецепту «Омлет фриттата», який використовує шпинат, що зіпсується сьогодні.", "Label/Regular", "on-primary-container");
+  ai.appendChild(btn("Додати", "Primary", "sm", "plus"));
+
+  // Додавання
+  const addRow = add(left, hbox("Add item", 8, 0), { fill: true });
+  add(addRow, await field("Додати продукт або страву (наприклад: Вівсяне молоко Barista 1 л)...", "plus", null, true), { grow: true });
+  addRow.appendChild(await field("Овочі & Зелень", null, "chevronDown", false));
+  addRow.appendChild(await field("1 шт", null, "chevronDown", false));
+  addRow.appendChild(btn("Додати", "Primary", "md"));
+
+  // Треба купити
+  const todoHead = add(left, hbox("To buy heading", 8, 0), { fill: true });
+  todoHead.appendChild(await t("ТРЕБА КУПИТИ", "Label/Strong", "on-surface", "Title"));
+  todoHead.appendChild(badge(String(SHOP_TODO.length), "Primary", false));
+  add(todoHead, spacer(), { grow: true });
+  todoHead.appendChild(await segmented([["Усі", null], ["За категоріями", null]], 0));
+  for (const it of SHOP_TODO) add(left, await shopRow(it, false), { fill: true });
+
+  // Вже куплено
+  const doneHead = add(left, hbox("Bought heading", 8, 0), { fill: true });
+  doneHead.paddingTop = 8;
+  doneHead.appendChild(icon("chevronDown", 16, "muted"));
+  doneHead.appendChild(await t("ВЖЕ КУПЛЕНО", "Label/Strong", "on-surface-variant", "Title"));
+  doneHead.appendChild(badge(String(SHOP_DONE.length), "Neutral", false));
+  for (const it of SHOP_DONE) add(left, await shopRow(it, true), { fill: true });
+
+  const move = add(left, hbox("Move to fridge", 12, [14, 16]), { fill: true });
+  surface(move, "surface-container-lowest", "border", "lg");
+  move.appendChild(iconBox("package", 18, 36, "surface-container", "on-surface-variant"));
+  await para(move, "Перенесіть 4 придбані товари одразу до цифрового інвентарю холодильника!", "Body/Regular", "on-surface");
+  move.children[1].layoutGrow = 1;
+  move.appendChild(btn("Перенести в холодильник", "Outline", "sm", "arrowRight"));
+
+  // Бічна панель
+  add(right, statCard("Neutral", "ОРІЄНТОВНИЙ БЮДЖЕТ", "≈ 640", "₴", "−12% завдяки залишкам", "cart"), { fill: true });
+  const tipsCard = add(right, vbox("Tips", 10, 20), { fill: true });
+  surface(tipsCard, "secondary-container", null, "lg");
+  const th = hbox("Heading", 8, 0);
+  th.appendChild(icon("bulb", 16, "on-warning-container"));
+  th.appendChild(await t("Порада", "Body/Strong", "on-secondary-container", "Title"));
+  tipsCard.appendChild(th);
+  await para(tipsCard, "Купуйте зелень невеликими порціями: шпинат і кріп зберігаються лише 2–3 дні.", "Label/Regular", "on-secondary-container");
+  const fam = add(right, vbox("Family", 12, 20), { fill: true });
+  surface(fam, "surface-container-lowest", "border", "lg");
+  fam.appendChild(await t("Хто купує", "Body/Strong", "on-surface", "Title"));
+  for (const m of [["ОК", "Олена", "4 товари"], ["АК", "Андрій", "2 товари"]]) {
+    const r = add(fam, hbox(m[1], 10, 0), { fill: true });
+    const av = hbox("Avatar", 0, 0);
+    surface(av, "primary-container", null, "pill");
+    av.appendChild(await t(m[0], "Caption/Strong", "on-primary-container", "Initials"));
+    r.appendChild(square(av, 28));
+    add(r, await t(m[1], "Label/Strong", "on-surface", "Name"), { grow: true });
+    r.appendChild(await t(m[2], "Caption/Regular", "muted", "Count"));
+  }
+  return finishShell(sh);
+}
+
+async function buildScreens(entries) {
+  entries.forEach(function (e) { if (e.node.type === "COMPONENT_SET") SETS[e.title] = e.node; });
+
+  let page = null;
+  figma.root.children.forEach(function (p) { if (p.name === MOCKUP_PAGE) page = p; });
+  if (!page) {
+    page = figma.createPage();
+    page.name = MOCKUP_PAGE;
+  }
+  await page.loadAsync();
+  await figma.setCurrentPageAsync(page);
+  page.children.slice().forEach(function (n) { if (n.getPluginData(TAG_KEY)) n.remove(); });
+
+  // Мокапи розміщуємо під наявними вайрфреймами
+  let top = 0, left = 0, first = true;
+  page.children.forEach(function (n) {
+    if (first) { left = n.x; first = false; }
+    top = Math.max(top, n.y + n.height);
+    left = Math.min(left, n.x);
+  });
+  top += page.children.length ? 400 : 0;
+
+  const light = [await fridgeScreen(), await recipesScreen(), await shoppingScreen()];
+  const rows = [["Desktop · Light", light, "light"], ["Desktop · Dark", null, "dark"]];
+  const all = [];
+  let y = top;
+  for (const r of rows) {
+    const label = await text(r[0], "Display", null, r[0]);
+    label.fills = [{ type: "SOLID", color: { r: 0.6, g: 0.62, b: 0.65 } }];
+    label.setPluginData(TAG_KEY, "label");
+    page.appendChild(label);
+    label.x = left;
+    label.y = y;
+    y += label.height + 32;
+    let x = left, rowH = 0;
+    const screens = r[1] || light.map(function (s) { return s.clone(); });
+    screens.forEach(function (s) {
+      page.appendChild(s);
+      s.name = s.name.replace(/ — (Light|Dark)$/, "") + (r[2] === "dark" ? " — Dark" : " — Light");
+      s.setPluginData(TAG_KEY, "mockup");
+      s.x = x;
+      s.y = y;
+      x += s.width + 120;
+      rowH = Math.max(rowH, s.height);
+      applyTheme(s, r[2]);
+      all.push(s);
+    });
+    y += rowH + 240;
+  }
+  return all;
+}
+
+// ---------------------------------------------------------------------------
 // main
 // ---------------------------------------------------------------------------
 async function preparePage() {
@@ -1087,11 +1968,15 @@ async function main() {
     x += b.width + 200;
   });
   figma.currentPage.selection = boards;
-  figma.viewport.scrollAndZoomIntoView(boards);
+
+  // Мокапи на сторінці «Мокап» (вайрфрейми не змінюються)
+  const mockups = await buildScreens(entries);
+  figma.currentPage.selection = mockups;
+  figma.viewport.scrollAndZoomIntoView(mockups);
 
   const variants = entries.reduce(function (n, e) { return n + (e.node.type === "COMPONENT_SET" ? e.node.children.length : 1); }, 0);
   return (
-    "UI Kit готовий: 3 фрейми (кольори, типографіка, компоненти), " + entries.length + " компонентів, " + variants + " варіантів. " +
+    "Готово: UI Kit (3 фрейми) + " + mockups.length + " мокапів на сторінці «Мокап», " + entries.length + " компонентів, " + variants + " варіантів. " +
     (THEME.native ? "Темна тема — режим Dark." : "Тариф без режимів: темна тема через колекцію «ZWF / Color (Dark)».")
   );
 }
