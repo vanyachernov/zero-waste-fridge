@@ -42,7 +42,7 @@ class ApiApplicationIT extends IntegrationTest {
 			.andExpect(jsonPath("$.info.title").value("Zero Waste Fridge API"));
 	}
 
-	/** Контракт для orval (I-10): усі ендпоінти холодильника потрапляють у специфікацію. */
+	/** Контракт для orval (I-10, I-40): усі ендпоінти холодильника й списку покупок є в специфікації. */
 	@Test
 	void openApiSpecDescribesFridgeEndpoints() throws Exception {
 		mvc.perform(get("/v3/api-docs"))
@@ -54,7 +54,14 @@ class ApiApplicationIT extends IntegrationTest {
 			.andExpect(jsonPath("$.paths['/api/products/{id}/write-off'].post").exists())
 			.andExpect(jsonPath("$.paths['/api/products/summary'].get").exists())
 			.andExpect(jsonPath("$.paths['/api/tips/today'].get").exists())
-			.andExpect(jsonPath("$.paths['/api/dictionaries'].get").exists());
+			.andExpect(jsonPath("$.paths['/api/dictionaries'].get").exists())
+			.andExpect(jsonPath("$.paths['/api/shopping-list'].get").exists())
+			.andExpect(jsonPath("$.paths['/api/shopping-list/{id}/toggle'].post").exists())
+			.andExpect(jsonPath("$.paths['/api/shopping-list/bought'].delete").exists())
+			.andExpect(jsonPath("$.paths['/api/shopping-list/move-to-fridge'].post").exists())
+			.andExpect(jsonPath("$.paths['/api/shopping-list/settings'].put").exists())
+			.andExpect(jsonPath("$.paths['/api/shopping-list/stores'].post").exists())
+			.andExpect(jsonPath("$.paths['/api/shopping-list/summary'].get").exists());
 	}
 
 }

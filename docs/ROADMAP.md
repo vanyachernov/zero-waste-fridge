@@ -105,7 +105,7 @@ Notification (user, type, payload, readAt)
 
 ---
 
-## Етап 2 — Інвентар холодильника (ядро продукту) — бекенд ✅ (крім ShoppingItem у B-13), фронтенд 🟡
+## Етап 2 — Інвентар холодильника (ядро продукту) — бекенд ✅, фронтенд 🟡
 
 Макети: «Мій холодильник», «Додати продукт», «Списати продукт».
 
@@ -116,7 +116,7 @@ Notification (user, type, payload, readAt)
 | B-10 | Модель Product + міграції | `V4__product.sql`: продукт домогосподарства з кодами, спільними з фронтендом (`category`, `zone`, `unit`), `effectiveExpiresAt`, `remindBeforeDays` (1/2/3/7), статус `ACTIVE / CONSUMED / WASTED`, CHECK-обмеження. Частковий індекс `(household_id, effective_expires_at) WHERE status = 'ACTIVE'` і `(household_id, created_at)` | B-01 | ✅ |
 | B-11 | CRUD продуктів | `GET /api/products`: `q` (назва або бренд), `category` і `freshness` (кілька значень), `status`, `sort` (expiry / name / added / category), `page` з 1 і `size` ≤ 100, `categoryCounts` для чіпів. `POST` (201 + Location, типова зона за категорією), `GET /{id}`, `PATCH /{id}` (відсутнє поле — без змін, `null` — очистити). `daysLeft` / `freshness` за поясом `zwf.time-zone` (Europe/Kyiv). Чужий продукт — 404 `PRODUCT_NOT_FOUND` | B-10, B-05 | ✅ |
 | B-12 | Правила відкритої упаковки | `effectiveExpiresAt = min(expiresAt, openedAt + днів)`. Правила за ключовими словами (йогурт — 5, молоко — 3, фарш — 1, тверді сири й масло — 14…), інакше типовий термін категорії. Застосований термін зберігається (`V5`), тож зміна довідника не зсуває вже відкриті продукти | B-10 | ✅ |
-| B-13 | Списання продукту | `POST /api/products/{id}/write-off` `{outcome: EATEN \| COOKED \| WASTED, quantity: "all" \| число, addToShoppingList?}`. Частково — зменшує кількість, усе — закриває як `CONSUMED` / `WASTED`. Журнал `product_event` (`V6`): ADDED, UPDATED, OPENED, WRITTEN_OFF з автором. **Лишилось:** `addToShoppingList` поки повертає `addedToShoppingList: false` — створення ShoppingItem після B-40 | B-11, B-40 | 🟡 без ShoppingItem |
+| B-13 | Списання продукту | `POST /api/products/{id}/write-off` `{outcome: EATEN \| COOKED \| WASTED, quantity: "all" \| число, addToShoppingList?}`. Частково — зменшує кількість, усе — закриває як `CONSUMED` / `WASTED`. Журнал `product_event` (`V6`): ADDED, UPDATED, OPENED, WRITTEN_OFF з автором. `addToShoppingList` створює позицію `WRITE_OFF` (B-40), без прапорця спрацьовує Smart Sync (B-43) | B-11, B-40 | ✅ |
 | B-14 | Статистика холодильника | `GET /api/products/summary` → `{total, addedThisWeek, soon (сьогодні…післязавтра), today, expired}` одним запитом | B-11 | ✅ |
 | B-15 | Розумна порада дня | `GET /api/tips/today` → `{date, kind: USE_SOON \| EXPIRED \| ALL_FRESH \| EMPTY, products (до 4, сьогодні й завтра), hint}`; страва за переважною категорією (SALAD, PANCAKES, STIR_FRY…). Тексти — на фронтенді. Потім AI (B-22) | B-11 | ✅ |
 | B-16 | Довідники | `GET /api/dictionaries` → категорії (типова зона, термін після відкриття), зони з температурою, одиниці з типом, варіанти нагадування, правила термінів. Лише коди: назви й описи — у `packages/i18n`. Кеш на годину | B-10 | ✅ |
@@ -161,18 +161,18 @@ Notification (user, type, payload, readAt)
 
 ---
 
-## Етап 4 — Розумний список покупок
+## Етап 4 — Розумний список покупок — бекенд ✅, фронтенд 🟡
 
 Макет «Розумний список покупок»: спільний доступ родини (аватари, «Максим зараз у „Сільпо“», «Синхронізовано щойно», «3 учасники онлайн»), прогрес «Куплено 4 з 6 · орієнтовно 480 ₴», «Авто-ввіз N товари», банер «Автопоповнення із залишків холодильника» (Smart Sync) з кнопкою «Налаштувати автопоповнення», рядок додавання (назва + категорія + магазин). Далі — «Треба купити (N)» з фільтрами «Всі / Сільпо / З холодильника», елементи з тегами («Закінчився вчора в холодильнику», «Авто-список», ціна «~74 ₴», «Пріоритет: Високий», «Додано Максимом»), кількістю −/+ і видаленням. Секція «Вже куплено (N)» з «Очистити куплені», а внизу — CTA «Закінчили покупки? Додати в холодильник (N т.)».
 
 | ID | Задача | Деталі / критерії приймання | Залежності | Статус |
 |---|---|---|---|---|
-| B-40 | Модель ShoppingItem + CRUD | `name, quantity, unit, category, store, priority, priceEstimate, source (MANUAL\|AUTO\|RECIPE\|WRITE_OFF), sourceProductId, addedBy, boughtAt, boughtBy`. `GET / POST / PATCH / DELETE /api/shopping-list`, `POST /{id}/toggle` | B-10 | ⬜ |
-| B-41 | Очистити куплені | `DELETE /api/shopping-list/bought` | B-40 | ⬜ |
-| B-42 | Перенести куплене в холодильник | `POST /api/shopping-list/move-to-fridge {itemIds}` — створює Products (термін за замовчуванням із довідника категорії) і закриває позиції | B-40, B-11 | ⬜ |
-| B-43 | Автопоповнення (Smart Sync) | Правила: продукт списано або закінчився → позиція з `source=AUTO`. Налаштування на рівні Household: увімкнено, категорії-винятки. `GET / PUT /api/shopping-list/settings` | B-13, B-40 | ⬜ |
-| B-44 | Довідник магазинів | `stores` на рівні Household (Сільпо, АТБ, Еко-лавка…) | B-40 | ⬜ |
-| B-45 | Підсумки | `GET /api/shopping-list/summary` → `{bought, total, estimatedTotal, autoCount}` | B-40 | ⬜ |
+| B-40 | Модель ShoppingItem + CRUD | `V7`: назва, кількість з одиницею (разом або жодної), категорія, пріоритет `NORMAL / HIGH`, орієнтовна ціна, джерело `MANUAL \| AUTO \| RECIPE \| WRITE_OFF`, продукт-джерело, хто додав і хто купив. `GET` → `{toBuy, bought}` (високий пріоритет першим), `POST`, `PATCH`, `DELETE`, `POST /{id}/toggle`. Та сама назва серед некуплених не дублюється | B-10 | ✅ |
+| B-41 | Очистити куплені | `DELETE /api/shopping-list/bought` → `{deleted}` | B-40 | ✅ |
+| B-42 | Перенести куплене в холодильник | `POST /api/shopping-list/move-to-fridge`: без `items` — усі куплені, з `items: [{id, expiresAt?, zone?, category?}]` — вибрані з поправками (F-52). Дата покупки — сьогодні, термін — `defaultShelfLifeDays` категорії з довідника, без кількості — 1 шт. Усе або нічого; некуплене — 409 `ITEM_NOT_BOUGHT` | B-40, B-11 | ✅ |
+| B-43 | Автопоповнення (Smart Sync) | Продукт списано повністю, категорія не у винятках → позиція `AUTO` (часткове списання не рахується). `GET / PUT /api/shopping-list/settings` `{autoRefill, excludedCategories}` (`V9`), за замовчуванням увімкнено | B-13, B-40 | ✅ |
+| B-44 | Довідник магазинів | `V8`: магазини домогосподарства з унікальною назвою без урахування регістру. `GET / POST / DELETE /api/shopping-list/stores` (409 `STORE_EXISTS`); `storeId` у позиції; фільтри списку `?store=` і `?fromFridge=true`. Видалення магазину лишає позиції | B-40 | ✅ |
+| B-45 | Підсумки | `GET /api/shopping-list/summary` → `{bought, total, estimatedTotal, autoCount}` | B-40 | ✅ |
 | F-50 | Екран списку покупок (повний) | Шапка з кнопками «Запросити члена сім'ї» і «Поділитися списком», картка спільного доступу, прогрес, лічильник «Авто-ввіз», банер Smart Sync, рядок додавання (назва + категорія + магазин), «Треба купити» з фільтрами, теги, лічильник −/+, видалення, «Вже куплено» з «Очистити куплені», CTA «Додати в холодильник» | F-07 | 🟡 мінімальний список |
 | F-51 | Налаштування автопоповнення | Модалка або drawer: перемикач, категорії-винятки | F-50 | ⬜ |
 | F-52 | «Додати в холодильник» | Підтвердження з можливістю поправити термін і зону для кожної позиції → B-42 | F-50, F-24 | ⬜ |
