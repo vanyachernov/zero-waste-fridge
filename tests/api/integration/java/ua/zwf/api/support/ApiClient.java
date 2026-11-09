@@ -51,6 +51,24 @@ public final class ApiClient {
 		return postRaw(path, body, csrfToken().orElseThrow());
 	}
 
+	/** PATCH з JSON-тілом і CSRF-заголовком. */
+	public Response patch(String path, Object body) {
+		ensureCsrfCookie();
+		return send(request(path).header("Content-Type", "application/json")
+			.header("Accept", "application/json")
+			.header(CSRF_HEADER, csrfToken().orElseThrow())
+			.method("PATCH", HttpRequest.BodyPublishers.ofString(JSON.writeValueAsString(body))));
+	}
+
+	/** POST із сирим тілом (зламаний JSON тощо). */
+	public Response postJson(String path, String rawJson) {
+		ensureCsrfCookie();
+		return send(request(path).header("Content-Type", "application/json")
+			.header("Accept", "application/json")
+			.header(CSRF_HEADER, csrfToken().orElseThrow())
+			.POST(HttpRequest.BodyPublishers.ofString(rawJson)));
+	}
+
 	/** POST без CSRF-заголовка або з довільним значенням — для негативних сценаріїв. */
 	public Response postRaw(String path, Object body, String csrfHeaderValue) {
 		var builder = request(path)

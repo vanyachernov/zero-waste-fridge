@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.UUID;
 import ua.zwf.api.household.Household;
@@ -101,7 +102,7 @@ public class Product {
 		this.household = Objects.requireNonNull(household);
 		this.addedBy = addedBy;
 		this.status = ProductStatus.ACTIVE;
-		this.createdAt = now;
+		this.createdAt = db(now);
 		apply(details, now);
 	}
 
@@ -121,7 +122,7 @@ public class Product {
 			throw new IllegalArgumentException("openedAt must not be before purchasedAt");
 		}
 		recalculateEffectiveExpiry();
-		this.updatedAt = now;
+		this.updatedAt = db(now);
 	}
 
 	/**
@@ -139,7 +140,7 @@ public class Product {
 		this.openedAt = openedAt;
 		this.openedShelfLifeDays = (short) shelfLifeDays;
 		recalculateEffectiveExpiry();
-		this.updatedAt = now;
+		this.updatedAt = db(now);
 	}
 
 	/** Позначку «відкрито» знято (помилково поставили) — знову діє дата з упаковки. */
@@ -147,11 +148,19 @@ public class Product {
 		this.openedAt = null;
 		this.openedShelfLifeDays = null;
 		recalculateEffectiveExpiry();
-		this.updatedAt = now;
+		this.updatedAt = db(now);
 	}
 
 	public boolean isOpened() {
 		return openedAt != null;
+	}
+
+	/**
+	 * PostgreSQL {@code TIMESTAMPTZ} зберігає мікросекунди: обрізаємо одразу, щоб відповідь на POST
+	 * збігалася з тим, що потім поверне GET.
+	 */
+	static Instant db(Instant instant) {
+		return instant == null ? null : instant.truncatedTo(ChronoUnit.MICROS);
 	}
 
 	private void recalculateEffectiveExpiry() {

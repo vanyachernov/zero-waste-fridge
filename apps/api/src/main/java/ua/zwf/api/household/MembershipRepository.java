@@ -8,6 +8,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface MembershipRepository extends JpaRepository<Membership, UUID> {
 
+	@Query("select m.household.id from Membership m where m.user.id = :userId")
+	Optional<UUID> findHouseholdIdByUserId(@Param("userId") UUID userId);
+
 	@Query("select m from Membership m join fetch m.household join fetch m.user where m.user.id = :userId")
 	Optional<Membership> findWithHouseholdByUserId(@Param("userId") UUID userId);
 

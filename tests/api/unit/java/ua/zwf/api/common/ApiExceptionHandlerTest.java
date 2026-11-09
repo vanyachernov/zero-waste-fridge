@@ -12,7 +12,10 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.mock.http.MockHttpInputMessage;
 import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ua.zwf.api.auth.EmailAlreadyUsedException;
 
 class ApiExceptionHandlerTest {
@@ -53,6 +56,31 @@ class ApiExceptionHandlerTest {
 	void omitsErrorsWhenThereAreNone() {
 		var problem = ApiExceptionHandler.problem(HttpStatus.UNAUTHORIZED, "X", "detail", Map.of());
 		assertThat(problem.getProperties()).containsOnlyKeys("code");
+	}
+
+	@Test
+	void unknownQueryValueBecomesFieldError() throws Exception {
+		var parameter = new MethodParameter(Object.class.getMethod("equals", Object.class), 0);
+		var ex = new MethodArgumentTypeMismatchException("price", String.class, "sort", parameter,
+				new IllegalArgumentException("Unknown"));
+
+		var response = handler.handleTypeMismatch(ex);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		assertThat(response.getBody().getProperties()).containsEntry("code", "VALIDATION_FAILED")
+			.containsEntry("errors", Map.of("sort", "INVALID"));
+	}
+
+	@Test
+	void unreadableBodyWithoutFieldPathIsMalformedRequest() {
+		var ex = new HttpMessageNotReadableException("broken", new MockHttpInputMessage(new byte[0]));
+
+		var response = handler.handleHttpMessageNotReadable(ex, new HttpHeaders(), HttpStatus.BAD_REQUEST,
+				new ServletWebRequest(new MockHttpServletRequest()));
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		assertThat(((ProblemDetail) response.getBody()).getProperties()).containsEntry("code", "MALFORMED_REQUEST")
+			.doesNotContainKey("errors");
 	}
 
 }
