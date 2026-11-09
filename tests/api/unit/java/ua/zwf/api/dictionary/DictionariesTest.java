@@ -35,6 +35,15 @@ class DictionariesTest {
 	}
 
 	@Test
+	void closedPackageShelfLifeIsLongerThanOpened() {
+		for (ProductCategory category : ProductCategory.values()) {
+			assertThat(Dictionaries.defaultShelfLifeDays(category)).isGreaterThanOrEqualTo(
+					OpenedShelfLife.categoryDays(category));
+		}
+		assertThat(Dictionaries.defaultShelfLifeDays(ProductCategory.MEAT)).isEqualTo(3);
+	}
+
+	@Test
 	void defaultZoneByCategory() {
 		assertThat(Dictionaries.defaultZone(ProductCategory.MEAT)).isEqualTo(StorageZone.FRESH);
 		assertThat(Dictionaries.defaultZone(ProductCategory.SAUCES)).isEqualTo(StorageZone.DOOR);
@@ -45,7 +54,7 @@ class DictionariesTest {
 	void serializesWithLowercaseCodes() {
 		var json = JsonMapper.builder().build().writeValueAsString(Dictionaries.all());
 
-		assertThat(json).contains("{\"code\":\"dairy\",\"defaultZone\":\"middle\",\"openedShelfLifeDays\":4}")
+		assertThat(json).contains("{\"code\":\"dairy\",\"defaultZone\":\"middle\",\"defaultShelfLifeDays\":7,\"openedShelfLifeDays\":4}")
 			.contains("{\"code\":\"pcs\",\"kind\":\"count\"}")
 			.contains("\"remindBeforeDays\":[1,2,3,7]")
 			.contains("\"defaultRemindBeforeDays\":2")

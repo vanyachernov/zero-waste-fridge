@@ -25,10 +25,13 @@ class ShoppingListController {
 
 	private final ShoppingListService service;
 
+	private final MoveToFridgeService moves;
+
 	private final CurrentHousehold household;
 
-	ShoppingListController(ShoppingListService service, CurrentHousehold household) {
+	ShoppingListController(ShoppingListService service, MoveToFridgeService moves, CurrentHousehold household) {
 		this.service = service;
+		this.moves = moves;
 		this.household = household;
 	}
 
@@ -63,6 +66,13 @@ class ShoppingListController {
 	}
 
 	record ClearedResponse(int deleted) {
+	}
+
+	@Operation(summary = "Move bought items to the fridge (all bought when items is absent)")
+	@PostMapping("/move-to-fridge")
+	MoveToFridgeResponse moveToFridge(@AuthenticationPrincipal AppUserPrincipal principal,
+			@RequestBody(required = false) MoveToFridgeRequest request) {
+		return moves.move(household.idOf(principal.id()), principal.id(), request);
 	}
 
 	@Operation(summary = "Remove an item")
