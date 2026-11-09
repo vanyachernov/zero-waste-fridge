@@ -32,7 +32,7 @@ class DictionaryIT extends IntegrationTest {
 				v -> assertThat(v).contains("max-age=3600").contains("private"));
 		var json = response.json();
 		assertThat(list(json, "categories")).hasSize(6)
-			.contains(Map.of("code", "meat", "defaultZone", "fresh", "openedShelfLifeDays", 2));
+			.contains(Map.of("code", "meat", "defaultZone", "fresh", "defaultShelfLifeDays", 3, "openedShelfLifeDays", 2));
 		assertThat(list(json, "zones")).contains(Map.of("code", "freezer", "minTemperatureC", -18,
 				"maxTemperatureC", -18));
 		assertThat(list(json, "units")).contains(Map.of("code", "kg", "kind", "mass"));

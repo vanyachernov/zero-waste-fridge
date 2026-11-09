@@ -15,7 +15,12 @@ import ua.zwf.api.product.Unit;
  */
 public final class Dictionaries {
 
-	public record CategoryEntry(ProductCategory code, StorageZone defaultZone, int openedShelfLifeDays) {
+	/**
+	 * @param defaultShelfLifeDays типовий термін закритої упаковки — коли купленому в списку покупок треба
+	 *     підставити «придатний до» (B-42)
+	 */
+	public record CategoryEntry(ProductCategory code, StorageZone defaultZone, int defaultShelfLifeDays,
+			int openedShelfLifeDays) {
 	}
 
 	/** Рекомендована температура зони, °C (картки зон на екрані «Мій холодильник»). */
@@ -51,6 +56,14 @@ public final class Dictionaries {
 			ProductCategory.SAUCES, StorageZone.DOOR,
 			ProductCategory.OTHER, StorageZone.MIDDLE);
 
+	private static final Map<ProductCategory, Integer> SHELF_LIFE = Map.of(
+			ProductCategory.VEGETABLES, 7,
+			ProductCategory.DAIRY, 7,
+			ProductCategory.MEAT, 3,
+			ProductCategory.FRUITS, 5,
+			ProductCategory.SAUCES, 90,
+			ProductCategory.OTHER, 14);
+
 	private static final Map<StorageZone, int[]> TEMPERATURE = Map.of(
 			StorageZone.FRESH, new int[] { 0, 2 },
 			StorageZone.MIDDLE, new int[] { 4, 6 },
@@ -78,9 +91,14 @@ public final class Dictionaries {
 		return DEFAULT_ZONE.get(category);
 	}
 
+	/** Типовий термін придатності закритого продукту категорії, днів. */
+	public static int defaultShelfLifeDays(ProductCategory category) {
+		return SHELF_LIFE.get(category);
+	}
+
 	private static Response build() {
 		var categories = Arrays.stream(ProductCategory.values())
-			.map(c -> new CategoryEntry(c, DEFAULT_ZONE.get(c), OpenedShelfLife.categoryDays(c)))
+			.map(c -> new CategoryEntry(c, DEFAULT_ZONE.get(c), SHELF_LIFE.get(c), OpenedShelfLife.categoryDays(c)))
 			.toList();
 		var zones = Arrays.stream(StorageZone.values())
 			.map(z -> new ZoneEntry(z, TEMPERATURE.get(z)[0], TEMPERATURE.get(z)[1]))
