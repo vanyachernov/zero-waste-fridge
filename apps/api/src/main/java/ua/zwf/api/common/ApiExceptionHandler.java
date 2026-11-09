@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import tools.jackson.core.JacksonException;
 import org.springframework.validation.FieldError;
@@ -72,6 +73,15 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		}
 		return ResponseEntity.badRequest()
 			.body(problem(HttpStatus.BAD_REQUEST, MALFORMED_REQUEST, "Malformed JSON request", Map.of()));
+	}
+
+	public static final String FORBIDDEN = "FORBIDDEN";
+
+	/** B-50: дія не дозволена ролі (напр. MEMBER запрошує учасника). */
+	@ExceptionHandler(AccessDeniedException.class)
+	ResponseEntity<ProblemDetail> handleAccessDenied(AccessDeniedException ex) {
+		return ResponseEntity.status(HttpStatus.FORBIDDEN)
+			.body(problem(HttpStatus.FORBIDDEN, FORBIDDEN, "Not allowed for your household role", Map.of()));
 	}
 
 	/** Невідоме значення query-параметра ({@code ?sort=price}, {@code ?category=fish}). */
