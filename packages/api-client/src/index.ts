@@ -1,47 +1,64 @@
 import { configureHttp, http, isApiError, notifyUnauthorized, type ApiError } from "./http";
 import { mockApi } from "./mock";
+import { mockFridge } from "./mock-fridge";
 import { mockAuth, setMockSessionRequired } from "./mock-auth";
 import type {
   CurrentUser,
-  DiscardReason,
+  Dictionaries,
   LoginRequest,
   Product,
-  ProductCreate,
+  ProductInput,
+  ProductPage,
+  ProductQuery,
+  ProductSummary,
   Recipe,
   RegisterRequest,
   ResetPasswordRequest,
   ShoppingItem,
+  Tip,
+  WriteOffRequest,
+  WriteOffResult,
 } from "./types";
 
 export * from "./types";
 export { ApiError, CSRF_COOKIE, CSRF_HEADER, http, isApiError, readCookie } from "./http";
 export { DEMO_ACCOUNT, mockAuthControl } from "./mock-auth";
+export { MOCK_DICTIONARIES, mockFridgeControl, openedShelfLifeDays } from "./mock-fridge";
 
 /**
  * Що обслуговують in-memory моки:
  * - `auth` — вхід, реєстрація, сесія, відновлення пароля (B-02…B-06);
- * - `data` — продукти, рецепти, список покупок (B-11+, B-20+, B-40+).
+ * - `fridge` — продукти, підсумки, порада дня, довідники (B-10…B-16);
+ * - `shopping` — список покупок (B-40…B-45);
+ * - `household` — сім'я, учасники, запрошення (B-50…B-55);
+ * - `recipes` — рецепти (B-20…B-24, бекенду ще немає).
  */
-export type MockDomain = "auth" | "data";
+export type MockDomain = "auth" | "fridge" | "shopping" | "household" | "recipes";
 export type MockMode = boolean | readonly MockDomain[];
 
-const ALL_DOMAINS: readonly MockDomain[] = ["auth", "data"];
+const ALL_DOMAINS: readonly MockDomain[] = ["auth", "fridge", "shopping", "household", "recipes"];
+/** `data` — історична назва «усе, крім автентифікації» (I-01). */
+const DATA_DOMAINS: readonly MockDomain[] = ["fridge", "shopping", "household", "recipes"];
 let mocked = new Set<MockDomain>();
 
 /**
  * Значення `VITE_API_MOCK` → режим моків:
  * `true` — усе на моках; `false` / порожньо — усе на бекенді;
- * `data` — справжня автентифікація, а продукти, рецепти й покупки поки на моках
- * (поки немає B-11 / B-40). Можна перелічити через кому: `auth,data`.
+ * перелік доменів через кому (`recipes`, `shopping,recipes`) — лише вони на моках;
+ * `data` — усе, крім автентифікації.
  */
 export function parseMockMode(value: string | undefined): MockMode {
   const raw = (value ?? "").trim().toLowerCase();
   if (raw === "" || raw === "false" || raw === "0" || raw === "off") return false;
   if (raw === "true" || raw === "1" || raw === "on" || raw === "all") return true;
-  const domains = raw.split(",").map((part) => part.trim()).filter(Boolean);
+  const domains = raw
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .flatMap((part): string[] => (part === "data" ? [...DATA_DOMAINS] : [part]));
   const unknown = domains.filter((d) => !ALL_DOMAINS.includes(d as MockDomain));
   if (unknown.length > 0) {
-    throw new Error(`VITE_API_MOCK: невідомі значення ${unknown.join(", ")}. Дозволено: true, false, ${ALL_DOMAINS.join(", ")}`);
+    throw new Error(`VITE_API_MOCK: невідомі значення ${unknown.join(", ")}. Дозволено: true, false, data, ${ALL_DOMAINS.join(", ")}`);
   }
   return [...new Set(domains)] as MockDomain[];
 }
@@ -70,9 +87,21 @@ function viaMock<T>(call: () => Promise<T>, options: { skipUnauthorizedHandler?:
 /** 401 від auth-ендпоінтів — очікуваний результат (неправильний пароль, немає сесії), а не «сесія закінчилась». */
 const auth = { skipUnauthorizedHandler: true } as const;
 
+/** `?q=…&category=dairy&category=meat` — масиви як повторювані параметри (так їх читає Spring). */
+export function toQueryString(params: Record<string, string | number | readonly string[] | undefined | null>): string {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value === undefined || value === null || value === "") continue;
+    if (Array.isArray(value)) value.forEach((v) => search.append(key, String(v)));
+    else search.set(key, String(value));
+  }
+  const text = search.toString();
+  return text ? `?${text}` : "";
+}
+
 /**
- * Фасад над API. Сигнатури відповідають operationId в openapi.yaml / контролерам Spring,
- * тож після генерації orval можна безболісно перейти на `./generated`.
+ * Фасад над API. Сигнатури відповідають контролерам Spring (див. README → API),
+ * тож після генерації orval з `/v3/api-docs` можна перейти на `./generated`.
  */
 export const api = {
   auth: {
@@ -93,29 +122,62 @@ export const api = {
       isMockApi("auth") ? mockAuth.resetPassword(body) : http("/auth/password/reset", { ...auth, method: "POST", body: json(body) }),
   },
   products: {
-    list: (): Promise<Product[]> => (isMockApi("data") ? viaMock(() => mockApi.listProducts()) : http("/products")),
-    create: (input: ProductCreate): Promise<Product> =>
-      isMockApi("data") ? viaMock(() => mockApi.createProduct(input)) : http("/products", { method: "POST", body: json(input) }),
-    discard: (id: string, reason: DiscardReason = "eaten"): Promise<void> =>
-      isMockApi("data") ? viaMock(() => mockApi.discardProduct(id)) : http(`/products/${id}?reason=${reason}`, { method: "DELETE" }),
+    /** B-11. Сторінка з 1; `categoryCounts` — для чіпів. */
+    list: (query: ProductQuery = {}): Promise<ProductPage> =>
+      isMockApi("fridge")
+        ? viaMock(() => mockFridge.list(query))
+        : http(
+            `/products${toQueryString({ q: query.q, category: query.category, freshness: query.freshness, status: query.status, sort: query.sort, page: query.page, size: query.size })}`,
+          ),
+    get: (id: string): Promise<Product> => (isMockApi("fridge") ? viaMock(() => mockFridge.get(id)) : http(`/products/${id}`)),
+    create: (input: ProductInput): Promise<Product> =>
+      isMockApi("fridge") ? viaMock(() => mockFridge.create(input)) : http("/products", { method: "POST", body: json(input) }),
+    /** Відсутнє поле — без змін, `null` — очистити. Списаний продукт — 409 `PRODUCT_CLOSED`. */
+    update: (id: string, input: ProductInput): Promise<Product> =>
+      isMockApi("fridge") ? viaMock(() => mockFridge.update(id, input)) : http(`/products/${id}`, { method: "PATCH", body: json(input) }),
+    /** B-13. Частково або все; `addedToShoppingList` — продукт тепер у списку покупок. */
+    writeOff: (id: string, request: WriteOffRequest): Promise<WriteOffResult> =>
+      isMockApi("fridge")
+        ? viaMock(() => mockFridge.writeOff(id, request))
+        : http(`/products/${id}/write-off`, { method: "POST", body: json(request) }),
+    /** B-14. */
+    summary: (): Promise<ProductSummary> => (isMockApi("fridge") ? viaMock(() => mockFridge.summary()) : http("/products/summary")),
+  },
+  /** B-15. */
+  tips: {
+    today: (): Promise<Tip> => (isMockApi("fridge") ? viaMock(() => mockFridge.tip()) : http("/tips/today")),
+  },
+  /** B-16. */
+  dictionaries: {
+    get: (): Promise<Dictionaries> => (isMockApi("fridge") ? viaMock(() => mockFridge.dictionaries()) : http("/dictionaries")),
   },
   recipes: {
-    suggest: (productIds: string[]): Promise<Recipe[]> =>
-      isMockApi("data") ? viaMock(() => mockApi.suggestRecipes(productIds)) : http("/recipes/suggest", { method: "POST", body: json({ productIds }) }),
+    /** Бекенду рецептів ще немає (B-20…B-24): мок отримує вже завантажені продукти, звідки б вони не прийшли. */
+    suggest: async (productIds: string[]): Promise<Recipe[]> => {
+      if (!isMockApi("recipes")) return http("/recipes/suggest", { method: "POST", body: json({ productIds }) });
+      const products = await Promise.all(productIds.map((id) => api.products.get(id).catch(() => null)));
+      return viaMock(() => mockApi.suggestRecipes(products.filter((p): p is Product => p !== null)));
+    },
   },
   shoppingList: {
-    get: (): Promise<ShoppingItem[]> => (isMockApi("data") ? viaMock(() => mockApi.getShoppingList()) : http("/shopping-list")),
+    get: (): Promise<ShoppingItem[]> => (isMockApi("shopping") ? viaMock(() => mockApi.getShoppingList()) : http("/shopping-list")),
     toggle: (id: string): Promise<void> =>
-      isMockApi("data") ? viaMock(() => mockApi.toggleShoppingItem(id)) : http(`/shopping-list/${id}/toggle`, { method: "POST" }),
+      isMockApi("shopping") ? viaMock(() => mockApi.toggleShoppingItem(id)) : http(`/shopping-list/${id}/toggle`, { method: "POST" }),
     addMany: (names: string[]): Promise<void> =>
-      isMockApi("data") ? viaMock(() => mockApi.addShoppingItems(names)) : http("/shopping-list", { method: "POST", body: json({ names }) }),
+      isMockApi("shopping") ? viaMock(() => mockApi.addShoppingItems(names)) : http("/shopping-list", { method: "POST", body: json({ names }) }),
   },
 };
 
 /** Ключі кешу TanStack Query — єдине джерело правди для інвалідації. */
 export const queryKeys = {
   me: ["me"] as const,
+  /** Префікс усього, що залежить від продуктів: списки, підсумки, порада. */
   products: ["products"] as const,
+  productList: (query: ProductQuery) => ["products", "list", query] as const,
+  product: (id: string) => ["products", "item", id] as const,
+  productSummary: ["products", "summary"] as const,
+  tip: ["products", "tip"] as const,
+  dictionaries: ["dictionaries"] as const,
   recipes: (ids: string[]) => ["recipes", [...ids].sort()] as const,
   shoppingList: ["shopping-list"] as const,
 };

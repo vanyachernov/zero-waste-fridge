@@ -1,26 +1,10 @@
 import { requireMockSession } from "./mock-auth";
-import type { Product, ProductCreate, Recipe, ShoppingItem } from "./types";
+import type { Product, Recipe, ShoppingItem } from "./types";
 
-/** In-memory бекенд для розробки UI без Spring Boot (VITE_API_MOCK=true). */
+/** In-memory рецепти й список покупок для розробки UI без Spring Boot (VITE_API_MOCK=true). */
 
-const DAY = 24 * 60 * 60 * 1000;
-const isoIn = (days: number) => new Date(Date.now() + days * DAY).toISOString().slice(0, 10);
 const delay = (ms = 250) => new Promise((r) => setTimeout(r, ms));
 let seq = 100;
-
-let products: Product[] = [
-  { id: "p1", name: "Фарш яловичий свіжий", brand: "Фермерська м'ясо, охолоджене", category: "meat", zone: "fresh", quantity: 500, unit: "g", expiresAt: isoIn(-1), addedAt: new Date().toISOString() },
-  { id: "p2", name: "Шпинат Baby свіжий", brand: "Органічна зелень, митий", category: "vegetables", zone: "fresh", quantity: 150, unit: "g", expiresAt: isoIn(0), addedAt: new Date().toISOString() },
-  { id: "p3", name: "Грецький йогурт 5%", brand: "ТМ Галичина, банка", category: "dairy", zone: "door", quantity: 350, unit: "g", expiresAt: isoIn(1), addedAt: new Date().toISOString() },
-  { id: "p4", name: "Філе куряче охолоджене", brand: "Еко-пакування", category: "meat", zone: "fresh", quantity: 650, unit: "g", expiresAt: isoIn(2), addedAt: new Date().toISOString() },
-  { id: "p5", name: "Полуниця солодка", brand: "Лоток, локальний збір", category: "fruits", zone: "fresh", quantity: 300, unit: "g", expiresAt: isoIn(4), addedAt: new Date().toISOString() },
-  { id: "p6", name: "Молоко пастеризоване 2.5%", brand: "Скляна пляшка багаторазова", category: "dairy", zone: "door", quantity: 1, unit: "l", expiresAt: isoIn(5), addedAt: new Date().toISOString() },
-  { id: "p7", name: "Авокадо Хаас стигле", brand: "Ready-to-eat", category: "vegetables", zone: "middle", quantity: 2, unit: "pcs", expiresAt: isoIn(7), addedAt: new Date().toISOString() },
-  { id: "p8", name: "Сир твердий Гауда 45%", brand: "Брусок у вощеній упаковці", category: "dairy", zone: "middle", quantity: 320, unit: "g", expiresAt: isoIn(14), addedAt: new Date().toISOString() },
-  { id: "p9", name: "Яйця фермерські С0", brand: "10 шт", category: "other", zone: "door", quantity: 6, unit: "pcs", expiresAt: isoIn(4), addedAt: new Date().toISOString() },
-  { id: "p10", name: "Кабачки / Цукіні", brand: "Місцевий фермер", category: "vegetables", zone: "fresh", quantity: 2, unit: "pcs", expiresAt: isoIn(3), addedAt: new Date().toISOString() },
-  { id: "p11", name: "Соус песто", brand: "Скляна банка, відкрита", category: "sauces", zone: "door", quantity: 90, unit: "g", expiresAt: isoIn(6), addedAt: new Date().toISOString() },
-];
 
 let shopping: ShoppingItem[] = [
   { id: "s1", name: "Лимон", quantity: "1 шт", reason: "recipe", done: false },
@@ -64,27 +48,10 @@ const RECIPE_TEMPLATES: Array<Omit<Recipe, "id" | "usedProductIds" | "matchPerce
 ];
 
 export const mockApi = {
-  async listProducts(): Promise<Product[]> {
-    requireMockSession();
-    await delay();
-    return [...products];
-  },
-  async createProduct(input: ProductCreate): Promise<Product> {
-    requireMockSession();
-    await delay();
-    const product: Product = { ...input, id: `p${++seq}`, addedAt: new Date().toISOString() };
-    products = [product, ...products];
-    return product;
-  },
-  async discardProduct(id: string): Promise<void> {
-    requireMockSession();
-    await delay(150);
-    products = products.filter((p) => p.id !== id);
-  },
-  async suggestRecipes(productIds: string[]): Promise<Recipe[]> {
+  /** Продукти вже завантажені фасадом (з моку холодильника або з бекенду). */
+  async suggestRecipes(selected: Product[]): Promise<Recipe[]> {
     requireMockSession();
     await delay(700);
-    const selected = products.filter((p) => productIds.includes(p.id));
     return RECIPE_TEMPLATES.map((tpl, i) => {
       const used = selected.filter((p) => tpl.keys.some((k) => p.name.toLowerCase().includes(k.toLowerCase())));
       const matchPercent = Math.round(55 + (used.length / Math.max(selected.length, 1)) * 45);

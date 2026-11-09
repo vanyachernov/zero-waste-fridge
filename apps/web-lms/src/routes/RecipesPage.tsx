@@ -5,8 +5,8 @@ import { useI18n } from "@zwf/i18n/react";
 import { Badge, Button, Card, FreshnessBadge, cn } from "@zwf/ui";
 import { ArrowLeft, Check, CheckCircle2, Clock, Flame, Gauge, Lightbulb, ShoppingCart, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
-import { daysLeft, freshnessLabel, sortByUrgency } from "../lib/freshness";
-import { productsQuery, recipesQuery } from "../lib/queries";
+import { freshnessLabel } from "../lib/freshness";
+import { activeProductsQuery, recipesQuery } from "../lib/queries";
 import { useDocumentTitle } from "../lib/useDocumentTitle";
 
 const route = getRouteApi("/_authenticated/recipes");
@@ -18,15 +18,15 @@ export function RecipesPage() {
   const { t } = i18n;
   const { ids = [] } = route.useSearch();
   const navigate = route.useNavigate();
-  const { data: products } = useSuspenseQuery(productsQuery);
+  const {
+    data: { items: products },
+  } = useSuspenseQuery(activeProductsQuery);
   const recipes = useQuery(recipesQuery(ids));
   const [openId, setOpenId] = useState<string | null>(null);
 
   const candidates = useMemo(
     () =>
-      sortByUrgency(products)
-        .map((p) => ({ ...p, days: daysLeft(p.expiresAt) }))
-        .filter((p) => p.days >= 0),
+      products.map((p) => ({ ...p, days: p.daysLeft })).filter((p) => p.days >= 0),
     [products],
   );
   const byId = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
