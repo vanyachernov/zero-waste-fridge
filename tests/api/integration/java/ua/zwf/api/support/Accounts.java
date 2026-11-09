@@ -8,6 +8,16 @@ public final class Accounts {
 	private Accounts() {
 	}
 
+	/** Те саме, але з відомим email — щоб надіслати запрошення саме йому. */
+	public static ApiClient signUp(ApiClient client, String name, String email) {
+		var response = client.post("/api/auth/register",
+				Map.of("name", name, "email", email, "password", TestData.PASSWORD));
+		if (response.status() != 201 && response.status() != 200) {
+			throw new IllegalStateException("Registration failed: " + response.status() + " " + response.body());
+		}
+		return client;
+	}
+
 	/** Реєструє нового користувача (зі своїм домогосподарством) і повертає залогінений клієнт. */
 	public static ApiClient signUp(ApiClient client, String name) {
 		var response = client.post("/api/auth/register",
