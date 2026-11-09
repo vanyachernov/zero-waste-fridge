@@ -28,11 +28,15 @@ class ProductController {
 
 	private final WriteOffService writeOffs;
 
+	private final ProductSummaryService summaries;
+
 	private final CurrentHousehold household;
 
-	ProductController(ProductService service, WriteOffService writeOffs, CurrentHousehold household) {
+	ProductController(ProductService service, WriteOffService writeOffs, ProductSummaryService summaries,
+			CurrentHousehold household) {
 		this.service = service;
 		this.writeOffs = writeOffs;
+		this.summaries = summaries;
 		this.household = household;
 	}
 
@@ -50,6 +54,13 @@ class ProductController {
 				category == null ? Set.of() : Set.copyOf(category), freshness == null ? Set.of() : Set.copyOf(freshness),
 				status);
 		return service.list(filter, sort, page, size);
+	}
+
+	/** Оголошено до {@code /{id}}, хоча Spring і так віддає перевагу буквальному шляху над шаблоном. */
+	@Operation(summary = "Fridge stat cards: total, added this week, expiring within 48 h, expired")
+	@GetMapping("/summary")
+	ProductSummary summary(@AuthenticationPrincipal AppUserPrincipal principal) {
+		return summaries.summary(household.idOf(principal.id()));
 	}
 
 	@Operation(summary = "Add a product to the fridge")
