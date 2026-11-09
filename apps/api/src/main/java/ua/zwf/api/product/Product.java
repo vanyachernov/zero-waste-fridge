@@ -151,6 +151,31 @@ public class Product {
 		this.updatedAt = db(now);
 	}
 
+	/**
+	 * B-13: списати {@code amount} (або все, якщо {@code null}). Повертає списану кількість. Коли нічого не
+	 * лишилось, продукт закривається зі статусом за результатом (викинуто → WASTED, інакше CONSUMED).
+	 */
+	public BigDecimal writeOff(WriteOffOutcome outcome, BigDecimal amount, Instant now) {
+		Objects.requireNonNull(outcome, "outcome");
+		if (!isActive()) {
+			throw new IllegalStateException("Product is already closed");
+		}
+		BigDecimal written = amount == null ? quantity : amount;
+		if (written.signum() <= 0 || written.compareTo(quantity) > 0) {
+			throw new IllegalArgumentException("amount must be in (0, quantity]");
+		}
+		BigDecimal remaining = quantity.subtract(written);
+		if (remaining.signum() == 0) {
+			this.status = outcome.closingStatus();
+			this.closedAt = db(now);
+		}
+		else {
+			this.quantity = remaining;
+		}
+		this.updatedAt = db(now);
+		return written;
+	}
+
 	public boolean isOpened() {
 		return openedAt != null;
 	}

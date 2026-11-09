@@ -25,6 +25,8 @@ public class ProductService {
 
 	private final ProductRepository products;
 
+	private final ProductEventRepository events;
+
 	private final HouseholdRepository households;
 
 	private final UserRepository users;
@@ -35,9 +37,10 @@ public class ProductService {
 
 	private final Today today;
 
-	public ProductService(ProductRepository products, HouseholdRepository households, UserRepository users,
-			EntityManager em, Clock clock, Today today) {
+	public ProductService(ProductRepository products, ProductEventRepository events, HouseholdRepository households,
+			UserRepository users, EntityManager em, Clock clock, Today today) {
 		this.products = products;
+		this.events = events;
 		this.households = households;
 		this.users = users;
 		this.em = em;
@@ -85,11 +88,12 @@ public class ProductService {
 			product.open(values.openedAt(), OpenedShelfLife.days(details.category(), details.name()), clock.instant());
 		}
 		products.saveAndFlush(product);
+		events.save(ProductEvent.of(product, users.getReferenceById(userId), ProductEventType.ADDED, clock.instant()));
 		return ProductResponse.of(products.findByIdAndHouseholdId(product.getId(), householdId).orElseThrow(), date);
 	}
 
 	@Transactional
-	public ProductResponse update(UUID householdId, UUID productId, ProductInput input) {
+	public ProductResponse update(UUID householdId, UUID userId, UUID productId, ProductInput input) {
 		var product = find(householdId, productId);
 		if (!product.isActive()) {
 			throw new ProductClosedException();
@@ -116,9 +120,12 @@ public class ProductService {
 			product.unopen(now);
 		}
 		product.apply(details, now);
-		if (openedChanged && values.openedAt() != null) {
+		boolean opened = openedChanged && values.openedAt() != null;
+		if (opened) {
 			product.open(values.openedAt(), OpenedShelfLife.days(details.category(), details.name()), now);
 		}
+		events.save(ProductEvent.of(product, users.getReferenceById(userId),
+				opened ? ProductEventType.OPENED : ProductEventType.UPDATED, now));
 		products.flush();
 		return ProductResponse.of(product, date);
 	}
