@@ -43,6 +43,12 @@ class ShoppingListController {
 		return service.list(household.idOf(principal.id()), store, fromFridge);
 	}
 
+	@Operation(summary = "Progress and estimate: bought of total, estimated total, auto items to buy")
+	@GetMapping("/summary")
+	ShoppingSummary summary(@AuthenticationPrincipal AppUserPrincipal principal) {
+		return service.summary(household.idOf(principal.id()));
+	}
+
 	@Operation(summary = "Add an item")
 	@PostMapping
 	ResponseEntity<ShoppingItemResponse> create(@AuthenticationPrincipal AppUserPrincipal principal,

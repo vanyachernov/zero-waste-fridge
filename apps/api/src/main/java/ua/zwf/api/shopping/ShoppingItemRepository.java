@@ -28,4 +28,13 @@ public interface ShoppingItemRepository extends JpaRepository<ShoppingItem, UUID
 	@Query("delete from ShoppingItem i where i.household.id = :household and i.boughtAt is not null")
 	int deleteBought(@Param("household") UUID householdId);
 
+	@Query("""
+			select coalesce(sum(case when i.boughtAt is not null then 1 else 0 end), 0),
+			       count(i),
+			       coalesce(sum(i.priceEstimate), 0),
+			       coalesce(sum(case when i.boughtAt is null and i.source = ua.zwf.api.shopping.ShoppingSource.AUTO
+			                         then 1 else 0 end), 0)
+			from ShoppingItem i where i.household.id = :household""")
+	List<Object[]> summary(@Param("household") UUID householdId);
+
 }
