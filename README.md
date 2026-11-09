@@ -74,11 +74,21 @@ pnpm dev:api
 
 Демо-акаунт мока: **olena@example.com / Secret-pass-123**. На сторінці входу є кнопка, що підставляє ці дані. Лист «відновлення пароля» в мок-режимі нікуди не надсилається: посилання з нього показується на сторінці «Перевірте пошту» і в консолі браузера.
 
-Щоб ходити в реальний бекенд, поставте `VITE_API_MOCK=false`. Vite проксує `/api` на `BACKEND_URL` (за замовчуванням `http://localhost:8080`), тому сесійна cookie лишається first-party. Зручніше не правити `.env.development`, а створити `apps/web-lms/.env.realapi.local` і запустити Vite з `--mode realapi`:
+`VITE_API_MOCK` приймає три значення:
+
+| Значення | Автентифікація | Продукти, рецепти, покупки |
+|---|---|---|
+| `true` (dev за замовчуванням) | моки | моки |
+| `data` | Spring Boot | моки (поки немає B-11 / B-40) |
+| `false` (prod) | Spring Boot | Spring Boot |
+
+Режим `data` уже налаштований у `apps/web-lms/.env.backend`. Запустіть бекенд, а потім:
 
 ```bash
-pnpm --filter @zwf/web-lms exec vite --mode realapi
+pnpm --filter @zwf/web-lms dev:backend
 ```
+
+Vite проксує `/api` на `BACKEND_URL` (за замовчуванням `http://localhost:8080`), тому сесійна cookie лишається first-party. Листи «відновлення пароля» тоді приходять у Mailpit. Для інших налаштувань створіть `apps/web-lms/.env.<mode>.local` і запустіть Vite з `--mode <mode>`.
 
 ## Інші команди
 
