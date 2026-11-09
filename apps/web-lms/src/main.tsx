@@ -1,4 +1,4 @@
-import { configureApi } from "@zwf/api-client";
+import { configureApi, parseMockMode } from "@zwf/api-client";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { AppProviders, createQueryClient, createUnauthorizedHandler } from "./app";
@@ -13,7 +13,8 @@ const router = createAppRouter(queryClient);
 
 configureApi({
   baseUrl: "/api",
-  mock: import.meta.env.VITE_API_MOCK === "true",
+  // true — усе на моках, false — усе на бекенді, data — справжній auth + моки продуктів/покупок
+  mock: parseMockMode(import.meta.env.VITE_API_MOCK),
   // Сесія (HttpOnly-cookie) закінчилась посеред роботи → на вхід, потім назад
   onUnauthorized: createUnauthorizedHandler(router, queryClient),
 });
