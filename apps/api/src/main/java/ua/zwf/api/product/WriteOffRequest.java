@@ -4,8 +4,8 @@ package ua.zwf.api.product;
  * Тіло {@code POST /api/products/{id}/write-off}.
  *
  * @param quantity {@code "all"} (або відсутнє) — усе; число — частково, в одиницях продукту
- * @param addToShoppingList «Додати … до списку покупок»: поки немає B-40, приймається, але позиція
- *     не створюється — відповідь каже про це полем {@code addedToShoppingList: false}
+ * @param addToShoppingList «Додати … до списку покупок» (B-40): позиція {@code WRITE_OFF}, якщо такої
+ *     назви ще немає серед некуплених
  */
 public record WriteOffRequest(WriteOffOutcome outcome, Object quantity, Boolean addToShoppingList) {
 

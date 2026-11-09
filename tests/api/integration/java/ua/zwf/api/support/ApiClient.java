@@ -60,6 +60,14 @@ public final class ApiClient {
 			.method("PATCH", HttpRequest.BodyPublishers.ofString(JSON.writeValueAsString(body))));
 	}
 
+	/** DELETE з CSRF-заголовком. */
+	public Response delete(String path) {
+		ensureCsrfCookie();
+		return send(request(path).header("Accept", "application/json")
+			.header(CSRF_HEADER, csrfToken().orElseThrow())
+			.DELETE());
+	}
+
 	/** POST із сирим тілом (зламаний JSON тощо). */
 	public Response postJson(String path, String rawJson) {
 		ensureCsrfCookie();
