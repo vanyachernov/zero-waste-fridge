@@ -56,6 +56,10 @@ public class ShoppingItem {
 	@Column(name = "price_estimate", precision = 10, scale = 2)
 	private BigDecimal priceEstimate;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "store_id")
+	private Store store;
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 16, updatable = false)
 	private ShoppingSource source;
@@ -106,6 +110,11 @@ public class ShoppingItem {
 
 	public ShoppingItemDetails details() {
 		return new ShoppingItemDetails(name, quantity, unit, category, priority, priceEstimate);
+	}
+
+	public void moveTo(Store store, Instant now) {
+		this.store = store;
+		this.updatedAt = db(now);
 	}
 
 	/** «Куплено» ↔ «треба купити». */
@@ -160,6 +169,10 @@ public class ShoppingItem {
 
 	public BigDecimal getPriceEstimate() {
 		return priceEstimate;
+	}
+
+	public Store getStore() {
+		return store;
 	}
 
 	public ShoppingSource getSource() {

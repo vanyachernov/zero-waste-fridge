@@ -3,6 +3,7 @@ package ua.zwf.api.shopping;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import ua.zwf.api.product.ProductCategory;
 import ua.zwf.api.product.Unit;
 
@@ -22,6 +23,8 @@ public class ShoppingItemInput {
 	private ShoppingPriority priority;
 
 	private BigDecimal priceEstimate;
+
+	private UUID storeId;
 
 	public boolean has(String field) {
 		return present.contains(field);
@@ -79,6 +82,15 @@ public class ShoppingItemInput {
 	public void setPriceEstimate(BigDecimal priceEstimate) {
 		present.add("priceEstimate");
 		this.priceEstimate = priceEstimate;
+	}
+
+	public UUID getStoreId() {
+		return storeId;
+	}
+
+	public void setStoreId(UUID storeId) {
+		present.add("storeId");
+		this.storeId = storeId;
 	}
 
 }
