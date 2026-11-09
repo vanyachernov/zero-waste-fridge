@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.zwf.api.auth.Emails;
 import ua.zwf.api.auth.PasswordPolicy;
 import ua.zwf.api.config.ZwfProperties;
+import ua.zwf.api.mail.MailTemplates;
 import ua.zwf.api.mail.Mailer;
 import ua.zwf.api.user.User;
 import ua.zwf.api.user.UserRepository;
@@ -44,9 +45,12 @@ public class PasswordResetService {
 
 	private final Clock clock;
 
+	private final MailTemplates templates;
+
 	public PasswordResetService(UserRepository users, PasswordResetTokenRepository tokens,
 			PasswordEncoder passwordEncoder, Mailer mailer, FindByIndexNameSessionRepository<? extends Session> sessions,
-			ZwfProperties properties, Clock clock) {
+			ZwfProperties properties, Clock clock, MailTemplates templates) {
+		this.templates = templates;
 		this.users = users;
 		this.tokens = tokens;
 		this.passwordEncoder = passwordEncoder;
@@ -76,7 +80,7 @@ public class PasswordResetService {
 
 		var link = PasswordResetMail.link(properties.publicUrl(), token);
 		try {
-			mailer.send(PasswordResetMail.create(user.getEmail(), user.getName(), link, auth.passwordResetTtl()));
+			mailer.send(PasswordResetMail.create(templates, user.getEmail(), user.getName(), link, auth.passwordResetTtl()));
 		}
 		catch (MailException ex) {
 			// Відповідь клієнту однакова в будь-якому разі; користувач може повторити запит після cooldown

@@ -58,7 +58,7 @@ class PasswordResetServiceTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		service = new PasswordResetService(users, tokens, encoder, mailer, sessions, properties,
-				Clock.fixed(NOW, ZoneOffset.UTC));
+				Clock.fixed(NOW, ZoneOffset.UTC), new ua.zwf.api.mail.MailTemplates());
 		user = new User("olena@example.com", "Олена", "{bcrypt}old", Instant.EPOCH);
 		Field id = User.class.getDeclaredField("id");
 		id.setAccessible(true);
