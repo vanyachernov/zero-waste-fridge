@@ -105,7 +105,7 @@ Notification (user, type, payload, readAt)
 
 ---
 
-## Етап 2 — Інвентар холодильника (ядро продукту)
+## Етап 2 — Інвентар холодильника (ядро продукту) — бекенд ✅ (крім ShoppingItem у B-13), фронтенд 🟡
 
 Макети: «Мій холодильник», «Додати продукт», «Списати продукт».
 
@@ -113,13 +113,13 @@ Notification (user, type, payload, readAt)
 
 | ID | Задача | Деталі / критерії приймання | Залежності | Статус |
 |---|---|---|---|---|
-| B-10 | Модель Product + міграції | Поля з розділу «Доменна модель». Індекси за `(household_id, effective_expires_at)` | B-01 | ⬜ |
-| B-11 | CRUD продуктів | `GET /api/products` (фільтри: `category`, `q`, `status`; сортування за терміном; пагінація), `POST`, `PATCH /{id}`, `GET /{id}`. Доступ лише в межах свого Household | B-10, B-05 | ⬜ |
-| B-12 | Правила відкритої упаковки | Якщо `openedAt` задано, `effectiveExpiresAt = min(expiresAt, openedAt + shelfLifeAfterOpening(category))`. Довідник термінів за категоріями: йогурт — 5 днів, молоко — 3 дні тощо | B-10 | ⬜ |
-| B-13 | Списання продукту | `POST /api/products/{id}/write-off` `{outcome: EATEN \| COOKED \| WASTED, quantity: all \| number, addToShoppingList: bool}`. Створює ProductEvent, зменшує кількість або закриває продукт. Опційно створює ShoppingItem | B-11, B-40 | ⬜ |
-| B-14 | Статистика холодильника | `GET /api/products/summary` → `{total, addedThisWeek, soon (≤48 год), expired}` | B-11 | ⬜ |
-| B-15 | Розумна порада дня | `GET /api/tips/today` — продукти, що закінчуються протягом 24 год, і підказка-рецепт. Перша версія — шаблони, потім AI (B-22) | B-11 | ⬜ |
-| B-16 | Довідники | `GET /api/dictionaries` → категорії, зони зберігання (з температурою й описом), одиниці, терміни після відкриття | B-10 | ⬜ |
+| B-10 | Модель Product + міграції | `V4__product.sql`: продукт домогосподарства з кодами, спільними з фронтендом (`category`, `zone`, `unit`), `effectiveExpiresAt`, `remindBeforeDays` (1/2/3/7), статус `ACTIVE / CONSUMED / WASTED`, CHECK-обмеження. Частковий індекс `(household_id, effective_expires_at) WHERE status = 'ACTIVE'` і `(household_id, created_at)` | B-01 | ✅ |
+| B-11 | CRUD продуктів | `GET /api/products`: `q` (назва або бренд), `category` і `freshness` (кілька значень), `status`, `sort` (expiry / name / added / category), `page` з 1 і `size` ≤ 100, `categoryCounts` для чіпів. `POST` (201 + Location, типова зона за категорією), `GET /{id}`, `PATCH /{id}` (відсутнє поле — без змін, `null` — очистити). `daysLeft` / `freshness` за поясом `zwf.time-zone` (Europe/Kyiv). Чужий продукт — 404 `PRODUCT_NOT_FOUND` | B-10, B-05 | ✅ |
+| B-12 | Правила відкритої упаковки | `effectiveExpiresAt = min(expiresAt, openedAt + днів)`. Правила за ключовими словами (йогурт — 5, молоко — 3, фарш — 1, тверді сири й масло — 14…), інакше типовий термін категорії. Застосований термін зберігається (`V5`), тож зміна довідника не зсуває вже відкриті продукти | B-10 | ✅ |
+| B-13 | Списання продукту | `POST /api/products/{id}/write-off` `{outcome: EATEN \| COOKED \| WASTED, quantity: "all" \| число, addToShoppingList?}`. Частково — зменшує кількість, усе — закриває як `CONSUMED` / `WASTED`. Журнал `product_event` (`V6`): ADDED, UPDATED, OPENED, WRITTEN_OFF з автором. **Лишилось:** `addToShoppingList` поки повертає `addedToShoppingList: false` — створення ShoppingItem після B-40 | B-11, B-40 | 🟡 без ShoppingItem |
+| B-14 | Статистика холодильника | `GET /api/products/summary` → `{total, addedThisWeek, soon (сьогодні…післязавтра), today, expired}` одним запитом | B-11 | ✅ |
+| B-15 | Розумна порада дня | `GET /api/tips/today` → `{date, kind: USE_SOON \| EXPIRED \| ALL_FRESH \| EMPTY, products (до 4, сьогодні й завтра), hint}`; страва за переважною категорією (SALAD, PANCAKES, STIR_FRY…). Тексти — на фронтенді. Потім AI (B-22) | B-11 | ✅ |
+| B-16 | Довідники | `GET /api/dictionaries` → категорії (типова зона, термін після відкриття), зони з температурою, одиниці з типом, варіанти нагадування, правила термінів. Лише коди: назви й описи — у `packages/i18n`. Кеш на годину | B-10 | ✅ |
 
 ### Фронтенд
 

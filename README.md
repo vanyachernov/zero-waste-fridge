@@ -195,6 +195,27 @@ SPRING_PROFILES_ACTIVE=prod DB_URL=jdbc:postgresql://host:5432/zwf DB_USER=zwf D
 
 - **OpenAPI**: `/v3/api-docs`. Щоб згенерувати клієнт з бекенду, змініть `input.target` у `packages/api-client/orval.config.ts` і запустіть `pnpm api:generate`.
 
+## Холодильник (B-10…B-16)
+
+Усі ендпоінти потребують сесії і працюють лише з продуктами домогосподарства поточного користувача. Чужий продукт виглядає як неіснуючий (404).
+
+| Метод і шлях | Відповідь |
+|---|---|
+| `GET /api/products?q=&category=&freshness=&status=&sort=&page=&size=` | `{items, page, size, total, totalPages, categoryCounts}`. `category` і `freshness` (`expired`, `today`, `soon`, `fresh`) приймають кілька значень; `sort`: `expiry` (за замовчуванням), `name`, `added`, `category`; `page` з 1, `size` до 100 |
+| `POST /api/products` | 201 + продукт. Обов'язкові `name`, `category`, `quantity`, `unit`, `expiresAt`; `zone` за замовчуванням — типова для категорії, `remindBeforeDays` — 2 |
+| `GET /api/products/{id}` | продукт · 404 `PRODUCT_NOT_FOUND` |
+| `PATCH /api/products/{id}` | продукт. Відсутнє поле не змінюється, `null` очищує `brand` / `purchasedAt` / `openedAt` · 409 `PRODUCT_CLOSED` для списаного |
+| `POST /api/products/{id}/write-off` `{outcome, quantity?, addToShoppingList?}` | `{product, writtenOff, addedToShoppingList}`. `outcome`: `EATEN`, `COOKED`, `WASTED`; `quantity`: `"all"` (за замовчуванням) або число · 400 `EXCEEDS_REMAINING` |
+| `GET /api/products/summary` | `{total, addedThisWeek, soon, today, expired}` |
+| `GET /api/tips/today` | `{date, kind, products, hint}` — продукти, що закінчуються сьогодні або завтра, та ідея страви |
+| `GET /api/dictionaries` | категорії, зони з температурою, одиниці, варіанти нагадування, терміни після відкриття |
+
+- **Коди** категорій, зон і одиниць — ті самі, що й на фронтенді (`dairy`, `door`, `kg`…). Статуси й результати списання — великими літерами (`ACTIVE`, `WASTED`).
+- **Терміни** — календарні дати. `daysLeft` і `freshness` рахуються від «сьогодні» в поясі `zwf.time-zone` (за замовчуванням `Europe/Kyiv`), а не в UTC сервера. «Скоро» — до 48 годин (завтра й післязавтра).
+- **Відкрита упаковка** (B-12): `effectiveExpiresAt = min(expiresAt, openedAt + днів після відкриття)`. Дні беруться з правил за назвою (йогурт — 5, молоко — 3), інакше з типового терміну категорії.
+- **Клієнт для фронтенду**: ручний `packages/api-client/openapi/openapi.yaml` застарів. В I-10 типи краще згенерувати orval з `/v3/api-docs` (там є всі ендпоінти вище).
+- **Помилки полів**: `NotNull`, `NotBlank`, `Size`, `Positive`, `Digits`, `NOT_ALLOWED`, `IN_FUTURE`, `BEFORE_PURCHASE`, `INVALID` (невідомий код, неправильна дата або query-параметр). Зламаний JSON — `MALFORMED_REQUEST`.
+
 ### Пошта
 
 | Оточення | Як відправляються листи |
