@@ -233,7 +233,29 @@ SPRING_PROFILES_ACTIVE=prod DB_URL=jdbc:postgresql://host:5432/zwf DB_USER=zwf D
 | `GET / POST / DELETE /api/shopping-list/stores` | магазини домогосподарства · 409 `STORE_EXISTS` |
 | `GET /api/shopping-list/summary` | `{bought, total, estimatedTotal, autoCount}` |
 
+## Сім'я (B-50…B-55)
+
+Ролі з макета «Моя сім'я»: `OWNER` може все, `MEMBER` — холодильник, рецепти, список покупок і нагадування, але не керує учасниками. Право перевіряється за роллю з БД, заборонене — 403 `FORBIDDEN`.
+
+| Метод і шлях | Хто | Відповідь |
+|---|---|---|
+| `GET /api/household` | усі | `{id, name, memberCount, role, permissions}` — `permissions` фронтенд використовує, щоб ховати недоступні дії |
+| `PATCH /api/household {name}` | власник | перейменування |
+| `DELETE /api/household {password}` | власник | видалити домогосподарство й усі дані; кожен учасник отримує власне порожнє |
+| `GET /api/household/members` | усі | учасники з роллю та «Останньою дією» |
+| `PATCH /api/household/members/{userId} {role}` | власник | 409 `LAST_OWNER`, якщо це останній власник |
+| `DELETE /api/household/members/{userId}` | власник або сам учасник | видалити / вийти |
+| `GET /api/household/activity?before=&limit=` | усі | стрічка дій, курсор `nextBefore` |
+| `POST /api/household/invites {email, role?}` | власник | лист із посиланням `/lms/join?invite=…` (7 днів, лише для цього email) · 409 `INVITE_EXISTS` / `ALREADY_MEMBER` |
+| `GET /api/household/invites` · `DELETE /invites/{id}` | усі · власник | очікувані запрошення · скасувати |
+| `GET / POST /api/household/invites/code` | власник | код `ZWF-XXXX-XX` на 7 днів; POST генерує новий і анулює старий |
+| `POST /api/household/join {code}` або `{invite}` | усі | вступ: 400 `INVALID_INVITE`, 403 `INVITE_EMAIL_MISMATCH`, 409 `LAST_OWNER` |
+
+Користувач завжди в одному домогосподарстві. Хто вступає в сім'ю, будучи в своєму домогосподарстві сам, переносить туди свої продукти й список покупок (без магазинів), а старе видаляється.
+
 ### Пошта
+
+Листи — шаблони Thymeleaf у `apps/api/src/main/resources/mail/`: `<лист>.html` (зі спільним `layout.html`) і `<лист>.txt`. Є скидання пароля, запрошення до сім'ї та щоденний дайджест термінів.
 
 | Оточення | Як відправляються листи |
 |---|---|
