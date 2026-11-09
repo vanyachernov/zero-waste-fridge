@@ -35,16 +35,19 @@ public class ShoppingListService implements WriteOffListener {
 
 	private final StoreRepository stores;
 
+	private final ShoppingSettingsService settings;
+
 	private final HouseholdRepository households;
 
 	private final UserRepository users;
 
 	private final Clock clock;
 
-	public ShoppingListService(ShoppingItemRepository items, StoreRepository stores, HouseholdRepository households,
-			UserRepository users, Clock clock) {
+	public ShoppingListService(ShoppingItemRepository items, StoreRepository stores, ShoppingSettingsService settings,
+			HouseholdRepository households, UserRepository users, Clock clock) {
 		this.items = items;
 		this.stores = stores;
+		this.settings = settings;
 		this.households = households;
 		this.users = users;
 		this.clock = clock;
@@ -116,16 +119,24 @@ public class ShoppingListService implements WriteOffListener {
 		return ShoppingItemResponse.of(find(householdId, itemId));
 	}
 
-	/** B-13: «Додати … до списку покупок» у модалці списання. */
+	/**
+	 * B-13: «Додати … до списку покупок» у модалці списання → позиція {@code WRITE_OFF}.
+	 * B-43 Smart Sync: без прапорця, коли продукт закінчився (списано все), а категорія не у винятках —
+	 * позиція {@code AUTO}. Часткове списання автоматично нічого не додає.
+	 */
 	@Override
 	@Transactional
 	public boolean afterWriteOff(Product product, UUID userId, WriteOffOutcome outcome, BigDecimal written,
 			boolean requested) {
-		if (!requested) {
-			return false;
+		if (requested) {
+			addFromProduct(product, userId, ShoppingSource.WRITE_OFF, written);
+			return true;
 		}
-		addFromProduct(product, userId, ShoppingSource.WRITE_OFF, written);
-		return true;
+		if (!product.isActive() && settings.of(product.getHousehold().getId()).refills(product.getCategory())) {
+			addFromProduct(product, userId, ShoppingSource.AUTO, written);
+			return true;
+		}
+		return false;
 	}
 
 	/** Позиція «купити ще раз» за продуктом; якщо така назва вже чекає на покупку — не дублюємо. */
