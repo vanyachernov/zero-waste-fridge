@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -21,5 +22,10 @@ public interface ShoppingItemRepository extends JpaRepository<ShoppingItem, UUID
 			select i from ShoppingItem i
 			where i.household.id = :household and i.boughtAt is null and lower(i.name) = lower(:name)""")
 	List<ShoppingItem> findOpenByName(@Param("household") UUID householdId, @Param("name") String name);
+
+	/** B-41: «Очистити куплені» одним запитом. */
+	@Modifying(clearAutomatically = true, flushAutomatically = true)
+	@Query("delete from ShoppingItem i where i.household.id = :household and i.boughtAt is not null")
+	int deleteBought(@Param("household") UUID householdId);
 
 }

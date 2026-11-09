@@ -182,4 +182,26 @@ class ShoppingListIT extends IntegrationTest {
 		assertThat(section(client, "toBuy")).hasSize(1);
 	}
 
+	@Test
+	void clearBoughtRemovesOnlyBoughtItemsOfOwnHousehold() {
+		var client = Accounts.signUp(client(), "Олена");
+		var bread = add(client, Map.of("name", "Хліб")).get("id");
+		var milk = add(client, Map.of("name", "Молоко")).get("id");
+		add(client, Map.of("name", "Яйця"));
+		client.post("/api/shopping-list/" + bread + "/toggle", null);
+		client.post("/api/shopping-list/" + milk + "/toggle", null);
+		var stranger = Accounts.signUp(client(), "Сусід");
+		var theirs = add(stranger, Map.of("name", "Сир")).get("id");
+		stranger.post("/api/shopping-list/" + theirs + "/toggle", null);
+
+		var cleared = client.delete("/api/shopping-list/bought");
+
+		assertThat(cleared.status()).isEqualTo(200);
+		assertThat(cleared.json()).isEqualTo(Map.of("deleted", 2));
+		assertThat(section(client, "bought")).isEmpty();
+		assertThat(names(section(client, "toBuy"))).containsExactly("Яйця");
+		assertThat(names(section(stranger, "bought"))).containsExactly("Сир");
+		assertThat(client.delete("/api/shopping-list/bought").json()).isEqualTo(Map.of("deleted", 0));
+	}
+
 }

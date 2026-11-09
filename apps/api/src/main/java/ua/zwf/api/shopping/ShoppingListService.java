@@ -86,6 +86,12 @@ public class ShoppingListService implements WriteOffListener {
 		items.delete(find(householdId, itemId));
 	}
 
+	/** B-41: повертає, скільки позицій прибрано. */
+	@Transactional
+	public int clearBought(UUID householdId) {
+		return items.deleteBought(householdId);
+	}
+
 	@Transactional
 	public ShoppingItemResponse toggle(UUID householdId, UUID userId, UUID itemId) {
 		var item = find(householdId, itemId);

@@ -52,6 +52,16 @@ class ShoppingListController {
 		return service.update(household.idOf(principal.id()), id, input);
 	}
 
+	/** Буквальний шлях має пріоритет над {@code /{id}}, тож «bought» не сприймається як id. */
+	@Operation(summary = "Clear bought items")
+	@DeleteMapping("/bought")
+	ClearedResponse clearBought(@AuthenticationPrincipal AppUserPrincipal principal) {
+		return new ClearedResponse(service.clearBought(household.idOf(principal.id())));
+	}
+
+	record ClearedResponse(int deleted) {
+	}
+
 	@Operation(summary = "Remove an item")
 	@DeleteMapping("/{id}")
 	ResponseEntity<Void> delete(@AuthenticationPrincipal AppUserPrincipal principal, @PathVariable UUID id) {
