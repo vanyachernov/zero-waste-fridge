@@ -39,55 +39,58 @@ export function RegisterForm({ onSuccess }: { onSuccess: (user: CurrentUser) => 
     errors[field] || withHint ? fieldMessageId(id) : undefined;
 
   return (
-    <form id="auth-panel-register" role="tabpanel" aria-labelledby="auth-tab-register" onSubmit={submit} noValidate className="flex flex-col gap-4">
-      <Field label={t("auth.name")} htmlFor="register-name" error={fieldMessage(errors.name, i18n)}>
-        <Input
-          id="register-name"
-          autoComplete="name"
-          autoFocus
-          placeholder={t("auth.namePlaceholder")}
-          value={values.name}
-          invalid={!!errors.name}
-          aria-describedby={describedBy("name", "register-name")}
-          leading={<UserRound className="size-4" aria-hidden />}
-          onChange={(e) => set("name", e.target.value)}
-        />
-      </Field>
+    <div id="auth-panel-register" role="tabpanel" aria-labelledby="auth-tab-register">
+      {/* F-91: role="tabpanel" на <form> недопустима — панель обгортає форму */}
+      <form onSubmit={submit} noValidate className="flex flex-col gap-4">
+        <Field label={t("auth.name")} htmlFor="register-name" error={fieldMessage(errors.name, i18n)}>
+          <Input
+            id="register-name"
+            autoComplete="name"
+            autoFocus
+            placeholder={t("auth.namePlaceholder")}
+            value={values.name}
+            invalid={!!errors.name}
+            aria-describedby={describedBy("name", "register-name")}
+            leading={<UserRound className="size-4" aria-hidden />}
+            onChange={(e) => set("name", e.target.value)}
+          />
+        </Field>
 
-      <Field label={t("auth.email")} htmlFor="register-email" error={fieldMessage(errors.email, i18n)}>
-        <Input
-          id="register-email"
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          placeholder={t("auth.emailPlaceholder")}
-          value={values.email}
-          invalid={!!errors.email}
-          aria-describedby={describedBy("email", "register-email")}
-          leading={<Mail className="size-4" aria-hidden />}
-          onChange={(e) => set("email", e.target.value)}
-        />
-      </Field>
+        <Field label={t("auth.email")} htmlFor="register-email" error={fieldMessage(errors.email, i18n)}>
+          <Input
+            id="register-email"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            placeholder={t("auth.emailPlaceholder")}
+            value={values.email}
+            invalid={!!errors.email}
+            aria-describedby={describedBy("email", "register-email")}
+            leading={<Mail className="size-4" aria-hidden />}
+            onChange={(e) => set("email", e.target.value)}
+          />
+        </Field>
 
-      <Field label={t("auth.password")} htmlFor="register-password" hint={t("auth.passwordHint")} error={fieldMessage(errors.password, i18n)}>
-        <PasswordInput
-          id="register-password"
-          autoComplete="new-password"
-          value={values.password}
-          invalid={!!errors.password}
-          aria-describedby={describedBy("password", "register-password", true)}
-          onChange={(e) => set("password", e.target.value)}
-        />
-      </Field>
+        <Field label={t("auth.password")} htmlFor="register-password" hint={t("auth.passwordHint")} error={fieldMessage(errors.password, i18n)}>
+          <PasswordInput
+            id="register-password"
+            autoComplete="new-password"
+            value={values.password}
+            invalid={!!errors.password}
+            aria-describedby={describedBy("password", "register-password", true)}
+            onChange={(e) => set("password", e.target.value)}
+          />
+        </Field>
 
-      <FormAlert message={formError} />
+        <FormAlert message={formError} />
 
-      <Button type="submit" size="lg" className="w-full" disabled={register.isPending} aria-busy={register.isPending}>
-        {register.isPending && <Loader2 className="size-4 animate-spin" aria-hidden />}
-        {t("auth.register")}
-      </Button>
+        <Button type="submit" size="lg" className="w-full" disabled={register.isPending} aria-busy={register.isPending}>
+          {register.isPending && <Loader2 className="size-4 animate-spin" aria-hidden />}
+          {t("auth.register")}
+        </Button>
 
-      <p className="text-center text-2xs text-muted">{t("auth.terms")}</p>
-    </form>
+        <p className="text-center text-2xs text-muted">{t("auth.terms")}</p>
+      </form>
+    </div>
   );
 }

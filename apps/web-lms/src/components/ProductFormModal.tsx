@@ -170,7 +170,6 @@ export function ProductFormModal({ open, onClose, product }: ProductFormModalPro
         <Field label={`${t("addProduct.name")} *`} error={error("name")} htmlFor={`${formId}-name`}>
           <Input
             id={`${formId}-name`}
-            autoFocus
             value={form.name}
             invalid={Boolean(errors.name)}
             placeholder={t("addProduct.namePlaceholder")}
