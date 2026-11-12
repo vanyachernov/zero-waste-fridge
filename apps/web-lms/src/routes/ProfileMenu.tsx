@@ -146,19 +146,15 @@ export function ProfileMenu({ user, onLogout, logoutPending = false, logoutError
             >
               <UserPlus className="size-4" aria-hidden /> {t("profile.joinFamily")}
             </Link>
-            {[{ icon: Settings, label: t("profile.settings") }].map(({ icon: Icon, label }) => (
-              <div
-                key={label}
-                role="menuitem"
-                aria-disabled="true"
-                tabIndex={-1}
-                className="flex cursor-not-allowed items-center gap-3 px-4 py-2 text-sm text-muted"
-              >
-                <Icon className="size-4" aria-hidden />
-                <span className="flex-1">{label}</span>
-                <Badge>{t("profile.soon")}</Badge>
-              </div>
-            ))}
+            <Link
+              to="/settings"
+              role="menuitem"
+              tabIndex={-1}
+              onClick={() => close(false)}
+              className="flex items-center gap-3 px-4 py-2 text-sm text-on-surface outline-none hover:bg-surface-container-low focus:bg-surface-container-low"
+            >
+              <Settings className="size-4" aria-hidden /> {t("profile.settings")}
+            </Link>
           </div>
 
           <div className="border-t border-border px-4 py-3" role="group" aria-label={t("profile.theme")}>

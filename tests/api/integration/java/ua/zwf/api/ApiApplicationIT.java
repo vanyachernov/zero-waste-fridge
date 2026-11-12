@@ -67,7 +67,12 @@ class ApiApplicationIT extends IntegrationTest {
 			.andExpect(jsonPath("$.paths['/api/household/activity'].get").exists())
 			.andExpect(jsonPath("$.paths['/api/household/invites'].post").exists())
 			.andExpect(jsonPath("$.paths['/api/household/invites/code'].post").exists())
-			.andExpect(jsonPath("$.paths['/api/household/join'].post").exists());
+			.andExpect(jsonPath("$.paths['/api/household/join'].post").exists())
+			.andExpect(jsonPath("$.paths['/api/notifications'].get").exists())
+			.andExpect(jsonPath("$.paths['/api/notifications/read-all'].post").exists())
+			.andExpect(jsonPath("$.paths['/api/me/notification-settings'].put").exists())
+			.andExpect(jsonPath("$.paths['/api/me/push-subscriptions'].post").exists())
+			.andExpect(jsonPath("$.paths['/api/household/stream'].get").exists());
 	}
 
 }

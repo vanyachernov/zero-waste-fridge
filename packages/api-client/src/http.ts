@@ -39,6 +39,11 @@ export function configureHttp(options: { baseUrl?: string; onUnauthorized?: (err
   onUnauthorized = options.onUnauthorized;
 }
 
+/** Повна адреса ендпоінта (для EventSource, де не можна використати http()). */
+export function apiUrl(path: string): string {
+  return `${baseUrl}${path}`;
+}
+
 /** Викликає глобальний обробник 401 (використовує і мок-бекенд, щоб поводитися як справжній). */
 export function notifyUnauthorized(error: ApiError) {
   onUnauthorized?.(error);

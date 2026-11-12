@@ -321,4 +321,46 @@ export interface FamilyCode {
 /** Вступ: або код сім'ї, або токен із посилання в листі. */
 export type JoinRequest = { code: string; invite?: never } | { invite: string; code?: never };
 
+// ---------- Сповіщення та реалтайм (B-31…B-34, B-54) ----------
+
+export type NotificationType = "EXPIRY_REMINDER";
+
+export interface AppNotification {
+  id: string;
+  type: NotificationType;
+  createdAt: string;
+  read: boolean;
+  /** Куди веде клік; `null`, якщо продукту вже немає. */
+  product: { id: string | null; name: string } | null;
+  daysLeft: number | null;
+}
+
+export interface NotificationFeed {
+  items: AppNotification[];
+  unread: number;
+}
+
+export interface NotificationSettings {
+  inApp: boolean;
+  emailDigest: boolean;
+  push: boolean;
+  /** 0…23, у поясі користувачів. */
+  digestHour: number;
+  /** Тиха година, також через північ (22 → 7); `null` — без тиші. */
+  quietHours: { from: number; to: number } | null;
+}
+
+/** Підписка браузера (PushSubscription.toJSON()). */
+export interface PushSubscriptionInput {
+  endpoint: string;
+  keys: { p256dh: string; auth: string };
+}
+
+export interface Presence {
+  online: { id: string; name: string; shoppingAt: string | null }[];
+}
+
+/** Події SSE `/api/household/stream`. */
+export type RealtimeTopic = "products" | "shopping-list" | "household";
+
 export type DiscardReason = "eaten" | "spoiled" | "donated";
