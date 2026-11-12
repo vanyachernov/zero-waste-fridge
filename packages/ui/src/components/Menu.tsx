@@ -1,4 +1,5 @@
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "../cn";
 
 export interface MenuItem {
@@ -22,12 +23,51 @@ export interface MenuProps {
 /**
  * F-07: випадне меню дій («⋮» у рядку таблиці, у рядку учасника). WAI-ARIA «menu button»:
  * Enter/Space/↓ відкривають, ↑/↓/Home/End рухаються, Escape закриває й повертає фокус.
+ *
+ * Список рендериться в портал з `position: fixed`, тож `overflow: hidden` таблиці чи картки його не обрізає;
+ * якщо внизу екрана місця замало — відкривається вгору.
  */
 export function Menu({ label, trigger, items, align = "right", className }: MenuProps) {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
+  const [position, setPosition] = useState<CSSProperties>({ visibility: "hidden" });
+
+  // Позиція відносно кнопки: під нею або (немає місця) над нею, по правому чи лівому краю
+  const place = () => {
+    const button = buttonRef.current;
+    const menu = menuRef.current;
+    if (!button || !menu) return;
+    const rect = button.getBoundingClientRect();
+    const height = menu.offsetHeight;
+    const gap = 4;
+    const below = window.innerHeight - rect.bottom;
+    const up = below < height + gap + 8 && rect.top > below;
+    setPosition({
+      position: "fixed",
+      top: up ? Math.max(8, rect.top - height - gap) : rect.bottom + gap,
+      ...(align === "right" ? { right: Math.max(8, window.innerWidth - rect.right) } : { left: Math.max(8, rect.left) }),
+    });
+  };
+
+  useLayoutEffect(() => {
+    if (!open) {
+      setPosition({ visibility: "hidden" });
+      return;
+    }
+    place();
+    // Прокрутка сторінки закриває меню (як нативні списки), зміна розміру — переставляє
+    const onScroll = (e: Event) => {
+      if (!(e.target instanceof Node && menuRef.current?.contains(e.target))) setOpen(false);
+    };
+    window.addEventListener("scroll", onScroll, true);
+    window.addEventListener("resize", place);
+    return () => {
+      window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", place);
+    };
+  }, [open]);
 
   const enabled = () => [...(menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]:not([aria-disabled="true"])') ?? [])];
 
@@ -90,17 +130,16 @@ export function Menu({ label, trigger, items, align = "right", className }: Menu
           </svg>
         )}
       </button>
-      {open && (
+      {open &&
+        createPortal(
         <div
           ref={menuRef}
           id={menuId}
           role="menu"
           aria-label={label}
           onKeyDown={onKeyDown}
-          className={cn(
-            "absolute top-full z-40 mt-1 min-w-52 overflow-hidden rounded-lg border border-border bg-surface-container-lowest py-1 shadow-modal",
-            align === "right" ? "right-0" : "left-0",
-          )}
+          style={position}
+          className="z-50 min-w-52 overflow-hidden rounded-lg border border-border bg-surface-container-lowest py-1 shadow-modal"
         >
           {items.map((item) => (
             <button
@@ -125,8 +164,10 @@ export function Menu({ label, trigger, items, align = "right", className }: Menu
               {item.label}
             </button>
           ))}
-        </div>
-      )}
+        </div>,
+        // Усередині <dialog> (top layer) — туди ж, інакше меню опиниться під модалкою
+        buttonRef.current?.closest("dialog") ?? document.body,
+        )}
     </div>
   );
 }

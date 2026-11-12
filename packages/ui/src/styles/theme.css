@@ -77,6 +77,28 @@
 
   --container-app: 80rem;    /* 1280px — ширина десктопного макета */
 
+  /* Модалка: м'яка поява (десктоп) і затемнення фону */
+  --animate-dialog-in: dialog-in 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-backdrop-in: backdrop-in 200ms ease-out;
+  @keyframes dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes backdrop-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
   /* F-84: bottom sheet виїжджає знизу */
   --animate-sheet-in: sheet-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
   @keyframes sheet-in {
