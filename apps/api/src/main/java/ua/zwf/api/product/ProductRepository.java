@@ -1,5 +1,6 @@
 package ua.zwf.api.product;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -19,5 +20,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
 	/** Доступ лише в межах свого домогосподарства: чужий продукт виглядає так само, як неіснуючий. */
 	@EntityGraph(attributePaths = "addedBy")
 	Optional<Product> findByIdAndHouseholdId(UUID id, UUID householdId);
+
+	/** B-21: усе, що зараз у холодильнику сім'ї. */
+	List<Product> findByHouseholdIdAndStatus(UUID householdId, ProductStatus status);
 
 }

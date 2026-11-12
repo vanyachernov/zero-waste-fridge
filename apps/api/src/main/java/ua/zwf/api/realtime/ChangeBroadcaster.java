@@ -37,6 +37,10 @@ class ChangeBroadcaster implements HandlerInterceptor {
 		if (path.startsWith("/api/shopping-list")) {
 			return path.endsWith("/move-to-fridge") ? List.of("shopping-list", "products") : List.of("shopping-list");
 		}
+		// B-23: «Приготувати і списати» змінює холодильник
+		if (path.startsWith("/api/recipes/") && path.endsWith("/cook")) {
+			return List.of("products");
+		}
 		if (path.startsWith("/api/household") && !path.startsWith("/api/household/presence")) {
 			return List.of("household");
 		}
