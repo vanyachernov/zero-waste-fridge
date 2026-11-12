@@ -9,7 +9,7 @@ export const uk = {
     login: "Увійти",
     openApp: "Відкрити кабінет",
   },
-  navShort: { fridge: "Холодильник", recipes: "Рецепти", stats: "Статистика", shopping: "Покупки" },
+  navShort: { fridge: "Холодильник", recipes: "Рецепти", stats: "Статистика", shopping: "Покупки", family: "Сім'я" },
   landing: {
     eyebrow: "Розумний облік продуктів",
     title: "Їжте свіже. Не викидайте зайве.",
