@@ -1,16 +1,9 @@
 import { requireMockSession } from "./mock-auth";
-import type { Product, Recipe, ShoppingItem } from "./types";
+import type { Product, Recipe } from "./types";
 
-/** In-memory рецепти й список покупок для розробки UI без Spring Boot (VITE_API_MOCK=true). */
+/** In-memory рецепти для розробки UI без бекенду рецептів (B-20…B-24 ще немає). */
 
 const delay = (ms = 250) => new Promise((r) => setTimeout(r, ms));
-let seq = 100;
-
-let shopping: ShoppingItem[] = [
-  { id: "s1", name: "Лимон", quantity: "1 шт", reason: "recipe", done: false },
-  { id: "s2", name: "Молоко пастеризоване 2.5%", quantity: "1 л", reason: "low-stock", done: false },
-  { id: "s3", name: "Цільнозерновий хліб", quantity: "1 шт", reason: "manual", done: true },
-];
 
 const RECIPE_TEMPLATES: Array<Omit<Recipe, "id" | "usedProductIds" | "matchPercent"> & { keys: string[] }> = [
   {
@@ -60,21 +53,5 @@ export const mockApi = {
     })
       .filter((r) => r.usedProductIds.length > 0)
       .sort((a, b) => b.matchPercent - a.matchPercent);
-  },
-  async getShoppingList(): Promise<ShoppingItem[]> {
-    requireMockSession();
-    await delay();
-    return [...shopping];
-  },
-  async toggleShoppingItem(id: string): Promise<void> {
-    requireMockSession();
-    shopping = shopping.map((s) => (s.id === id ? { ...s, done: !s.done } : s));
-  },
-  async addShoppingItems(names: string[]): Promise<void> {
-    requireMockSession();
-    const fresh = names
-      .filter((n) => !shopping.some((s) => s.name === n))
-      .map((name) => ({ id: `s${++seq}`, name, reason: "recipe" as const, done: false }));
-    shopping = [...fresh, ...shopping];
   },
 };

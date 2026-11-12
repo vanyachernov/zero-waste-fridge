@@ -1,6 +1,7 @@
 import { configureHttp, http, isApiError, notifyUnauthorized, type ApiError } from "./http";
 import { mockApi } from "./mock";
 import { mockFridge } from "./mock-fridge";
+import { mockShopping } from "./mock-shopping";
 import { mockAuth, setMockSessionRequired } from "./mock-auth";
 import type {
   CurrentUser,
@@ -14,7 +15,14 @@ import type {
   Recipe,
   RegisterRequest,
   ResetPasswordRequest,
+  MoveToFridgeRequest,
+  MoveToFridgeResult,
   ShoppingItem,
+  ShoppingItemInput,
+  ShoppingList,
+  ShoppingSettings,
+  ShoppingSummary,
+  Store,
   Tip,
   WriteOffRequest,
   WriteOffResult,
@@ -24,6 +32,7 @@ export * from "./types";
 export { ApiError, CSRF_COOKIE, CSRF_HEADER, http, isApiError, readCookie } from "./http";
 export { DEMO_ACCOUNT, mockAuthControl } from "./mock-auth";
 export { MOCK_DICTIONARIES, mockFridgeControl, openedShelfLifeDays } from "./mock-fridge";
+export { mockShoppingControl } from "./mock-shopping";
 
 /**
  * Що обслуговують in-memory моки:
@@ -159,12 +168,40 @@ export const api = {
       return viaMock(() => mockApi.suggestRecipes(products.filter((p): p is Product => p !== null)));
     },
   },
+  /** B-40…B-45. */
   shoppingList: {
-    get: (): Promise<ShoppingItem[]> => (isMockApi("shopping") ? viaMock(() => mockApi.getShoppingList()) : http("/shopping-list")),
-    toggle: (id: string): Promise<void> =>
-      isMockApi("shopping") ? viaMock(() => mockApi.toggleShoppingItem(id)) : http(`/shopping-list/${id}/toggle`, { method: "POST" }),
-    addMany: (names: string[]): Promise<void> =>
-      isMockApi("shopping") ? viaMock(() => mockApi.addShoppingItems(names)) : http("/shopping-list", { method: "POST", body: json({ names }) }),
+    get: (filter: { store?: string; fromFridge?: boolean } = {}): Promise<ShoppingList> =>
+      isMockApi("shopping")
+        ? viaMock(() => mockShopping.list(filter))
+        : http(`/shopping-list${toQueryString({ store: filter.store, fromFridge: filter.fromFridge ? "true" : undefined })}`),
+    add: (input: ShoppingItemInput): Promise<ShoppingItem> =>
+      isMockApi("shopping") ? viaMock(() => mockShopping.add(input)) : http("/shopping-list", { method: "POST", body: json(input) }),
+    update: (id: string, input: ShoppingItemInput): Promise<ShoppingItem> =>
+      isMockApi("shopping") ? viaMock(() => mockShopping.update(id, input)) : http(`/shopping-list/${id}`, { method: "PATCH", body: json(input) }),
+    remove: (id: string): Promise<void> =>
+      isMockApi("shopping") ? viaMock(() => mockShopping.remove(id)) : http(`/shopping-list/${id}`, { method: "DELETE" }),
+    toggle: (id: string): Promise<ShoppingItem> =>
+      isMockApi("shopping") ? viaMock(() => mockShopping.toggle(id)) : http(`/shopping-list/${id}/toggle`, { method: "POST" }),
+    /** B-41. */
+    clearBought: (): Promise<{ deleted: number }> =>
+      isMockApi("shopping") ? viaMock(() => mockShopping.clearBought()) : http("/shopping-list/bought", { method: "DELETE" }),
+    /** B-42. Усе або нічого; некуплене — 409 `ITEM_NOT_BOUGHT`. */
+    moveToFridge: (request: MoveToFridgeRequest = {}): Promise<MoveToFridgeResult> =>
+      isMockApi("shopping")
+        ? viaMock(() => mockShopping.moveToFridge(request))
+        : http("/shopping-list/move-to-fridge", { method: "POST", body: json(request) }),
+    /** B-45. */
+    summary: (): Promise<ShoppingSummary> => (isMockApi("shopping") ? viaMock(() => mockShopping.summary()) : http("/shopping-list/summary")),
+    /** B-43. */
+    settings: (): Promise<ShoppingSettings> => (isMockApi("shopping") ? viaMock(() => mockShopping.getSettings()) : http("/shopping-list/settings")),
+    saveSettings: (next: ShoppingSettings): Promise<ShoppingSettings> =>
+      isMockApi("shopping") ? viaMock(() => mockShopping.putSettings(next)) : http("/shopping-list/settings", { method: "PUT", body: json(next) }),
+    /** B-44. */
+    stores: (): Promise<Store[]> => (isMockApi("shopping") ? viaMock(() => mockShopping.stores()) : http("/shopping-list/stores")),
+    addStore: (name: string): Promise<Store> =>
+      isMockApi("shopping") ? viaMock(() => mockShopping.addStore(name)) : http("/shopping-list/stores", { method: "POST", body: json({ name }) }),
+    removeStore: (id: string): Promise<void> =>
+      isMockApi("shopping") ? viaMock(() => mockShopping.removeStore(id)) : http(`/shopping-list/stores/${id}`, { method: "DELETE" }),
   },
 };
 
@@ -180,4 +217,7 @@ export const queryKeys = {
   dictionaries: ["dictionaries"] as const,
   recipes: (ids: string[]) => ["recipes", [...ids].sort()] as const,
   shoppingList: ["shopping-list"] as const,
+  shoppingSummary: ["shopping-list", "summary"] as const,
+  shoppingSettings: ["shopping-list", "settings"] as const,
+  stores: ["shopping-list", "stores"] as const,
 };

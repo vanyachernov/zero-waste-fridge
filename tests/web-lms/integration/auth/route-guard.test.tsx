@@ -42,7 +42,7 @@ describe("route guard", () => {
     await user.click(screen.getByRole("button", { name: "Створити акаунт" }));
 
     await waitForPath(router, "/shopping");
-    expect(await screen.findByRole("heading", { name: "Список покупок" })).toBeVisible();
+    expect(await screen.findByRole("heading", { name: "Розумний список покупок" })).toBeVisible();
   });
 
   it("ignores external redirect targets", async () => {
@@ -64,8 +64,8 @@ describe("route guard", () => {
 
   it("session that expires mid-work leads to login and back to the same page", async () => {
     const { router, queryClient, user } = renderApp("/shopping", { signedIn: true });
-    expect(await screen.findByRole("heading", { name: "Список покупок" })).toBeVisible();
-    expect(await screen.findByText("Лимон")).toBeVisible(); // дані завантажені — далі буде саме повторний запит
+    expect(await screen.findByRole("heading", { name: "Розумний список покупок" })).toBeVisible();
+    expect(await screen.findByText("Шпинат Baby свіжий")).toBeVisible(); // дані завантажені — далі буде саме повторний запит
 
     mockAuthControl.expireSession();
     await act(() => queryClient.refetchQueries({ queryKey: client.queryKeys.shoppingList }));

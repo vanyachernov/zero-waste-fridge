@@ -174,12 +174,76 @@ export interface Recipe {
   steps: string[];
 }
 
+export type ShoppingPriority = "NORMAL" | "HIGH";
+/** Звідки позиція: вручну, Smart Sync, рецепт, «Додати до списку» при списанні. */
+export type ShoppingSource = "MANUAL" | "AUTO" | "RECIPE" | "WRITE_OFF";
+
+export interface Store {
+  id: string;
+  name: string;
+}
+
+/** Позиція спільного списку покупок (B-40). */
 export interface ShoppingItem {
   id: string;
   name: string;
-  quantity?: string;
-  reason?: "recipe" | "low-stock" | "manual";
-  done: boolean;
+  /** Кількість і одиниця — разом або жодної («Хліб»). */
+  quantity: number | null;
+  unit: Unit | null;
+  category: Category | null;
+  priority: ShoppingPriority;
+  /** Орієнтовна ціна, ₴. */
+  priceEstimate: number | null;
+  store: Store | null;
+  source: ShoppingSource;
+  /** Продукт холодильника, після якого з'явилась позиція («Закінчився вчора в холодильнику»). */
+  sourceProduct: { id: string; name: string; closedAt: string | null } | null;
+  addedBy: Person | null;
+  bought: boolean;
+  boughtAt: string | null;
+  boughtBy: Person | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ShoppingList {
+  toBuy: ShoppingItem[];
+  bought: ShoppingItem[];
+}
+
+/** Тіло POST / PATCH позиції. Для PATCH відсутнє поле — без змін, `null` — очистити. */
+export interface ShoppingItemInput {
+  name?: string;
+  quantity?: number | null;
+  unit?: Unit | null;
+  category?: Category | null;
+  priority?: ShoppingPriority;
+  priceEstimate?: number | null;
+  storeId?: string | null;
+}
+
+/** B-42: без `items` — усі куплені з типовими значеннями. */
+export interface MoveToFridgeRequest {
+  items?: { id: string; expiresAt?: string; zone?: StorageZone; category?: Category }[];
+}
+
+export interface MoveToFridgeResult {
+  moved: number;
+  products: Product[];
+}
+
+/** B-43: Smart Sync. */
+export interface ShoppingSettings {
+  autoRefill: boolean;
+  excludedCategories: Category[];
+}
+
+/** B-45: «Куплено 4 з 6 · орієнтовно 480 ₴», «Авто-ввіз N». */
+export interface ShoppingSummary {
+  bought: number;
+  total: number;
+  estimatedTotal: number;
+  autoCount: number;
 }
 
 export type DiscardReason = "eaten" | "spoiled" | "donated";

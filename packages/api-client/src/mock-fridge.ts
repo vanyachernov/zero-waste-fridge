@@ -385,9 +385,9 @@ export const mockFridge = {
 
 /** Хелпери лише для тестів і інших моків (список покупок B-42 / Smart Sync B-43). */
 export const mockFridgeControl = {
+  /** Хук списання не скидається: його ставить мок списку покупок один раз при завантаженні. */
   reset() {
     clock = () => new Date();
-    writeOffHook = (_, __, request) => Boolean(request.addToShoppingList);
     seed();
   },
   setClock(now: () => Date) {
@@ -409,5 +409,7 @@ export const mockFridgeControl = {
     return view(stored);
   },
   all: () => products.filter((p) => p.householdId === householdId()).map(view),
+  today: () => isoDate(clock()),
+  now: () => clock(),
   defaultShelfLifeDays: (category: Category) => SHELF_LIFE[category],
 };
