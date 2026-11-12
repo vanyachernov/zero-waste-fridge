@@ -8,7 +8,7 @@ import { ResetPasswordPage } from "./auth/ResetPasswordPage";
 import { toProductQuery, validateFridgeSearch } from "./lib/fridgeSearch";
 import { activeProductsQuery, meQuery, productSummaryQuery, productsQuery } from "./lib/queries";
 import { safeRedirect } from "./lib/redirect";
-import { AppErrorScreen, AppPendingScreen } from "./routes/AppStatusScreens";
+import { AppErrorScreen, AppPendingScreen, NotFoundScreen, RouteErrorScreen } from "./routes/AppStatusScreens";
 import { AppShell } from "./routes/AppShell";
 import { FamilyPage } from "./routes/FamilyPage";
 import { FridgePage } from "./routes/FridgePage";
@@ -21,7 +21,7 @@ export interface RouterContext {
   queryClient: QueryClient;
 }
 
-const rootRoute = createRootRouteWithContext<RouterContext>()({ component: Outlet });
+const rootRoute = createRootRouteWithContext<RouterContext>()({ component: Outlet, notFoundComponent: NotFoundScreen });
 
 // ---------- Публічні сторінки (без AppShell) ----------
 
@@ -192,6 +192,8 @@ export function createAppRouter(queryClient: QueryClient, options: { history?: R
     defaultPreload: "intent",
     defaultPreloadStaleTime: 0,
     scrollRestoration: true,
+    // F-92: помилка в розділі не валить увесь кабінет
+    defaultErrorComponent: RouteErrorScreen,
   });
 }
 
