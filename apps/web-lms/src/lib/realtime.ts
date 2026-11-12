@@ -11,7 +11,8 @@ export interface RealtimeStatus {
 const STATUS_KEY = ["realtime", "status"] as const;
 
 const TOPIC_KEYS: Record<RealtimeTopic, readonly unknown[][]> = {
-  products: [queryKeys.products as unknown as unknown[]],
+  // Рецепти й «Врятовано» рахуються від холодильника — оновлюються разом із ним
+  products: [queryKeys.products as unknown as unknown[], queryKeys.recipes as unknown as unknown[], queryKeys.savedStats as unknown as unknown[]],
   "shopping-list": [queryKeys.shoppingList as unknown as unknown[]],
   household: [queryKeys.household as unknown as unknown[], queryKeys.me as unknown as unknown[], queryKeys.activity as unknown as unknown[]],
 };

@@ -1,5 +1,5 @@
 import { keepPreviousData, queryOptions } from "@tanstack/react-query";
-import { api, queryKeys, type ProductQuery } from "@zwf/api-client";
+import { api, queryKeys, type ProductQuery, type RecipeSort } from "@zwf/api-client";
 
 /** Поточний користувач (B-05). Без сесії — ApiError 401; не повторюємо. */
 export const meQuery = queryOptions({ queryKey: queryKeys.me, queryFn: () => api.auth.me(), staleTime: Infinity, retry: false });
@@ -18,12 +18,11 @@ export const tipQuery = queryOptions({ queryKey: queryKeys.tip, queryFn: () => a
 /** Довідники змінюються лише з релізом. */
 export const dictionariesQuery = queryOptions({ queryKey: queryKeys.dictionaries, queryFn: () => api.dictionaries.get(), staleTime: Infinity });
 
-export const recipesQuery = (ids: string[]) =>
-  queryOptions({
-    queryKey: queryKeys.recipes(ids),
-    queryFn: () => api.recipes.suggest(ids),
-    enabled: ids.length > 0,
-    staleTime: 5 * 60_000,
-  });
+export const recommendedRecipesQuery = (sort: RecipeSort) =>
+  queryOptions({ queryKey: queryKeys.recommendedRecipes(sort), queryFn: () => api.recipes.recommended(sort) });
+
+export const recipeQuery = (id: string) => queryOptions({ queryKey: queryKeys.recipe(id), queryFn: () => api.recipes.get(id) });
+
+export const savedStatsQuery = queryOptions({ queryKey: queryKeys.savedStats, queryFn: () => api.stats.saved() });
 
 export const shoppingQuery = queryOptions({ queryKey: queryKeys.shoppingList, queryFn: () => api.shoppingList.get() });

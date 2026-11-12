@@ -23,6 +23,7 @@ async function violations() {
 const PAGES = [
   ["/", "Мій холодильник"],
   ["/recipes", "Розумні рецепти"],
+  ["/recipes/recipe-crustless-quiche", "Теплий кіш"],
   ["/shopping", "Розумний список покупок"],
   ["/family", "Моя сім'я"],
   ["/settings", "Налаштування"],

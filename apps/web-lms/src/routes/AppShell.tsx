@@ -67,7 +67,7 @@ export function AppShell() {
                 <Link
                   key={to}
                   to={to}
-                  activeOptions={{ exact: true, includeSearch: false }}
+                  activeOptions={{ exact: to === "/", includeSearch: false }}
                   className="rounded-md border border-transparent px-3 py-1.5 text-sm font-medium whitespace-nowrap text-on-surface-variant transition-colors hover:text-primary"
                   activeProps={{ className: "!border-border bg-surface-container-low !text-on-surface" }}
                 >
@@ -122,7 +122,7 @@ export function AppShell() {
           <Link
             key={to}
             to={to}
-            activeOptions={{ exact: true, includeSearch: false }}
+            activeOptions={{ exact: to === "/", includeSearch: false }}
             className="group flex min-h-14 flex-col items-center justify-center gap-1 pt-2 pb-1.5 text-[11px] font-medium text-muted outline-none"
             activeProps={{ className: "!text-on-surface" }}
           >

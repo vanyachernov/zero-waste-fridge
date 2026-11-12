@@ -18,7 +18,8 @@ describe("family page — owner", () => {
     expect(table.getByText("Користувач")).toBeVisible();
     expect(table.getAllByText("Член сім'ї")).toHaveLength(2);
     expect(table.getByText(/Додано «Молоко пастеризоване 2.5%» · 10 хв тому/)).toBeVisible();
-    expect(table.getByText(/Списано «Грецький йогурт 5%» · вчора/)).toBeVisible();
+    // «вчора» / «позавчора» залежить від години запуску (подія 26 год тому) — перевіряємо саму подію
+    expect(table.getByText(/Списано «Грецький йогурт 5%» · /)).toBeVisible();
     expect(table.getByText("andriy.k@gmail.com")).toBeVisible();
     expect(table.getByText("Очікує")).toBeVisible();
 

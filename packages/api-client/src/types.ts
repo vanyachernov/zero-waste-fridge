@@ -165,18 +165,82 @@ export interface Dictionaries {
   openedShelfLifeRules: { category: Category; keywords: string[]; days: number }[];
 }
 
-export interface Recipe {
+export type Difficulty = "easy" | "medium" | "hard";
+export type RecipeSource = "CATALOG" | "AI";
+/** Сортування рекомендацій (B-21): критичні інгредієнти, збіг запасів, час, калорійність. */
+export type RecipeSort = "critical" | "match" | "time" | "kcal";
+
+/** «З вашого холодильника»: продукт і скільки його піде (на `servings` порцій). */
+export interface RecipeFromFridge {
+  productId: string;
+  name: string;
+  quantity: number | null;
+  unit: Unit | null;
+  note: string | null;
+  daysLeft: number;
+  /** Скільки продукту є зараз. */
+  available: number;
+  availableUnit: Unit;
+}
+
+/** «Чого не вистачає (докупити або замінити)». */
+export interface RecipeMissing {
+  name: string;
+  quantity: number | null;
+  unit: Unit | null;
+  note: string | null;
+  substitutes: string[];
+}
+
+/** B-21: картка рекомендації. */
+export interface RecipeCard {
   id: string;
   title: string;
-  imageUrl?: string;
+  imageUrl: string | null;
   minutes: number;
+  /** На порцію. */
   kcal: number;
-  difficulty: "easy" | "medium" | "hard";
+  servings: number;
+  difficulty: Difficulty;
+  source: RecipeSource;
+  /** % небазових інгредієнтів, які вже є. */
   matchPercent: number;
-  usedProductIds: string[];
-  ingredients: string[];
-  missing: string[];
-  steps: string[];
+  /** Скільки використаних продуктів зіпсуються за ≤ 48 год. */
+  criticalCount: number;
+  fromFridge: RecipeFromFridge[];
+  missing: RecipeMissing[];
+}
+
+/** B-22: детальний рецепт. */
+export interface RecipeDetail extends RecipeCard {
+  description: string | null;
+  /** «Економія ~180 ₴». */
+  savingsUah: number | null;
+  /** Базове: сіль, олія — «за смаком». */
+  pantry: { name: string; note: string | null }[];
+  steps: { title: string | null; text: string }[];
+}
+
+/** B-23: «Приготувати і списати». */
+export interface CookRequest {
+  portions?: number;
+  /** Лише ці продукти (за замовчуванням — усі використані). */
+  productIds?: string[];
+}
+
+export interface CookResult {
+  recipeId: string;
+  portions: number;
+  cooked: { productId: string; name: string; quantity: number; unit: Unit; closed: boolean }[];
+}
+
+/** B-24: «Врятовано від смітника» за місяць. */
+export interface SavedStats {
+  period: "month";
+  from: string;
+  to: string;
+  saved: number;
+  wasted: number;
 }
 
 export type ShoppingPriority = "NORMAL" | "HIGH";
