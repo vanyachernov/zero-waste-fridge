@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, type PointerEvent, type ReactNode } from "react";
 import { cn } from "../cn";
 
 export interface ModalProps {
@@ -42,6 +42,27 @@ export function Modal({
 }: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const id = useId();
+  const drag = useRef<{ startY: number; dy: number } | null>(null);
+
+  // F-84: bottom sheet тягнеться вниз за «ручку» / заголовок — далі за 96 px закривається
+  const onDragStart = (e: PointerEvent<HTMLElement>) => {
+    if (e.pointerType !== "touch" || (e.target as HTMLElement).closest("button")) return;
+    drag.current = { startY: e.clientY, dy: 0 };
+  };
+  const onDragMove = (e: PointerEvent<HTMLElement>) => {
+    const dialog = ref.current;
+    if (!drag.current || !dialog) return;
+    drag.current.dy = Math.max(0, e.clientY - drag.current.startY);
+    dialog.style.transform = `translateY(${drag.current.dy}px)`;
+  };
+  const onDragEnd = () => {
+    const dialog = ref.current;
+    if (!drag.current || !dialog) return;
+    const closing = drag.current.dy > 96;
+    drag.current = null;
+    dialog.style.transform = "";
+    if (closing) onClose();
+  };
 
   useEffect(() => {
     const dialog = ref.current;
@@ -63,14 +84,25 @@ export function Modal({
       onClose={onClose}
       onClick={(e) => e.target === ref.current && onClose()}
       className={cn(
-        "m-0 mt-auto max-h-[92dvh] w-full max-w-none overflow-y-auto rounded-t-xl bg-surface-container-lowest p-0 text-on-surface shadow-modal backdrop:bg-on-surface/40 backdrop:backdrop-blur-[2px]",
+        "m-0 mt-auto max-h-[92dvh] w-full max-w-none overflow-y-auto overscroll-contain rounded-t-xl bg-surface-container-lowest p-0 text-on-surface shadow-modal backdrop:bg-on-surface/40 backdrop:backdrop-blur-[2px]",
+        "max-sm:transition-transform max-sm:motion-safe:animate-sheet-in",
         "sm:m-auto sm:rounded-2xl",
         size === "lg" ? "sm:max-w-[600px]" : "sm:max-w-lg",
         className,
       )}
     >
-      <div className="flex flex-col gap-5 p-6 sm:p-7">
-        <header className="flex items-start gap-3.5">
+      <div className="flex flex-col gap-5 p-6 pt-3 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:p-7">
+        <div
+          aria-hidden
+          className="-mx-6 -mb-2 flex touch-none justify-center pb-1 sm:hidden"
+          onPointerDown={onDragStart}
+          onPointerMove={onDragMove}
+          onPointerUp={onDragEnd}
+          onPointerCancel={onDragEnd}
+        >
+          <span className="h-1 w-10 rounded-pill bg-outline-variant" />
+        </div>
+        <header className="flex items-start gap-3.5" onPointerDown={onDragStart} onPointerMove={onDragMove} onPointerUp={onDragEnd} onPointerCancel={onDragEnd}>
           {icon && (
             <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-[10px] [&>svg]:size-5", iconTones[iconTone])} aria-hidden>
               {icon}
@@ -90,7 +122,7 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label={closeLabel}
-            className="-m-1 rounded-md p-1 text-muted hover:bg-surface-container-low hover:text-on-surface"
+            className="touch-hit -m-1 rounded-md p-1 text-muted hover:bg-surface-container-low hover:text-on-surface"
           >
             <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M6 6l12 12M18 6 6 18" />

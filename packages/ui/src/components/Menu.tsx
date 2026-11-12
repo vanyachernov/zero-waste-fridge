@@ -80,7 +80,7 @@ export function Menu({ label, trigger, items, align = "right", className }: Menu
             setOpen(true);
           }
         }}
-        className="inline-flex size-9 cursor-pointer items-center justify-center rounded-md text-on-surface-variant transition-colors hover:bg-surface-container-low focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:outline-none"
+        className="touch-hit inline-flex size-9 cursor-pointer items-center justify-center rounded-md text-on-surface-variant transition-colors hover:bg-surface-container-low focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:outline-none"
       >
         {trigger ?? (
           <svg viewBox="0 0 24 24" className="size-4" fill="currentColor" aria-hidden>

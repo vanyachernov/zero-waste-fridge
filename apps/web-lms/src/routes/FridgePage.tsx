@@ -24,6 +24,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { CATEGORY_ORDER } from "../components/categoryEmoji";
 import { ProductFormModal } from "../components/ProductFormModal";
 import { ProductIcon } from "../components/ProductIcon";
+import { SwipeRow } from "../components/SwipeRow";
 import { TipBanner } from "../components/TipBanner";
 import { WriteOffModal } from "../components/WriteOffModal";
 import { errorMessage } from "../lib/errors";
@@ -360,27 +361,30 @@ export function FridgePage() {
               const checked = selected.includes(p.id);
               const blocked = !checked && selected.length >= MAX_SELECTED;
               return (
-                <li
-                  key={p.id}
-                  className={cn(
-                    "flex min-w-0 items-center gap-2.5 rounded-lg border bg-surface-container-lowest py-2.5 pr-1 pl-3 shadow-card transition-colors sm:gap-3",
-                    checked ? "border-primary bg-primary-container/35" : "border-border",
-                  )}
-                >
-                  {/* На телефоні вибір продуктів для рецепта — у майстрі генератора (F-82), не в списку */}
-                  <Checkbox className="max-sm:hidden" checked={checked} disabled={blocked} onChange={() => toggle(p.id)} aria-label={p.name} />
-                  <ProductIcon category={p.category} className="size-10 rounded-lg sm:size-11" />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold text-on-surface">{p.name}</p>
-                    <p className="truncate text-2xs text-on-surface-variant">
-                      {formatQty(p, i18n)} · {messages.zonesShort[p.zone]}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 flex-col items-end gap-1">
-                    <FreshnessBadge daysLeft={p.daysLeft} label={freshnessLabel(p.daysLeft, i18n)} />
-                    <span className="text-2xs text-muted">{formatShortDate(p.effectiveExpiresAt)}</span>
-                  </div>
-                  <RowActions product={p} actions={actions} compact />
+                <li key={p.id} className="min-w-0">
+                  <SwipeRow label={t("fridge.discard")} onSwipe={() => actions.writeOff(p)}>
+                    <div
+                      className={cn(
+                        "flex min-w-0 items-center gap-2.5 rounded-lg border bg-surface-container-lowest py-2.5 pr-1 pl-3 shadow-card transition-colors sm:gap-3",
+                        checked ? "border-primary bg-primary-container/35" : "border-border",
+                      )}
+                    >
+                      {/* На телефоні вибір продуктів для рецепта — у майстрі генератора (F-82), не в списку */}
+                      <Checkbox className="max-sm:hidden" checked={checked} disabled={blocked} onChange={() => toggle(p.id)} aria-label={p.name} />
+                      <ProductIcon category={p.category} className="size-10 rounded-lg sm:size-11" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-bold text-on-surface">{p.name}</p>
+                        <p className="truncate text-2xs text-on-surface-variant">
+                          {formatQty(p, i18n)} · {messages.zonesShort[p.zone]}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 flex-col items-end gap-1">
+                        <FreshnessBadge daysLeft={p.daysLeft} label={freshnessLabel(p.daysLeft, i18n)} />
+                        <span className="text-2xs text-muted">{formatShortDate(p.effectiveExpiresAt)}</span>
+                      </div>
+                      <RowActions product={p} actions={actions} compact />
+                    </div>
+                  </SwipeRow>
                 </li>
               );
             })}
