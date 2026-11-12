@@ -256,6 +256,24 @@ SPRING_PROFILES_ACTIVE=prod DB_URL=jdbc:postgresql://host:5432/zwf DB_USER=zwf D
 
 Користувач завжди в одному домогосподарстві. Хто вступає в сім'ю, будучи в своєму домогосподарстві сам, переносить туди свої продукти й список покупок (без магазинів), а старе видаляється.
 
+## Сповіщення та реалтайм (B-31…B-34, B-54)
+
+| Метод і шлях | Відповідь |
+|---|---|
+| `GET /api/notifications?limit=` | `{items, unread}` — непрочитані першими |
+| `GET /api/notifications/unread-count` | `{count}` для дзвіночка |
+| `POST /api/notifications/{id}/read` · `POST /api/notifications/read-all` | 204 · `{updated}` |
+| `GET / PUT /api/me/notification-settings` | `{inApp, emailDigest, push, digestHour, quietHours}` |
+| `GET /api/me/push/public-key` | `{publicKey}` (`null` — push вимкнено) |
+| `POST / DELETE /api/me/push-subscriptions` | підписка браузера `{endpoint, keys: {p256dh, auth}}` |
+| `GET /api/household/stream` | SSE: `changed {topic, actor}`, `presence {online}`, `notifications` |
+| `GET / POST /api/household/presence` | хто онлайн · `{shoppingAt}` — «я в магазині» |
+
+- **Нагадування** (щогодини, на 5-й хвилині): продукт, у якого `effectiveExpiresAt − remindBeforeDays ≤ сьогодні`, отримує одне сповіщення на термін для кожного учасника сім'ї з увімкненим дзвіночком або push.
+- **Щоденний лист** — на початку вибраної години, якщо є прострочене, сьогоднішнє чи завтрашнє. У dev листи видно в Mailpit.
+- **Push** — лише з ключами `VAPID_*`; кабінет реєструє Service Worker `/lms/sw.js` і підписується зі сторінки «Налаштування».
+- Розклад: `zwf.reminders.cron`, `zwf.reminders.digest-cron`, вимкнути — `zwf.reminders.enabled=false` (так у тестах).
+
 ### Пошта
 
 Листи — шаблони Thymeleaf у `apps/api/src/main/resources/mail/`: `<лист>.html` (зі спільним `layout.html`) і `<лист>.txt`. Є скидання пароля, запрошення до сім'ї та щоденний дайджест термінів.
@@ -277,6 +295,8 @@ SPRING_PROFILES_ACTIVE=prod DB_URL=jdbc:postgresql://host:5432/zwf DB_USER=zwf D
 | `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` | ні | За замовчуванням `587`, без авторизації |
 | `SMTP_AUTH`, `SMTP_STARTTLS` | ні | За замовчуванням `true` |
 | `MAIL_FROM` | ні | Відправник, за замовчуванням `Zero Waste Fridge <no-reply@zerowastefridge.app>` |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | ні | Ключі Web Push (`npx web-push generate-vapid-keys`). Без них push вимкнено, решта сповіщень працює |
+| `VAPID_SUBJECT` | ні | Контакт для push-сервісів, за замовчуванням `mailto:no-reply@zerowastefridge.app` |
 
 ## Тести
 
