@@ -134,7 +134,7 @@ export function ShoppingPage() {
           <h1 className="mt-1 text-3xl font-extrabold tracking-tight sm:text-display">{t("shopping.heading")}</h1>
           <p className="mt-1 max-w-2xl text-sm text-on-surface-variant">{t("shopping.subtitle")}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 [&>*]:flex-1 sm:[&>*]:flex-none">
           {can(household.data?.permissions, "MANAGE_MEMBERS") && (
             <Link to="/family" className={buttonClasses("outline", "md", "rounded-xl")}>
               <UserPlus className="size-4 text-primary" aria-hidden /> {t("shopping.invite")}

@@ -64,6 +64,7 @@ export const uk = {
     statSoon: "Скоро зіпсуються",
     statSoonHint: "Термін: ≤ 48 годин",
     statExpired: "Прострочені",
+    statShort: { total: "Всього", soon: "Скоро", expired: "Прострочено" },
     statExpiredHint: "Потребують компосту або списання",
     products: "продукти",
     search: "Пошук продуктів (наприклад: йогурт, шпинат, фарш...)",
