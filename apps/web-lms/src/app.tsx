@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import { isApiError } from "@zwf/api-client";
 import { I18nProvider } from "@zwf/i18n/react";
+import { ToastProvider } from "@zwf/ui";
 import { isPublicPath } from "./lib/redirect";
 import type { AppRouter } from "./router";
 
@@ -36,7 +37,9 @@ export function AppProviders({ router, queryClient }: { router: AppRouter; query
   return (
     <I18nProvider locale="uk">
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <ToastProvider>
+          <RouterProvider router={router} />
+        </ToastProvider>
       </QueryClientProvider>
     </I18nProvider>
   );
