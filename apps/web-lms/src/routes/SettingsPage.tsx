@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, isApiError, queryKeys, type NotificationSettings } from "@zwf/api-client";
 import { useI18n } from "@zwf/i18n/react";
-import { Button, Card, Field, Select, Switch, useToast } from "@zwf/ui";
+import { Button, Card, Field, Input, Select, Switch, useToast } from "@zwf/ui";
 import { BellRing, Moon, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FormAlert } from "../auth/FormAlert";
@@ -83,8 +83,16 @@ export function SettingsPage() {
           <Switch checked={form.inApp} onChange={(v) => set("inApp", v)} label={t("settings.inApp")} description={t("settings.inAppHint")} />
           <Switch checked={form.emailDigest} onChange={(v) => set("emailDigest", v)} label={t("settings.emailDigest")} description={t("settings.emailDigestHint")} />
           {form.emailDigest && (
-            <Field label={t("settings.digestHour")} error={fieldError("digestHour")} htmlFor="digest-hour" className="pl-[52px] sm:max-w-60">
-              <Select id="digest-hour" value={String(form.digestHour)} onChange={(h) => set("digestHour", Number(h))} options={hourOptions} />
+            <Field label={t("settings.digestTime")} error={fieldError("digestTime")} htmlFor="digest-time" className="pl-[52px] sm:max-w-60">
+              <Input
+                id="digest-time"
+                type="time"
+                step={60}
+                required
+                value={form.digestTime}
+                invalid={Boolean(fieldError("digestTime"))}
+                onChange={(e) => set("digestTime", e.target.value)}
+              />
             </Field>
           )}
           <Switch

@@ -3,6 +3,7 @@ package ua.zwf.api.notification;
 import jakarta.persistence.EntityManager;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -23,8 +24,8 @@ import ua.zwf.api.mail.Mailer;
 import ua.zwf.api.product.Product;
 
 /**
- * B-33: щоденний email-дайджест «N продуктів потребують уваги» — прострочені, сьогодні й завтра. Іде в обрану
- * користувачем годину (B-34), не частіше разу на день і лише коли є що сказати.
+ * B-33: щоденний email-дайджест «N продуктів потребують уваги» — прострочені, сьогодні й завтра. Іде в обраний
+ * користувачем час (B-34, з точністю до хвилини), не частіше разу на день і лише коли є що сказати.
  */
 @Service
 public class DigestService {
@@ -66,17 +67,18 @@ public class DigestService {
 	/** @return скільки листів надіслано */
 	@Transactional
 	public int run() {
-		LocalDate date = today.date();
-		int hour = ZonedDateTime.now(clock.withZone(today.zone())).getHour();
+		return run(today.date(), ZonedDateTime.now(clock.withZone(today.zone())).toLocalTime());
+	}
+
+	/** @param now локальний час у часовому поясі застосунку */
+	@Transactional
+	public int run(LocalDate date, LocalTime now) {
 		List<Membership> members = em.createQuery("select m from Membership m join fetch m.user join fetch m.household",
 				Membership.class)
 			.getResultList();
 		var settings = settingsService.of(members.stream().map(m -> m.getUser().getId()).toList());
 
-		var due = members.stream().filter(m -> {
-			var s = settings.get(m.getUser().getId());
-			return s.isEmailDigest() && s.getDigestHour() == hour && !date.equals(s.getDigestSentOn());
-		}).toList();
+		var due = members.stream().filter(m -> settings.get(m.getUser().getId()).isDigestDue(date, now)).toList();
 		if (due.isEmpty()) {
 			return 0;
 		}
@@ -86,23 +88,26 @@ public class DigestService {
 		int sent = 0;
 		for (Membership member : due) {
 			var products = urgent.getOrDefault(member.getHousehold().getId(), List.of());
+			var user = member.getUser();
+			var s = settings.get(user.getId());
 			if (products.isEmpty()) {
+				// Казати нічого — на сьогодні все, щоб не перевіряти щохвилини до півночі
+				s.markDigestSent(date);
+				settingsRepository.save(s);
 				continue;
 			}
 			var lines = products.stream()
 				.map(p -> ExpiryDigestMail.Line.of(p.getName(), ChronoUnit.DAYS.between(date, p.getEffectiveExpiresAt())))
 				.toList();
-			var user = member.getUser();
 			try {
 				mailer.send(ExpiryDigestMail.create(templates, user.getEmail(), user.getName(),
 						member.getHousehold().getName(), lines, properties.publicUrl() + "/lms/"));
-				var s = settings.get(user.getId());
 				s.markDigestSent(date);
 				settingsRepository.save(s);
 				sent++;
 			}
 			catch (MailException ex) {
-				// Наступна спроба — за годину не буде (година інша); завтра лист піде знову
+				// Позначки немає — наступний запуск (за хвилину) спробує ще раз
 				log.error("Could not send expiry digest to user {}", user.getId(), ex);
 			}
 		}

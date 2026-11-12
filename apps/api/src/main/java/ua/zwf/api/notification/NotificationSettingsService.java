@@ -1,6 +1,9 @@
 package ua.zwf.api.notification;
 
 import java.time.Clock;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,18 +21,23 @@ public class NotificationSettingsService {
 	public record QuietHours(Integer from, Integer to) {
 	}
 
-	public record SettingsResponse(boolean inApp, boolean emailDigest, boolean push, int digestHour, QuietHours quietHours) {
+	public record SettingsResponse(boolean inApp, boolean emailDigest, boolean push, String digestTime,
+			QuietHours quietHours) {
 
 		static SettingsResponse of(NotificationSettings s) {
 			var quiet = s.getQuietFrom() == null ? null : new QuietHours(s.getQuietFrom(), s.getQuietTo());
-			return new SettingsResponse(s.isInApp(), s.isEmailDigest(), s.isPush(), s.getDigestHour(), quiet);
+			return new SettingsResponse(s.isInApp(), s.isEmailDigest(), s.isPush(), s.getDigestTime().format(HH_MM),
+					quiet);
 		}
 
 	}
 
-	public record SettingsRequest(Boolean inApp, Boolean emailDigest, Boolean push, Integer digestHour,
+	public record SettingsRequest(Boolean inApp, Boolean emailDigest, Boolean push, String digestTime,
 			QuietHours quietHours) {
 	}
+
+	/** Час листа в API — {@code "HH:mm"}, 24-годинний формат. */
+	static final DateTimeFormatter HH_MM = DateTimeFormatter.ofPattern("HH:mm");
 
 	private final NotificationSettingsRepository settings;
 
@@ -77,9 +85,14 @@ public class NotificationSettingsService {
 		if (request.push() == null) {
 			errors.put("push", "NotNull");
 		}
-		int hour = request.digestHour() == null ? NotificationSettings.DEFAULT_DIGEST_HOUR : request.digestHour();
-		if (hour < 0 || hour > 23) {
-			errors.put("digestHour", "Range");
+		LocalTime time = NotificationSettings.DEFAULT_DIGEST_TIME;
+		if (request.digestTime() != null) {
+			try {
+				time = LocalTime.parse(request.digestTime().strip(), HH_MM);
+			}
+			catch (DateTimeParseException ex) {
+				errors.put("digestTime", "INVALID");
+			}
 		}
 		var quiet = request.quietHours();
 		if (quiet != null) {
@@ -97,7 +110,7 @@ public class NotificationSettingsService {
 			throw new ValidationException(errors);
 		}
 		var current = of(userId);
-		current.update(request.inApp(), request.emailDigest(), request.push(), hour, quiet == null ? null : quiet.from(),
+		current.update(request.inApp(), request.emailDigest(), request.push(), time, quiet == null ? null : quiet.from(),
 				quiet == null ? null : quiet.to(), clock.instant());
 		return SettingsResponse.of(settings.save(current));
 	}

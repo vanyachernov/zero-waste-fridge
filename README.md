@@ -263,16 +263,16 @@ SPRING_PROFILES_ACTIVE=prod DB_URL=jdbc:postgresql://host:5432/zwf DB_USER=zwf D
 | `GET /api/notifications?limit=` | `{items, unread}` — непрочитані першими |
 | `GET /api/notifications/unread-count` | `{count}` для дзвіночка |
 | `POST /api/notifications/{id}/read` · `POST /api/notifications/read-all` | 204 · `{updated}` |
-| `GET / PUT /api/me/notification-settings` | `{inApp, emailDigest, push, digestHour, quietHours}` |
+| `GET / PUT /api/me/notification-settings` | `{inApp, emailDigest, push, digestTime: "HH:mm", quietHours}` |
 | `GET /api/me/push/public-key` | `{publicKey}` (`null` — push вимкнено) |
 | `POST / DELETE /api/me/push-subscriptions` | підписка браузера `{endpoint, keys: {p256dh, auth}}` |
 | `GET /api/household/stream` | SSE: `changed {topic, actor}`, `presence {online}`, `notifications` |
 | `GET / POST /api/household/presence` | хто онлайн · `{shoppingAt}` — «я в магазині» |
 
 - **Нагадування** (щогодини, на 5-й хвилині): продукт, у якого `effectiveExpiresAt − remindBeforeDays ≤ сьогодні`, отримує одне сповіщення на термін для кожного учасника сім'ї з увімкненим дзвіночком або push.
-- **Щоденний лист** — на початку вибраної години, якщо є прострочене, сьогоднішнє чи завтрашнє. У dev листи видно в Mailpit.
+- **Щоденний лист** — у вибраний час з точністю до хвилини (наприклад, 20:31; пропущену через рестарт хвилину надолужує того ж дня), раз на день, якщо є прострочене, сьогоднішнє чи завтрашнє. У dev листи видно в Mailpit.
 - **Push** — лише з ключами `VAPID_*`; кабінет реєструє Service Worker `/lms/sw.js` і підписується зі сторінки «Налаштування».
-- Розклад: `zwf.reminders.cron`, `zwf.reminders.digest-cron`, вимкнути — `zwf.reminders.enabled=false` (так у тестах).
+- Розклад: `zwf.reminders.cron` (щогодини), `zwf.reminders.digest-cron` (щохвилини), вимкнути — `zwf.reminders.enabled=false` (так у тестах).
 
 ### Пошта
 

@@ -8,7 +8,8 @@ import type { AppNotification, NotificationFeed, NotificationSettings, Presence,
  */
 
 const delay = (ms = 80) => new Promise((r) => setTimeout(r, ms));
-const DEFAULTS: NotificationSettings = { inApp: true, emailDigest: true, push: false, digestHour: 8, quietHours: null };
+const DEFAULTS: NotificationSettings = { inApp: true, emailDigest: true, push: false, digestTime: "08:00", quietHours: null };
+const HH_MM = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 type Stored = AppNotification & { userId: string; householdId: string };
 let notifications: Stored[] = [];
@@ -87,8 +88,8 @@ export const mockNotifications = {
     await delay(60);
     const errors: Record<string, string> = {};
     for (const key of ["inApp", "emailDigest", "push"] as const) if (typeof next?.[key] !== "boolean") errors[key] = "NotNull";
-    const hour = next?.digestHour ?? 8;
-    if (!Number.isInteger(hour) || hour < 0 || hour > 23) errors.digestHour = "Range";
+    const time = typeof next?.digestTime === "string" ? next.digestTime.trim() : (next?.digestTime ?? DEFAULTS.digestTime);
+    if (typeof time !== "string" || !HH_MM.test(time)) errors.digestTime = "INVALID";
     const quiet = next?.quietHours;
     if (quiet) {
       if (!(quiet.from >= 0 && quiet.from <= 23)) errors["quietHours.from"] = "Range";
@@ -96,7 +97,7 @@ export const mockNotifications = {
       if (quiet.from === quiet.to) errors["quietHours.to"] = "SAME_AS_FROM";
     }
     if (Object.keys(errors).length) throw validation(errors);
-    const saved = { inApp: next.inApp, emailDigest: next.emailDigest, push: next.push, digestHour: hour, quietHours: quiet ?? null };
+    const saved = { inApp: next.inApp, emailDigest: next.emailDigest, push: next.push, digestTime: time as string, quietHours: quiet ?? null };
     settings.set(me().id, saved);
     return saved;
   },
