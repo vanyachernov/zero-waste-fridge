@@ -5,6 +5,7 @@ import { useI18n } from "@zwf/i18n/react";
 import { Logo } from "@zwf/ui";
 import { BarChart3, ChefHat, Leaf, Refrigerator, ShoppingCart, Users } from "lucide-react";
 import { NotificationBell } from "../components/NotificationBell";
+import { OfflineBanner } from "../components/OfflineBanner";
 import { useHouseholdStream } from "../lib/realtime";
 import { errorMessage } from "../lib/errors";
 import { meQuery } from "../lib/queries";
@@ -93,6 +94,7 @@ export function AppShell() {
             )}
           </div>
         </div>
+        <OfflineBanner />
       </header>
 
       <main id="main" tabIndex={-1} className="mx-auto w-full max-w-app flex-1 outline-none px-4 pt-5 pb-28 sm:px-6 lg:pb-10">
