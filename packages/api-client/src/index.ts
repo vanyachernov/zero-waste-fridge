@@ -3,9 +3,14 @@ import { mockApi } from "./mock";
 import { mockFridge } from "./mock-fridge";
 import { mockShopping } from "./mock-shopping";
 import { mockHousehold } from "./mock-household";
+import { mockNotifications } from "./mock-notifications";
 import { mockAuth, setMockSessionRequired } from "./mock-auth";
 import type {
   ActivityPage,
+  NotificationFeed,
+  NotificationSettings,
+  Presence,
+  PushSubscriptionInput,
   CurrentUser,
   FamilyCode,
   Household,
@@ -37,11 +42,12 @@ import type {
 } from "./types";
 
 export * from "./types";
-export { ApiError, CSRF_COOKIE, CSRF_HEADER, http, isApiError, readCookie } from "./http";
+export { ApiError, CSRF_COOKIE, CSRF_HEADER, apiUrl, http, isApiError, readCookie } from "./http";
 export { DEMO_ACCOUNT, mockAuthControl } from "./mock-auth";
 export { MOCK_DICTIONARIES, mockFridgeControl, openedShelfLifeDays } from "./mock-fridge";
 export { mockShoppingControl } from "./mock-shopping";
 export { mockHouseholdControl, normalizeJoinCode } from "./mock-household";
+export { mockNotificationsControl } from "./mock-notifications";
 
 /**
  * Що обслуговують in-memory моки:
@@ -94,6 +100,18 @@ export function configureApi(options: { baseUrl?: string; mock?: MockMode; onUna
 /** Без аргументу — чи на моках автентифікація (демо-акаунт, посилання зі «листа» на екрані). */
 export function isMockApi(domain: MockDomain = "auth") {
   return mocked.has(domain);
+}
+
+let forcedRealtime = false;
+
+/** F-63: потік `/api/household/stream` є лише на бекенді (у моках сім'ї його немає). */
+export function realtimeAvailable() {
+  return forcedRealtime || !isMockApi("household");
+}
+
+/** Лише для тестів: відкрити потік попри моки (з підміненим EventSource). */
+export function forceRealtimeForTests(value: boolean) {
+  forcedRealtime = value;
 }
 
 const json = (body: unknown) => JSON.stringify(body);
@@ -249,6 +267,42 @@ export const api = {
     join: (request: JoinRequest): Promise<CurrentUser> =>
       isMockApi("household") ? viaMock(() => mockHousehold.join(request)) : http("/household/join", { method: "POST", body: json(request) }),
   },
+  /** B-32…B-34: дзвіночок, налаштування, Web Push. Моки — разом з доменом `household`. */
+  notifications: {
+    list: (limit = 20): Promise<NotificationFeed> =>
+      isMockApi("household") ? viaMock(() => mockNotifications.list(limit)) : http(`/notifications${toQueryString({ limit })}`),
+    unreadCount: (): Promise<{ count: number }> =>
+      isMockApi("household") ? viaMock(() => mockNotifications.unreadCount()) : http("/notifications/unread-count"),
+    read: (id: string): Promise<void> =>
+      isMockApi("household") ? viaMock(() => mockNotifications.read(id)) : http(`/notifications/${id}/read`, { method: "POST" }),
+    readAll: (): Promise<{ updated: number }> =>
+      isMockApi("household") ? viaMock(() => mockNotifications.readAll()) : http("/notifications/read-all", { method: "POST" }),
+    settings: (): Promise<NotificationSettings> =>
+      isMockApi("household") ? viaMock(() => mockNotifications.settings()) : http("/me/notification-settings"),
+    saveSettings: (next: NotificationSettings): Promise<NotificationSettings> =>
+      isMockApi("household")
+        ? viaMock(() => mockNotifications.saveSettings(next))
+        : http("/me/notification-settings", { method: "PUT", body: json(next) }),
+    /** `publicKey: null` — push на сервері вимкнено. */
+    pushPublicKey: (): Promise<{ publicKey: string | null }> =>
+      isMockApi("household") ? viaMock(() => mockNotifications.pushPublicKey()) : http("/me/push/public-key"),
+    subscribePush: (subscription: PushSubscriptionInput): Promise<void> =>
+      isMockApi("household")
+        ? viaMock(() => mockNotifications.subscribePush(subscription))
+        : http("/me/push-subscriptions", { method: "POST", body: json(subscription) }),
+    unsubscribePush: (endpoint: string): Promise<void> =>
+      isMockApi("household")
+        ? viaMock(() => mockNotifications.unsubscribePush(endpoint))
+        : http("/me/push-subscriptions", { method: "DELETE", body: json({ endpoint }) }),
+  },
+  /** B-54. Потік подій — `streamUrl()` для EventSource (у моках його немає). */
+  realtime: {
+    presence: (): Promise<Presence> => (isMockApi("household") ? viaMock(() => mockNotifications.presence()) : http("/household/presence")),
+    setShopping: (store: string | null): Promise<void> =>
+      isMockApi("household")
+        ? viaMock(() => mockNotifications.setShopping(store))
+        : http("/household/presence", { method: "POST", body: json({ shoppingAt: store }) }),
+  },
 };
 
 /** Ключі кешу TanStack Query — єдине джерело правди для інвалідації. */
@@ -266,6 +320,10 @@ export const queryKeys = {
   invites: ["household", "invites"] as const,
   familyCode: ["household", "code"] as const,
   activity: ["household", "activity"] as const,
+  presence: ["household", "presence"] as const,
+  notifications: ["notifications"] as const,
+  unreadCount: ["notifications", "unread"] as const,
+  notificationSettings: ["notifications", "settings"] as const,
   recipes: (ids: string[]) => ["recipes", [...ids].sort()] as const,
   shoppingList: ["shopping-list"] as const,
   shoppingSummary: ["shopping-list", "summary"] as const,

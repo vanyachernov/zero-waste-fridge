@@ -3,7 +3,9 @@ import { Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { api } from "@zwf/api-client";
 import { useI18n } from "@zwf/i18n/react";
 import { Logo, cn } from "@zwf/ui";
-import { BarChart3, Bell, ChefHat, Leaf, Refrigerator, ShoppingCart } from "lucide-react";
+import { BarChart3, ChefHat, Leaf, Refrigerator, ShoppingCart } from "lucide-react";
+import { NotificationBell } from "../components/NotificationBell";
+import { useHouseholdStream } from "../lib/realtime";
 import { errorMessage } from "../lib/errors";
 import { meQuery } from "../lib/queries";
 import { ProfileMenu } from "./ProfileMenu";
@@ -19,6 +21,8 @@ export function AppShell() {
   const i18n = useI18n();
   const { t, messages } = i18n;
   const { data: me } = useQuery(meQuery);
+  // F-63: зміни інших учасників сім'ї приходять без перезавантаження
+  useHouseholdStream(Boolean(me?.householdId));
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const logout = useMutation({
@@ -58,14 +62,7 @@ export function AppShell() {
           </nav>
 
           <div className="ml-auto flex items-center gap-3 sm:gap-4">
-            <button
-              type="button"
-              className="relative rounded-md p-2 text-on-surface-variant hover:bg-surface-container-low"
-              aria-label="Сповіщення"
-            >
-              <Bell className="size-5" />
-              <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-warning ring-2 ring-surface-container-lowest" />
-            </button>
+            <NotificationBell />
             {me && (
               <ProfileMenu
                 user={me}

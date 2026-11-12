@@ -13,6 +13,7 @@ import { AppShell } from "./routes/AppShell";
 import { FamilyPage } from "./routes/FamilyPage";
 import { FridgePage } from "./routes/FridgePage";
 import { JoinPage } from "./routes/JoinPage";
+import { SettingsPage } from "./routes/SettingsPage";
 import { RecipesPage } from "./routes/RecipesPage";
 import { ShoppingPage } from "./routes/ShoppingPage";
 
@@ -146,6 +147,12 @@ const shoppingRoute = createRoute({
   component: ShoppingPage,
 });
 
+const settingsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: "/settings",
+  component: SettingsPage,
+});
+
 const familyRoute = createRoute({
   getParentRoute: () => appRoute,
   path: "/family",
@@ -173,7 +180,7 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   forgotPasswordRoute,
   resetPasswordRoute,
-  appRoute.addChildren([fridgeRoute, recipesRoute, shoppingRoute, familyRoute, joinRoute]),
+  appRoute.addChildren([fridgeRoute, recipesRoute, shoppingRoute, familyRoute, joinRoute, settingsRoute]),
 ]);
 
 export function createAppRouter(queryClient: QueryClient, options: { history?: RouterHistory } = {}) {

@@ -24,7 +24,8 @@ describe("shopping list page", () => {
     expect(screen.getByText("Пріоритет: Високий")).toBeVisible();
     expect(screen.getByText("~74 ₴")).toBeVisible();
     expect(screen.getByText(/Додано: Максим Кравченко/)).toBeVisible();
-    expect(await screen.findByText("Олена (Ви), Максим, Софія • 3 учасники")).toBeVisible();
+    expect(await screen.findByText("Олена (Ви), Максим, Софія • 3 учасники • 2 учасники онлайн")).toBeVisible();
+    expect(screen.getByText("Максим зараз у «Сільпо»")).toBeVisible();
     expect(screen.getByRole("link", { name: "Запросити члена сім'ї" })).toHaveAttribute("href", "/lms/family");
     expect(screen.getByRole("region", { name: "Автопоповнення із залишків холодильника" })).toHaveTextContent(
       "Шпинат Baby свіжий, Грецький йогурт 5% закінчилися або списані",

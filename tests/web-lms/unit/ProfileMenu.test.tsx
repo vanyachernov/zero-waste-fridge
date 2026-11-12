@@ -35,7 +35,7 @@ describe("ProfileMenu", () => {
     expect(trigger).toHaveTextContent("ОК");
   });
 
-  it("opens with email, household and role; family links work, settings are still disabled", async () => {
+  it("opens with email, household and role; family and settings links work", async () => {
     const { user: u } = renderWithProviders(<ProfileMenu user={user} onLogout={vi.fn()} />);
 
     await u.click(await screen.findByRole("button", { name: "Меню профілю" }));
@@ -46,7 +46,7 @@ describe("ProfileMenu", () => {
     expect(within(menu).getByText("Власник")).toBeVisible();
     expect(within(menu).getByRole("menuitem", { name: /Моя сім'я/ })).toHaveAttribute("href", "/family");
     expect(within(menu).getByRole("menuitem", { name: /Приєднатися до сім'ї/ })).toHaveAttribute("href", "/join");
-    expect(within(menu).getByRole("menuitem", { name: /Налаштування/ })).toHaveAttribute("aria-disabled", "true");
+    expect(within(menu).getByRole("menuitem", { name: /Налаштування/ })).toHaveAttribute("href", "/settings");
     expect((await screen.findByRole("button", { name: "Меню профілю" }))).toHaveAttribute("aria-expanded", "true");
   });
 

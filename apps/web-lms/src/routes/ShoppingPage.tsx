@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { api, queryKeys, type Category, type ShoppingItem, type ShoppingList, type Store } from "@zwf/api-client";
+import { api, queryKeys, type Category, type Member, type Presence, type ShoppingItem, type ShoppingList, type Store } from "@zwf/api-client";
 import { useI18n } from "@zwf/i18n/react";
-import { Avatar, Badge, Button, Card, Chip, Input, Select, buttonClasses, cn, useToast } from "@zwf/ui";
-import { Check, ChevronDown, Home, Minus, Plus, Refrigerator, RefreshCcw, Search, Share2, ShoppingBasket, Sparkles, Trash2, UserPlus } from "lucide-react";
+import { Avatar, Badge, Button, Card, Chip, Input, Menu, Select, buttonClasses, cn, useToast } from "@zwf/ui";
+import { Check, ChevronDown, Home, LogOut, MapPin, Minus, Plus, Refrigerator, RefreshCcw, Search, Share2, ShoppingBasket, Sparkles, Trash2, UserPlus } from "lucide-react";
 import { useMemo, useState, type FormEvent } from "react";
 import { CATEGORY_EMOJI, CATEGORY_ORDER } from "../components/categoryEmoji";
 import { MoveToFridgeModal } from "../components/MoveToFridgeModal";
@@ -12,6 +12,7 @@ import { errorMessage } from "../lib/errors";
 import { can, householdQuery, membersQuery } from "../lib/household";
 import { meQuery } from "../lib/queries";
 import { changeQuantity, formatItemQty, parseQuickAdd, shareText } from "../lib/shopping";
+import { useRealtimeStatus } from "../lib/realtime";
 import { relativeTime } from "../lib/time";
 import { useDocumentTitle } from "../lib/useDocumentTitle";
 
@@ -33,6 +34,13 @@ export function ShoppingPage() {
   const stores = useQuery({ queryKey: queryKeys.stores, queryFn: () => api.shoppingList.stores() });
   const household = useQuery(householdQuery);
   const members = useQuery(membersQuery);
+  const presence = useQuery({ queryKey: queryKeys.presence, queryFn: () => api.realtime.presence() });
+  const realtime = useRealtimeStatus();
+  const setShopping = useMutation({
+    mutationFn: (store: string | null) => api.realtime.setShopping(store),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: queryKeys.presence }),
+    onError: (error) => toast.show({ message: errorMessage(error, i18n), tone: "error" }),
+  });
   const [filter, setFilter] = useState<Filter>({ kind: "all" });
   const [showBought, setShowBought] = useState(true);
   const [smartOpen, setSmartOpen] = useState(false);
@@ -140,30 +148,14 @@ export function ShoppingPage() {
 
       {/* ---------- Підсумки (B-45) ---------- */}
       <Card className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[5fr_7fr]">
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-2xs font-bold tracking-wide text-muted uppercase">{t("shopping.familyAccess")}</p>
-            <Badge tone="neutral" dot>
-              {t("shopping.synced")}
-            </Badge>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="flex -space-x-2">
-              {members.data?.slice(0, 4).map((m, index) => (
-                <Avatar key={m.id} name={m.name} src={m.avatarUrl} tone={(["primary", "warning", "neutral"] as const)[index % 3]} className="ring-2 ring-surface-container-lowest" />
-              ))}
-            </div>
-            {members.data && (
-              <p className="text-xs text-on-surface-variant">
-                {t("shopping.members", {
-                  names: members.data.map((m) => (m.me ? `${m.name.split(" ")[0]} (${t("family.you")})` : m.name.split(" ")[0])).join(", "),
-                  n: members.data.length,
-                  unit: plural(members.data.length, ["учасник", "учасники", "учасників"]),
-                })}
-              </p>
-            )}
-          </div>
-        </div>
+        <FamilyPresence
+          members={members.data}
+          online={presence.data?.online}
+          connected={realtime.connected}
+          lastEventAt={realtime.lastEventAt}
+          stores={stores.data ?? []}
+          onShopping={(store) => setShopping.mutate(store)}
+        />
         <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
         <div className="rounded-xl bg-surface-container-low p-3">
           <p className="text-2xs text-on-surface-variant">{t("shopping.boughtOf")}</p>
@@ -333,6 +325,87 @@ export function ShoppingPage() {
 
       <SmartSyncModal open={smartOpen} onClose={() => setSmartOpen(false)} />
       <MoveToFridgeModal open={moveOpen} items={bought} onClose={() => setMoveOpen(false)} />
+    </div>
+  );
+}
+
+/** F-63: «Максим зараз у «Сільпо»», хто онлайн, стан синхронізації і «Я в магазині». */
+function FamilyPresence({
+  members,
+  online,
+  connected,
+  lastEventAt,
+  stores,
+  onShopping,
+}: {
+  members: Member[] | undefined;
+  online: Presence["online"] | undefined;
+  connected: boolean;
+  lastEventAt: string | null;
+  stores: Store[];
+  onShopping: (store: string | null) => void;
+}) {
+  const i18n = useI18n();
+  const { t, plural } = i18n;
+  const onlineIds = new Set(online?.map((o) => o.id));
+  const me = members?.find((m) => m.me);
+  const shopper = online?.find((o) => o.shoppingAt);
+  const myStore = online?.find((o) => o.id === me?.id)?.shoppingAt ?? null;
+  const first = (name: string) => name.split(" ")[0] ?? name;
+  const onlineCount = online?.length ?? 0;
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-2xs font-bold tracking-wide text-muted uppercase">{t("shopping.familyAccess")}</p>
+        <Badge tone={connected ? "primary" : "neutral"} dot>
+          {connected ? t("realtime.synced", { ago: lastEventAt ? relativeTime(lastEventAt, i18n) : t("time.justNow") }) : t("realtime.offline")}
+        </Badge>
+      </div>
+      <div className="flex items-center gap-3">
+        <div className="flex -space-x-2">
+          {members?.slice(0, 4).map((m, index) => (
+            <span key={m.id} className="relative">
+              <Avatar name={m.name} src={m.avatarUrl} tone={(["primary", "warning", "neutral"] as const)[index % 3]} className="ring-2 ring-surface-container-lowest" />
+              {onlineIds.has(m.id) && (
+                <span className="absolute -right-0.5 -bottom-0.5 size-3 rounded-full bg-primary ring-2 ring-surface-container-lowest" aria-hidden />
+              )}
+            </span>
+          ))}
+        </div>
+        <div className="min-w-0">
+          {shopper && (
+            <p className="truncate text-sm font-bold">{t("realtime.shoppingAt", { name: first(shopper.name), store: shopper.shoppingAt! })}</p>
+          )}
+          {members && (
+            <p className="text-xs text-on-surface-variant">
+              {t("shopping.members", {
+                names: members.map((m) => (m.me ? `${first(m.name)} (${t("family.you")})` : first(m.name))).join(", "),
+                n: members.length,
+                unit: plural(members.length, ["учасник", "учасники", "учасників"]),
+              })}
+              {onlineCount > 0 && ` • ${t("realtime.online", { n: onlineCount, unit: plural(onlineCount, ["учасник", "учасники", "учасників"]) })}`}
+            </p>
+          )}
+        </div>
+      </div>
+      {myStore ? (
+        <Button variant="ghost" size="sm" className="self-start" onClick={() => onShopping(null)}>
+          <LogOut className="size-3.5" /> {t("realtime.leftStore")}
+        </Button>
+      ) : (
+        <Menu
+          label={t("realtime.whichStore")}
+          align="left"
+          className="self-start"
+          trigger={
+            <span className="flex items-center gap-1.5 px-2 text-xs font-semibold text-primary">
+              <MapPin className="size-3.5" aria-hidden /> {t("realtime.imShopping")}
+            </span>
+          }
+          items={(stores.length ? stores.map((s) => s.name) : [t("shopping.anyStore")]).map((name) => ({ label: name, onSelect: () => onShopping(name) }))}
+        />
+      )}
     </div>
   );
 }
