@@ -3,7 +3,7 @@ import { Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { api } from "@zwf/api-client";
 import { useI18n } from "@zwf/i18n/react";
 import { Logo, cn } from "@zwf/ui";
-import { BarChart3, ChefHat, Leaf, Refrigerator, ShoppingCart } from "lucide-react";
+import { BarChart3, ChefHat, Leaf, Refrigerator, ShoppingCart, Users } from "lucide-react";
 import { NotificationBell } from "../components/NotificationBell";
 import { useHouseholdStream } from "../lib/realtime";
 import { errorMessage } from "../lib/errors";
@@ -15,6 +15,14 @@ const NAV = [
   { to: "/recipes", key: "nav.recipes", short: "navShort.recipes", icon: ChefHat, disabled: false },
   { to: "/stats", key: "nav.stats", short: "navShort.stats", icon: BarChart3, disabled: true }, // розділ ще не реалізовано
   { to: "/shopping", key: "nav.shopping", short: "navShort.shopping", icon: ShoppingCart, disabled: false },
+] as const;
+
+/** F-81: мобільна навігація за макетом — без «Статистики» (вона в меню профілю), зате з «Сім'єю». */
+const MOBILE_NAV = [
+  { to: "/", short: "navShort.fridge", icon: Refrigerator },
+  { to: "/recipes", short: "navShort.recipes", icon: ChefHat },
+  { to: "/shopping", short: "navShort.shopping", icon: ShoppingCart },
+  { to: "/family", short: "navShort.family", icon: Users },
 ] as const;
 
 export function AppShell() {
@@ -96,30 +104,20 @@ export function AppShell() {
         aria-label="Mobile"
         className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-border bg-surface-container-lowest/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
       >
-        {NAV.map(({ to, short, icon: Icon, disabled }) => {
-          const content = (
-            <>
-              <Icon className="size-5" />
-              <span className="max-w-full truncate px-1">{t(short)}</span>
-            </>
-          );
-          const base = "flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium text-muted";
-          return disabled ? (
-            <span key={to} className={cn(base, "opacity-50")} aria-disabled>
-              {content}
+        {MOBILE_NAV.map(({ to, short, icon: Icon }) => (
+          <Link
+            key={to}
+            to={to}
+            activeOptions={{ exact: true, includeSearch: false }}
+            className="group flex min-h-14 flex-col items-center justify-center gap-1 pt-2 pb-1.5 text-[11px] font-medium text-muted outline-none"
+            activeProps={{ className: "!text-on-surface" }}
+          >
+            <span className="flex h-7 w-13 items-center justify-center rounded-pill transition-colors group-hover:bg-surface-container-low group-focus-visible:ring-2 group-focus-visible:ring-primary group-data-[status=active]:bg-primary-container group-data-[status=active]:text-on-primary-container">
+              <Icon className="size-5" aria-hidden />
             </span>
-          ) : (
-            <Link
-              key={to}
-              to={to}
-              activeOptions={{ exact: true, includeSearch: false }}
-              className={base}
-              activeProps={{ className: "!text-primary" }}
-            >
-              {content}
-            </Link>
-          );
-        })}
+            <span className="max-w-full truncate px-1">{t(short)}</span>
+          </Link>
+        ))}
       </nav>
     </div>
   );

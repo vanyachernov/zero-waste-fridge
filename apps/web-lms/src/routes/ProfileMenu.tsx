@@ -2,7 +2,7 @@ import type { CurrentUser } from "@zwf/api-client";
 import { useI18n } from "@zwf/i18n/react";
 import { Badge, cn } from "@zwf/ui";
 import { Link } from "@tanstack/react-router";
-import { Leaf, Loader2, LogOut, Monitor, Moon, Settings, Sun, UserPlus, Users } from "lucide-react";
+import { BarChart3, Leaf, Loader2, LogOut, Monitor, Moon, Settings, Sun, UserPlus, Users } from "lucide-react";
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { useTheme, type ThemePreference } from "../lib/theme";
 
@@ -155,6 +155,16 @@ export function ProfileMenu({ user, onLogout, logoutPending = false, logoutError
             >
               <Settings className="size-4" aria-hidden /> {t("profile.settings")}
             </Link>
+            {/* F-81: на мобільному «Статистики» немає в нижній навігації — вона тут (розділ ще в роботі) */}
+            <span
+              role="menuitem"
+              aria-disabled="true"
+              tabIndex={-1}
+              className="flex cursor-not-allowed items-center gap-3 px-4 py-2 text-sm text-muted lg:hidden"
+            >
+              <BarChart3 className="size-4" aria-hidden /> {t("nav.stats")}
+              <Badge className="ml-auto">{t("profile.soon")}</Badge>
+            </span>
           </div>
 
           <div className="border-t border-border px-4 py-3" role="group" aria-label={t("profile.theme")}>
