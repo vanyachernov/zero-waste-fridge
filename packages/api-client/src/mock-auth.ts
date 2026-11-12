@@ -187,6 +187,15 @@ export function requireMockSession() {
   if (!session || !accounts.has(session)) throw new ApiError(401, "Unauthorized");
 }
 
+/**
+ * Користувач мок-сесії для моків даних (автор продукту, домогосподарство). Коли auth справжній
+ * (`VITE_API_MOCK=data`), мок-сесії немає — дані тоді живуть у спільному «зовнішньому» домогосподарстві.
+ */
+export function mockSessionUser(): CurrentUser | null {
+  const account = session ? accounts.get(session) : undefined;
+  return account ? { ...account.user } : null;
+}
+
 /** Хелпери лише для тестів і dev-інструментів. */
 export const mockAuthControl = {
   reset() {

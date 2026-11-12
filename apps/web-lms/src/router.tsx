@@ -5,7 +5,8 @@ import type { AuthTab } from "./auth/AuthTabs";
 import { ForgotPasswordPage } from "./auth/ForgotPasswordPage";
 import { LoginPage } from "./auth/LoginPage";
 import { ResetPasswordPage } from "./auth/ResetPasswordPage";
-import { meQuery, productsQuery } from "./lib/queries";
+import { toProductQuery, validateFridgeSearch } from "./lib/fridgeSearch";
+import { activeProductsQuery, meQuery, productSummaryQuery, productsQuery } from "./lib/queries";
 import { safeRedirect } from "./lib/redirect";
 import { AppErrorScreen, AppPendingScreen } from "./routes/AppStatusScreens";
 import { AppShell } from "./routes/AppShell";
@@ -108,7 +109,13 @@ const appRoute = createRoute({
 const fridgeRoute = createRoute({
   getParentRoute: () => appRoute,
   path: "/",
-  loader: ({ context }) => context.queryClient.ensureQueryData(productsQuery),
+  validateSearch: validateFridgeSearch,
+  loaderDeps: ({ search }) => toProductQuery(search),
+  // Підвантажуємо паралельно, не блокуючи перехід: сторінка має скелетон і обробку помилок
+  loader: ({ context, deps }) => {
+    void context.queryClient.prefetchQuery(productsQuery(deps));
+    void context.queryClient.prefetchQuery(productSummaryQuery);
+  },
   component: FridgePage,
 });
 
@@ -127,7 +134,7 @@ const recipesRoute = createRoute({
       .slice(0, 4);
     return ids.length ? { ids } : {};
   },
-  loader: ({ context }) => context.queryClient.ensureQueryData(productsQuery),
+  loader: ({ context }) => context.queryClient.ensureQueryData(activeProductsQuery),
   component: RecipesPage,
 });
 
