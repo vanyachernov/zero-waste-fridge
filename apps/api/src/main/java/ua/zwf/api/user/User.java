@@ -30,6 +30,10 @@ public class User {
 	@Column(name = "avatar_url", length = 512)
 	private String avatarUrl;
 
+	/** F-90: {@code NULL} — як у системі. */
+	@Column(length = 5)
+	private String theme;
+
 	@Column(name = "created_at", nullable = false)
 	private Instant createdAt;
 
@@ -79,6 +83,15 @@ public class User {
 
 	public Instant getUpdatedAt() {
 		return updatedAt;
+	}
+
+	public Theme getTheme() {
+		return theme == null ? Theme.SYSTEM : Theme.valueOf(theme);
+	}
+
+	public void changeTheme(Theme theme, Instant now) {
+		this.theme = theme == Theme.SYSTEM ? null : theme.name();
+		this.updatedAt = now;
 	}
 
 }

@@ -13,6 +13,7 @@ export const BACKEND_USER: CurrentUser = {
   avatarUrl: null,
   householdId: "h-7",
   householdName: "Сім'я Бекенд",
+  theme: "system",
   role: "OWNER",
 };
 export const BACKEND_PASSWORD = "Backend-pass-1";
