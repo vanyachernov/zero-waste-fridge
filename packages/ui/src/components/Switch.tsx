@@ -24,7 +24,7 @@ export function Switch({ checked, onChange, label, description, disabled, classN
         disabled={disabled}
         onClick={() => onChange(!checked)}
         className={cn(
-          "relative mt-0.5 inline-flex h-[22px] w-10 shrink-0 cursor-pointer items-center rounded-pill transition-colors",
+          "touch-hit mt-0.5 inline-flex h-[22px] w-10 shrink-0 cursor-pointer items-center rounded-pill transition-colors",
           "focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
           checked ? "bg-primary" : "bg-outline-variant",
         )}

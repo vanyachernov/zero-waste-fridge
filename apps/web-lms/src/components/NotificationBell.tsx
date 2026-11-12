@@ -67,7 +67,7 @@ export function NotificationBell() {
         aria-controls={open ? panelId : undefined}
         aria-label={count ? t("notifications.bellUnread", { n: count }) : t("notifications.bell")}
         onClick={() => setOpen((v) => !v)}
-        className="relative cursor-pointer rounded-md p-2 text-on-surface-variant hover:bg-surface-container-low"
+        className="touch-hit cursor-pointer rounded-md p-2 text-on-surface-variant hover:bg-surface-container-low"
       >
         <Bell className="size-5" aria-hidden />
         {count > 0 && (

@@ -47,6 +47,25 @@
   --color-border: #263039;
 }
 
+/*
+ * F-84: зона тапу ≥ 44×44 px (вимога UI-Kit) без зміни розміру самої кнопки —
+ * невидима «подушка» навколо елемента лише на сенсорних екранах.
+ */
+@utility touch-hit {
+  position: relative;
+  @media (pointer: coarse) {
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: max(100%, 44px);
+      height: max(100%, 44px);
+      transform: translate(-50%, -50%);
+    }
+  }
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;

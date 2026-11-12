@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { api } from "@zwf/api-client";
 import { useI18n } from "@zwf/i18n/react";
-import { Logo, cn } from "@zwf/ui";
+import { Logo } from "@zwf/ui";
 import { BarChart3, ChefHat, Leaf, Refrigerator, ShoppingCart, Users } from "lucide-react";
 import { NotificationBell } from "../components/NotificationBell";
 import { useHouseholdStream } from "../lib/realtime";
