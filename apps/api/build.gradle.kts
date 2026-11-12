@@ -1,5 +1,6 @@
 plugins {
 	java
+	jacoco
 	id("org.springframework.boot") version "4.1.2"
 	id("io.spring.dependency-management") version "1.1.7"
 }
@@ -88,6 +89,45 @@ val integrationTest = tasks.register<Test>("integrationTest") {
 
 tasks.check {
 	dependsOn(integrationTest)
+}
+
+// ---------------------------------------------------------------------------
+// Q-02: покриття JaCoCo за unit + інтеграційними тестами разом.
+//   ./gradlew check jacocoTestReport → build/reports/jacoco/test/html/index.html
+// ---------------------------------------------------------------------------
+jacoco {
+	toolVersion = "0.8.14"
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test, integrationTest)
+	executionData(fileTree(layout.buildDirectory.dir("jacoco")).include("*.exec"))
+	reports {
+		xml.required = true
+		html.required = true
+	}
+}
+
+// Зараз ≈ 97 % рядків / 88 % гілок — поріг із запасом; `check` падає, якщо покриття просяде
+tasks.jacocoTestCoverageVerification {
+	dependsOn(tasks.jacocoTestReport)
+	executionData(fileTree(layout.buildDirectory.dir("jacoco")).include("*.exec"))
+	violationRules {
+		rule {
+			limit {
+				counter = "LINE"
+				minimum = "0.90".toBigDecimal()
+			}
+			limit {
+				counter = "BRANCH"
+				minimum = "0.80".toBigDecimal()
+			}
+		}
+	}
+}
+
+tasks.check {
+	dependsOn(tasks.jacocoTestCoverageVerification)
 }
 
 tasks.withType<Test>().configureEach {
