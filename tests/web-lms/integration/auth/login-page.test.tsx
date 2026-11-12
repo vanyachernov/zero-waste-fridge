@@ -39,12 +39,19 @@ describe("login page", () => {
     expect(await screen.findByRole("button", { name: "Створити акаунт" })).toBeVisible();
   });
 
-  it("join-by-code explains it is coming soon", async () => {
-    const { user } = renderApp("/login");
+  it("join-by-code leads through login to the code form (F-61)", async () => {
+    const { user, router } = renderApp("/login");
 
     await user.click(await screen.findByRole("button", { name: "Приєднатися до сім'ї за кодом" }));
+    expect(screen.getByRole("status")).toHaveTextContent("Спершу увійдіть або зареєструйтесь");
+    await waitForPath(router, "/login?redirect=%2Fjoin");
 
-    expect(screen.getByRole("status")).toHaveTextContent("з'явиться найближчим часом");
+    await user.type(screen.getByLabelText("Електронна пошта"), DEMO_ACCOUNT.email);
+    await user.type(screen.getByLabelText("Пароль"), DEMO_ACCOUNT.password);
+    await user.click(screen.getByRole("button", { name: "Увійти" }));
+
+    await waitForPath(router, "/join");
+    expect(await screen.findByRole("heading", { name: "Приєднатися до сім'ї" })).toBeVisible();
   });
 
   it("login opens the fridge with the user's name in the header", async () => {

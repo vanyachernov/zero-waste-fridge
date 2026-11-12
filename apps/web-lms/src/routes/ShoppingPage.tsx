@@ -1,13 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { api, queryKeys, type Category, type ShoppingItem, type ShoppingList, type Store } from "@zwf/api-client";
 import { useI18n } from "@zwf/i18n/react";
-import { Badge, Button, Card, Chip, Input, Select, cn, useToast } from "@zwf/ui";
-import { Check, ChevronDown, Home, Minus, Plus, Refrigerator, RefreshCcw, Search, Share2, ShoppingBasket, Sparkles, Trash2 } from "lucide-react";
+import { Avatar, Badge, Button, Card, Chip, Input, Select, buttonClasses, cn, useToast } from "@zwf/ui";
+import { Check, ChevronDown, Home, Minus, Plus, Refrigerator, RefreshCcw, Search, Share2, ShoppingBasket, Sparkles, Trash2, UserPlus } from "lucide-react";
 import { useMemo, useState, type FormEvent } from "react";
 import { CATEGORY_EMOJI, CATEGORY_ORDER } from "../components/categoryEmoji";
 import { MoveToFridgeModal } from "../components/MoveToFridgeModal";
 import { SmartSyncModal } from "../components/SmartSyncModal";
 import { errorMessage } from "../lib/errors";
+import { can, householdQuery, membersQuery } from "../lib/household";
 import { meQuery } from "../lib/queries";
 import { changeQuantity, formatItemQty, parseQuickAdd, shareText } from "../lib/shopping";
 import { relativeTime } from "../lib/time";
@@ -29,6 +31,8 @@ export function ShoppingPage() {
   const summary = useQuery({ queryKey: queryKeys.shoppingSummary, queryFn: () => api.shoppingList.summary() });
   const settings = useQuery({ queryKey: queryKeys.shoppingSettings, queryFn: () => api.shoppingList.settings() });
   const stores = useQuery({ queryKey: queryKeys.stores, queryFn: () => api.shoppingList.stores() });
+  const household = useQuery(householdQuery);
+  const members = useQuery(membersQuery);
   const [filter, setFilter] = useState<Filter>({ kind: "all" });
   const [showBought, setShowBought] = useState(true);
   const [smartOpen, setSmartOpen] = useState(false);
@@ -123,14 +127,44 @@ export function ShoppingPage() {
           <p className="mt-1 max-w-2xl text-sm text-on-surface-variant">{t("shopping.subtitle")}</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => void share()} disabled={!toBuy.length}>
+          {can(household.data?.permissions, "MANAGE_MEMBERS") && (
+            <Link to="/family" className={buttonClasses("outline", "md", "rounded-xl")}>
+              <UserPlus className="size-4 text-primary" aria-hidden /> {t("shopping.invite")}
+            </Link>
+          )}
+          <Button className="rounded-xl" onClick={() => void share()} disabled={!toBuy.length}>
             <Share2 className="size-4" /> {t("shopping.share")}
           </Button>
         </div>
       </div>
 
       {/* ---------- Підсумки (B-45) ---------- */}
-      <Card className="grid gap-3 p-4 sm:grid-cols-[1fr_auto] sm:p-5">
+      <Card className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[5fr_7fr]">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-2xs font-bold tracking-wide text-muted uppercase">{t("shopping.familyAccess")}</p>
+            <Badge tone="neutral" dot>
+              {t("shopping.synced")}
+            </Badge>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex -space-x-2">
+              {members.data?.slice(0, 4).map((m, index) => (
+                <Avatar key={m.id} name={m.name} src={m.avatarUrl} tone={(["primary", "warning", "neutral"] as const)[index % 3]} className="ring-2 ring-surface-container-lowest" />
+              ))}
+            </div>
+            {members.data && (
+              <p className="text-xs text-on-surface-variant">
+                {t("shopping.members", {
+                  names: members.data.map((m) => (m.me ? `${m.name.split(" ")[0]} (${t("family.you")})` : m.name.split(" ")[0])).join(", "),
+                  n: members.data.length,
+                  unit: plural(members.data.length, ["учасник", "учасники", "учасників"]),
+                })}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
         <div className="rounded-xl bg-surface-container-low p-3">
           <p className="text-2xs text-on-surface-variant">{t("shopping.boughtOf")}</p>
           <p className="mt-1 flex flex-wrap items-baseline gap-1">
@@ -151,6 +185,7 @@ export function ShoppingPage() {
             <span className="text-[28px] leading-none font-bold text-primary">{summary.data?.autoCount ?? 0}</span>
             <span className="text-2xs font-bold text-on-surface-variant">{t("shopping.autoUnit")}</span>
           </p>
+        </div>
         </div>
       </Card>
 

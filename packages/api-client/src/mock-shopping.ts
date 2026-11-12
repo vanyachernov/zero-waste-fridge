@@ -344,6 +344,20 @@ export const mockShopping = {
 };
 
 export const mockShoppingControl = {
+  /** Для стрічки «Остання дія»: хто додав (не Smart Sync) і хто купив. */
+  items: (household: string) => items.filter((i) => i.householdId === household).map(view),
+  reassign(from: string, to: string) {
+    items.forEach((i) => {
+      if (i.householdId === from) Object.assign(i, { householdId: to, storeId: null });
+    });
+    stores = stores.filter((s) => s.householdId !== from);
+    settings.delete(from);
+  },
+  drop(household: string) {
+    items = items.filter((i) => i.householdId !== household);
+    stores = stores.filter((s) => s.householdId !== household);
+    settings.delete(household);
+  },
   reset() {
     seed();
     mockFridgeControl.onWriteOff(afterWriteOff);

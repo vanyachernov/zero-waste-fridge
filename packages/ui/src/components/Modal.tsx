@@ -46,7 +46,12 @@ export function Modal({
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      // showModal() фокусує першу кнопку (✕). Нам потрібне перше поле форми або елемент з data-autofocus
+      const target = dialog.querySelector<HTMLElement>("[data-autofocus], input:not([disabled]):not([type=hidden]), select:not([disabled]), textarea:not([disabled])");
+      target?.focus();
+    }
     if (!open && dialog.open) dialog.close();
   }, [open]);
 

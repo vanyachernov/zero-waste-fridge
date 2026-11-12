@@ -2,9 +2,17 @@ import { configureHttp, http, isApiError, notifyUnauthorized, type ApiError } fr
 import { mockApi } from "./mock";
 import { mockFridge } from "./mock-fridge";
 import { mockShopping } from "./mock-shopping";
+import { mockHousehold } from "./mock-household";
 import { mockAuth, setMockSessionRequired } from "./mock-auth";
 import type {
+  ActivityPage,
   CurrentUser,
+  FamilyCode,
+  Household,
+  HouseholdRole,
+  Invite,
+  JoinRequest,
+  Member,
   Dictionaries,
   LoginRequest,
   Product,
@@ -33,6 +41,7 @@ export { ApiError, CSRF_COOKIE, CSRF_HEADER, http, isApiError, readCookie } from
 export { DEMO_ACCOUNT, mockAuthControl } from "./mock-auth";
 export { MOCK_DICTIONARIES, mockFridgeControl, openedShelfLifeDays } from "./mock-fridge";
 export { mockShoppingControl } from "./mock-shopping";
+export { mockHouseholdControl, normalizeJoinCode } from "./mock-household";
 
 /**
  * Що обслуговують in-memory моки:
@@ -46,15 +55,18 @@ export type MockDomain = "auth" | "fridge" | "shopping" | "household" | "recipes
 export type MockMode = boolean | readonly MockDomain[];
 
 const ALL_DOMAINS: readonly MockDomain[] = ["auth", "fridge", "shopping", "household", "recipes"];
-/** `data` — історична назва «усе, крім автентифікації» (I-01). */
-const DATA_DOMAINS: readonly MockDomain[] = ["fridge", "shopping", "household", "recipes"];
+/**
+ * `data` — історична назва «дані на моках, вхід справжній» (I-01). Сім'я сюди не входить: її мок
+ * спирається на мок-сесію (хто я, яка роль), а з справжнім входом мок-сесії немає.
+ */
+const DATA_DOMAINS: readonly MockDomain[] = ["fridge", "shopping", "recipes"];
 let mocked = new Set<MockDomain>();
 
 /**
  * Значення `VITE_API_MOCK` → режим моків:
  * `true` — усе на моках; `false` / порожньо — усе на бекенді;
  * перелік доменів через кому (`recipes`, `shopping,recipes`) — лише вони на моках;
- * `data` — усе, крім автентифікації.
+ * `data` — продукти, список покупок і рецепти (вхід і сім'я — справжні).
  */
 export function parseMockMode(value: string | undefined): MockMode {
   const raw = (value ?? "").trim().toLowerCase();
@@ -203,6 +215,40 @@ export const api = {
     removeStore: (id: string): Promise<void> =>
       isMockApi("shopping") ? viaMock(() => mockShopping.removeStore(id)) : http(`/shopping-list/stores/${id}`, { method: "DELETE" }),
   },
+  /** B-50…B-55. */
+  household: {
+    get: (): Promise<Household> => (isMockApi("household") ? viaMock(() => mockHousehold.get()) : http("/household")),
+    rename: (name: string): Promise<Household> =>
+      isMockApi("household") ? viaMock(() => mockHousehold.rename(name)) : http("/household", { method: "PATCH", body: json({ name }) }),
+    /** Лише власник; неправильний пароль — помилка поля `password: INVALID_PASSWORD`. */
+    remove: (password: string): Promise<CurrentUser> =>
+      isMockApi("household") ? viaMock(() => mockHousehold.remove(password)) : http("/household", { method: "DELETE", body: json({ password }) }),
+    members: (): Promise<Member[]> => (isMockApi("household") ? viaMock(() => mockHousehold.members()) : http("/household/members")),
+    changeRole: (userId: string, role: HouseholdRole): Promise<Member> =>
+      isMockApi("household")
+        ? viaMock(() => mockHousehold.changeRole(userId, role))
+        : http(`/household/members/${userId}`, { method: "PATCH", body: json({ role }) }),
+    /** Власник видаляє учасника; свій id — вийти із сім'ї. */
+    removeMember: (userId: string): Promise<void> =>
+      isMockApi("household") ? viaMock(() => mockHousehold.removeMember(userId)) : http(`/household/members/${userId}`, { method: "DELETE" }),
+    activity: (query: { before?: string; limit?: number } = {}): Promise<ActivityPage> =>
+      isMockApi("household")
+        ? viaMock(() => mockHousehold.activity(query.before, query.limit))
+        : http(`/household/activity${toQueryString({ before: query.before, limit: query.limit })}`),
+    invite: (email: string, role: HouseholdRole = "MEMBER"): Promise<Invite> =>
+      isMockApi("household")
+        ? viaMock(() => mockHousehold.invite(email, role))
+        : http("/household/invites", { method: "POST", body: json({ email, role }) }),
+    invites: (): Promise<Invite[]> => (isMockApi("household") ? viaMock(() => mockHousehold.invites()) : http("/household/invites")),
+    cancelInvite: (id: string): Promise<void> =>
+      isMockApi("household") ? viaMock(() => mockHousehold.cancelInvite(id)) : http(`/household/invites/${id}`, { method: "DELETE" }),
+    code: (): Promise<FamilyCode> => (isMockApi("household") ? viaMock(() => mockHousehold.code()) : http("/household/invites/code")),
+    regenerateCode: (): Promise<FamilyCode> =>
+      isMockApi("household") ? viaMock(() => mockHousehold.regenerateCode()) : http("/household/invites/code", { method: "POST" }),
+    /** Вступ: 400 `INVALID_INVITE`, 403 `INVITE_EMAIL_MISMATCH`, 409 `ALREADY_MEMBER` / `LAST_OWNER`. */
+    join: (request: JoinRequest): Promise<CurrentUser> =>
+      isMockApi("household") ? viaMock(() => mockHousehold.join(request)) : http("/household/join", { method: "POST", body: json(request) }),
+  },
 };
 
 /** Ключі кешу TanStack Query — єдине джерело правди для інвалідації. */
@@ -215,6 +261,11 @@ export const queryKeys = {
   productSummary: ["products", "summary"] as const,
   tip: ["products", "tip"] as const,
   dictionaries: ["dictionaries"] as const,
+  household: ["household"] as const,
+  members: ["household", "members"] as const,
+  invites: ["household", "invites"] as const,
+  familyCode: ["household", "code"] as const,
+  activity: ["household", "activity"] as const,
   recipes: (ids: string[]) => ["recipes", [...ids].sort()] as const,
   shoppingList: ["shopping-list"] as const,
   shoppingSummary: ["shopping-list", "summary"] as const,

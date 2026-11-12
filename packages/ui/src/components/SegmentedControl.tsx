@@ -72,7 +72,8 @@ export function SegmentedControl<T extends string>({
             tabIndex={active ? 0 : -1}
             onClick={() => onChange(o.value)}
             className={cn(
-              "inline-flex min-w-8 cursor-pointer items-center justify-center gap-1.5 rounded-sm px-2.5 whitespace-nowrap transition-colors",
+              "inline-flex min-w-8 cursor-pointer items-center justify-center gap-1.5 rounded-sm whitespace-nowrap transition-colors",
+              stretch ? "min-w-0 px-1" : "px-2.5",
               "focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:outline-none",
               size === "md" ? "text-[13px]" : "text-xs",
               stretch && "flex-1",

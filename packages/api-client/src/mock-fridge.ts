@@ -105,6 +105,24 @@ type Stored = Omit<Product, "daysLeft" | "freshness" | "effectiveExpiresAt"> & {
 
 const EXTERNAL_HOUSEHOLD = "external";
 let products: Stored[] = [];
+
+/** Журнал дій для стрічки «Остання дія» (B-53), як product_event на бекенді. */
+export interface MockProductEvent {
+  type: "ADDED" | "UPDATED" | "OPENED" | "WRITTEN_OFF";
+  at: string;
+  actor: { id: string; name: string } | null;
+  productId: string;
+  productName: string;
+  outcome: WriteOffRequest["outcome"] | null;
+  quantity: number | null;
+  unit: Unit | null;
+  householdId: string;
+}
+let events: MockProductEvent[] = [];
+
+function log(type: MockProductEvent["type"], p: Stored, extra: Partial<MockProductEvent> = {}) {
+  events.push({ type, at: clock().toISOString(), actor: author(), productId: p.id, productName: p.name, outcome: null, quantity: null, unit: null, householdId: p.householdId, ...extra });
+}
 let seq = 100;
 let clock = () => new Date();
 
@@ -135,7 +153,8 @@ function view(p: Stored): Product {
 
 function seed() {
   const today = isoDate(clock());
-  const at = clock().toISOString();
+  // Демо-продукти додано позавчора (крім кількох нижче) — щоб «Остання дія» в сім'ї була правдоподібною
+  const at = new Date(clock().getTime() - 2 * DAY).toISOString();
   const demo = { id: "u1", name: "Олена Кравченко" };
   const make = (id: string, name: string, brand: string | null, category: Category, zone: StorageZone, quantity: number, unit: Unit, days: number, extra: Partial<Stored> = {}): Stored => ({
     id, name, brand, category, zone, quantity, unit, purchasedAt: addDays(today, -2), expiresAt: addDays(today, days), openedAt: null,
@@ -154,6 +173,17 @@ function seed() {
     make("p10", "Кабачки / Цукіні", "Місцевий фермер", "vegetables", "fresh", 2, "pcs", 3),
     make("p11", "Соус песто", "Скляна банка", "sauces", "door", 90, "g", 20, { openedAt: addDays(today, -1), openedShelfLifeDays: 7 }),
   ];
+  // Хто що додав — для «Останньої дії» учасників демо-сім'ї
+  const maksym = { id: "u2", name: "Максим Кравченко" };
+  const sofia = { id: "u3", name: "Софія Кравченко" };
+  const ago = (minutes: number) => new Date(clock().getTime() - minutes * 60_000).toISOString();
+  products.find((p) => p.id === "p6")!.createdAt = ago(10);
+  products.find((p) => p.id === "p8")!.addedBy = maksym;
+  products.find((p) => p.id === "p8")!.createdAt = ago(180);
+  events = products.map((p) => ({
+    type: "ADDED" as const, at: p.createdAt, actor: p.addedBy, productId: p.id, productName: p.name, outcome: null, quantity: null, unit: null, householdId: p.householdId,
+  }));
+  events.push({ type: "WRITTEN_OFF", at: ago(26 * 60), actor: sofia, productId: "p-old-2", productName: "Грецький йогурт 5%", outcome: "EATEN", quantity: 350, unit: "g", householdId: "h1" });
   seq = 100;
 }
 
@@ -284,6 +314,7 @@ export const mockFridge = {
       householdId: householdId(),
     };
     products = [stored, ...products];
+    log("ADDED", stored);
     return view(stored);
   },
 
@@ -309,6 +340,7 @@ export const mockFridge = {
       openedShelfLifeDays: !merged.openedAt ? null : openedChanged ? openedShelfLifeDays(merged.category!, name) : current.openedShelfLifeDays,
       updatedAt: clock().toISOString(),
     });
+    log(openedChanged && merged.openedAt ? "OPENED" : "UPDATED", current);
     return view(current);
   },
 
@@ -334,6 +366,7 @@ export const mockFridge = {
     if (closed) product.status = request.outcome === "WASTED" ? "WASTED" : "CONSUMED";
     else product.quantity = Math.round((product.quantity - written) * 1000) / 1000;
     product.updatedAt = clock().toISOString();
+    log("WRITTEN_OFF", product, { outcome: request.outcome, quantity: written, unit: product.unit });
     const result = view(product);
     const inShoppingList = writeOffHook(result, written, request);
     return { product: result, writtenOff: { outcome: request.outcome, quantity: written, unit: product.unit, closed }, addedToShoppingList: inShoppingList };
@@ -409,6 +442,17 @@ export const mockFridgeControl = {
     return view(stored);
   },
   all: () => products.filter((p) => p.householdId === householdId()).map(view),
+  events: (household: string) => events.filter((e) => e.householdId === household),
+  /** B-52: хто був сам, переносить продукти й історію в сім'ю. */
+  reassign(from: string, to: string) {
+    products.forEach((p) => p.householdId === from && (p.householdId = to));
+    events.forEach((e) => e.householdId === from && (e.householdId = to));
+  },
+  /** B-55: каскадне видалення. */
+  drop(household: string) {
+    products = products.filter((p) => p.householdId !== household);
+    events = events.filter((e) => e.householdId !== household);
+  },
   today: () => isoDate(clock()),
   now: () => clock(),
   defaultShelfLifeDays: (category: Category) => SHELF_LIFE[category],

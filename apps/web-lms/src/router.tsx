@@ -10,7 +10,9 @@ import { activeProductsQuery, meQuery, productSummaryQuery, productsQuery } from
 import { safeRedirect } from "./lib/redirect";
 import { AppErrorScreen, AppPendingScreen } from "./routes/AppStatusScreens";
 import { AppShell } from "./routes/AppShell";
+import { FamilyPage } from "./routes/FamilyPage";
 import { FridgePage } from "./routes/FridgePage";
+import { JoinPage } from "./routes/JoinPage";
 import { RecipesPage } from "./routes/RecipesPage";
 import { ShoppingPage } from "./routes/ShoppingPage";
 
@@ -144,11 +146,34 @@ const shoppingRoute = createRoute({
   component: ShoppingPage,
 });
 
+const familyRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: "/family",
+  component: FamilyPage,
+});
+
+export interface JoinSearch {
+  /** Токен із посилання в листі-запрошенні (B-52). */
+  invite?: string;
+  code?: string;
+}
+
+/** F-61: з листа `/lms/join?invite=…` або вручну кодом. Без сесії — вхід і повернення сюди ж (F-11). */
+const joinRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: "/join",
+  validateSearch: (search: Record<string, unknown>): JoinSearch => ({
+    ...(typeof search.invite === "string" && search.invite.trim() ? { invite: search.invite.trim() } : {}),
+    ...(typeof search.code === "string" && search.code.trim() ? { code: search.code.trim().slice(0, 16) } : {}),
+  }),
+  component: JoinPage,
+});
+
 const routeTree = rootRoute.addChildren([
   loginRoute,
   forgotPasswordRoute,
   resetPasswordRoute,
-  appRoute.addChildren([fridgeRoute, recipesRoute, shoppingRoute]),
+  appRoute.addChildren([fridgeRoute, recipesRoute, shoppingRoute, familyRoute, joinRoute]),
 ]);
 
 export function createAppRouter(queryClient: QueryClient, options: { history?: RouterHistory } = {}) {
