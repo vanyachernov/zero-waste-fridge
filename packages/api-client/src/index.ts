@@ -12,6 +12,7 @@ import type {
   Presence,
   PushSubscriptionInput,
   CurrentUser,
+  ThemePreference,
   FamilyCode,
   Household,
   HouseholdRole,
@@ -153,6 +154,9 @@ export const api = {
     register: (body: RegisterRequest): Promise<CurrentUser> =>
       isMockApi("auth") ? mockAuth.register(body) : http("/auth/register", { ...auth, method: "POST", body: json(body) }),
     logout: (): Promise<void> => (isMockApi("auth") ? mockAuth.logout() : http("/auth/logout", { ...auth, method: "POST" })),
+    /** F-90: тема в профілі (204). */
+    setTheme: (theme: ThemePreference): Promise<void> =>
+      isMockApi("auth") ? mockAuth.setTheme(theme) : http("/me/theme", { method: "PUT", body: json({ theme }) }),
     /** B-06. Завжди успіх (202), навіть для невідомого email. */
     forgotPassword: (email: string): Promise<void> =>
       isMockApi("auth") ? mockAuth.forgotPassword(email) : http("/auth/password/forgot", { ...auth, method: "POST", body: json({ email }) }),

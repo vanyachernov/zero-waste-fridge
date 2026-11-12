@@ -77,6 +77,11 @@ export function AppShell() {
                 onLogout={() => logout.mutate()}
                 logoutPending={logout.isPending}
                 logoutError={logout.isError ? errorMessage(logout.error, i18n) : null}
+                onThemeChange={(theme) => {
+                  queryClient.setQueryData(meQuery.queryKey, (user) => (user ? { ...user, theme } : user));
+                  // Не вдалося зберегти — тема все одно діє на цьому пристрої
+                  void api.auth.setTheme(theme).catch(() => undefined);
+                }}
               />
             )}
           </div>

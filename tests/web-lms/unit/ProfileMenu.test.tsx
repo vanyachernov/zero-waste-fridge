@@ -11,6 +11,7 @@ const user: CurrentUser = {
   avatarUrl: null,
   householdId: "h1",
   householdName: "Сім'я Кравченко",
+  theme: "system",
   role: "OWNER",
 };
 

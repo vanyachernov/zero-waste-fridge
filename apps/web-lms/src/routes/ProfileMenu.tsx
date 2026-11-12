@@ -21,6 +21,8 @@ export interface ProfileMenuProps {
   onLogout: () => void;
   logoutPending?: boolean;
   logoutError?: string | null;
+  /** F-90: зберегти вибір теми в профілі. */
+  onThemeChange?: (theme: ThemePreference) => void;
 }
 
 const THEMES: { value: ThemePreference; icon: typeof Sun; key: "profile.themeLight" | "profile.themeDark" | "profile.themeSystem" }[] = [
@@ -33,10 +35,14 @@ const THEMES: { value: ThemePreference; icon: typeof Sun; key: "profile.themeLig
  * F-12: меню профілю в хедері. Доступність за патерном WAI-ARIA «menu button»:
  * Enter/Space/↓ відкривають, ↑/↓ переміщують фокус, Escape закриває й повертає фокус на кнопку.
  */
-export function ProfileMenu({ user, onLogout, logoutPending = false, logoutError }: ProfileMenuProps) {
+export function ProfileMenu({ user, onLogout, logoutPending = false, logoutError, onThemeChange }: ProfileMenuProps) {
   const { t, messages } = useI18n();
   const [open, setOpen] = useState(false);
-  const [theme, setTheme] = useTheme();
+  const [theme, applyTheme] = useTheme(user.theme);
+  const setTheme = (next: ThemePreference) => {
+    applyTheme(next);
+    onThemeChange?.(next);
+  };
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuId = useId();

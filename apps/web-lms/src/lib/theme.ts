@@ -52,8 +52,18 @@ export function initTheme(): () => void {
   return () => media.removeEventListener("change", onChange);
 }
 
-export function useTheme(): [ThemePreference, (preference: ThemePreference) => void] {
-  const [preference, setPreference] = useState<ThemePreference>(readThemePreference);
+/**
+ * @param serverPreference F-90: тема з профілю. Коли вона відома, вона головна — так вибір переходить
+ * між пристроями; локальне сховище лише прибирає «блимання» до відповіді `/auth/me`.
+ */
+export function useTheme(serverPreference?: ThemePreference): [ThemePreference, (preference: ThemePreference) => void] {
+  const [preference, setPreference] = useState<ThemePreference>(() => serverPreference ?? readThemePreference());
+
+  useEffect(() => {
+    if (!serverPreference) return;
+    saveThemePreference(serverPreference);
+    setPreference(serverPreference);
+  }, [serverPreference]);
 
   useEffect(() => {
     applyTheme(preference);

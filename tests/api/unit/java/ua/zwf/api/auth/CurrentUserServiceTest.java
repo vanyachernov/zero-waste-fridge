@@ -33,7 +33,7 @@ class CurrentUserServiceTest {
 		var profile = service.find(userId).orElseThrow();
 
 		assertThat(profile).isEqualTo(new CurrentUserResponse(userId, "Олена Кравченко", "olena@example.com", null,
-				householdId, "Сім'я Кравченко", HouseholdRole.MEMBER));
+				householdId, "Сім'я Кравченко", HouseholdRole.MEMBER, "system"));
 	}
 
 	@Test
@@ -48,7 +48,7 @@ class CurrentUserServiceTest {
 	void profileNeverExposesPasswordHash() {
 		assertThat(CurrentUserResponse.class.getRecordComponents())
 			.extracting(java.lang.reflect.RecordComponent::getName)
-			.containsExactly("id", "name", "email", "avatarUrl", "householdId", "householdName", "role");
+			.containsExactly("id", "name", "email", "avatarUrl", "householdId", "householdName", "role", "theme");
 	}
 
 	static <T> T withId(T entity, UUID id) throws Exception {

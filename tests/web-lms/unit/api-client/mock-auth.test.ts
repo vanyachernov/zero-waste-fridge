@@ -58,4 +58,14 @@ describe("mock auth backend", () => {
     await api.auth.login({ email: DEMO_ACCOUNT.email, password: DEMO_ACCOUNT.password, rememberMe: true });
     expect(localStorage.getItem("zwf.mock.session")).toBe(DEMO_ACCOUNT.email);
   });
+
+  it("F-90: theme lives in the profile, needs a session and is validated", async () => {
+    expect(await codeOf(api.auth.setTheme("dark"))).toBe("401");
+    await api.auth.login({ email: DEMO_ACCOUNT.email, password: DEMO_ACCOUNT.password, rememberMe: false });
+    expect((await api.auth.me()).theme).toBe("system");
+
+    await api.auth.setTheme("dark");
+    expect((await api.auth.me()).theme).toBe("dark");
+    expect(await codeOf(api.auth.setTheme("sepia" as never))).toBe("400 VALIDATION_FAILED");
+  });
 });

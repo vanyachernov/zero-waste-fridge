@@ -58,7 +58,7 @@
 
   --color-on-surface: #171c1f;
   --color-on-surface-variant: #3e4942;
-  --color-muted: #6e7a72;
+  --color-muted: #66726a; /* F-90/F-91: ≥ 4.5:1 і на білому, і на surface-container-low */
 
   --color-outline: #6e7a72;
   --color-outline-variant: #bccac0;           /* Disabled Surface */

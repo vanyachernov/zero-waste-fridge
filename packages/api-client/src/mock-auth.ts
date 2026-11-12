@@ -1,5 +1,5 @@
 import { ApiError } from "./http";
-import type { CurrentUser, LoginRequest, RegisterRequest, ResetPasswordRequest } from "./types";
+import type { CurrentUser, LoginRequest, RegisterRequest, ResetPasswordRequest, ThemePreference } from "./types";
 
 /**
  * In-memory імітація B-02…B-06 для розробки й тестів UI без Spring Boot.
@@ -31,7 +31,7 @@ function seed() {
     {
       password: DEMO_ACCOUNT.password,
       joinedAt,
-      user: { id, name, email, avatarUrl: null, householdId: "h1", householdName: "Сім'я Кравченко", role },
+      user: { id, name, email, avatarUrl: null, householdId: "h1", householdName: "Сім'я Кравченко", role, theme: "system" },
     },
   ];
   accounts = new Map([
@@ -133,10 +133,20 @@ export const mockAuth = {
       householdId: `h${seq}`,
       householdName: householdName(cleanName),
       role: "OWNER",
+      theme: "system",
     };
     accounts.set(key, { user, password, joinedAt: new Date().toISOString() });
     writeSession(key);
     return { ...user };
+  },
+
+  /** F-90: як `PUT /api/me/theme`. */
+  async setTheme(theme: ThemePreference): Promise<void> {
+    await delay(60);
+    const account = session ? accounts.get(session) : undefined;
+    if (!account) throw new ApiError(401, "Unauthorized");
+    if (theme !== "light" && theme !== "dark" && theme !== "system") throw validation({ theme: "INVALID" });
+    account.user.theme = theme;
   },
 
   async logout(): Promise<void> {

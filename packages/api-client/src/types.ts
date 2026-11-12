@@ -17,7 +17,12 @@ export interface CurrentUser {
   householdId: string;
   householdName: string;
   role: HouseholdRole;
+  /** F-90: тема з профілю — переходить між пристроями. */
+  theme: ThemePreference;
 }
+
+/** Тема інтерфейсу: світла / темна / як у системі. */
+export type ThemePreference = "light" | "dark" | "system";
 
 /** @deprecated використовуйте {@link CurrentUser} */
 export type User = CurrentUser;
