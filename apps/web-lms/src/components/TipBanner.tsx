@@ -50,15 +50,15 @@ export function TipBanner() {
   return (
     <section
       aria-label={t("fridge.tipLabel")}
-      className="flex flex-col gap-3 rounded-xl bg-secondary-container px-4 py-3 sm:flex-row sm:items-center sm:gap-4 sm:px-5"
+      className="flex flex-col gap-2 rounded-xl bg-secondary-container px-3 py-3 sm:flex-row sm:items-center sm:gap-4 sm:px-5"
     >
       <div className="flex flex-1 items-start gap-3">
-        <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-md bg-surface-container-lowest text-on-warning-container shadow-card">
+        <span className="mt-0.5 flex size-8 shrink-0 sm:size-10 items-center justify-center rounded-md bg-surface-container-lowest text-on-warning-container shadow-card">
           <Lightbulb className="size-5" aria-hidden />
         </span>
         <div className="min-w-0">
-          <p className="text-2xs font-bold tracking-wide text-on-warning-container uppercase">{t("fridge.tipLabel")}</p>
-          <p className="text-sm text-on-secondary-container">{text}</p>
+          <p className="hidden text-2xs font-bold tracking-wide text-on-warning-container uppercase sm:block">{t("fridge.tipLabel")}</p>
+          <p className="text-[13px] leading-snug text-on-secondary-container sm:text-sm">{text}</p>
         </div>
       </div>
       <div className="flex items-center gap-2 self-end sm:self-auto">

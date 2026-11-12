@@ -126,13 +126,14 @@ export function FamilyPage() {
             </div>
             <Badge tone="primary">{t("family.synced")}</Badge>
           </div>
-          <table className="w-full text-left text-sm">
+          {/* table-fixed: довгий email обрізається «…», а не розпирає сторінку на телефоні */}
+          <table className="w-full table-fixed text-left text-sm">
             <thead className="bg-surface-container-low text-2xs font-semibold tracking-wide text-on-surface-variant uppercase">
               <tr>
                 <th className="py-2 pr-4 pl-5">{t("family.colMember")}</th>
-                <th className="py-2 pr-4">{t("family.colRole")}</th>
-                <th className="hidden py-2 pr-4 sm:table-cell">{t("family.colActivity")}</th>
-                <th className="w-12 py-2 pr-5">
+                <th className="w-28 py-2 pr-4 sm:w-36">{t("family.colRole")}</th>
+                <th className="hidden py-2 pr-4 sm:table-cell sm:w-[30%]">{t("family.colActivity")}</th>
+                <th className="w-16 py-2 pr-5">
                   <span className="sr-only">{t("fridge.colActions")}</span>
                 </th>
               </tr>

@@ -38,7 +38,7 @@ const MAX_SELECTED = 4;
 
 export function FridgePage() {
   const i18n = useI18n();
-  const { t, messages, formatDate } = i18n;
+  const { t, messages, formatDate, formatShortDate } = i18n;
   useDocumentTitle(t("fridge.title"));
   const search = route.useSearch();
   const navigate = route.useNavigate();
@@ -132,30 +132,50 @@ export function FridgePage() {
       {/* ---------- Заголовок ---------- */}
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <nav className="text-2xs text-on-surface-variant" aria-label="Breadcrumb">
+          <nav className="hidden text-2xs text-on-surface-variant sm:block" aria-label="Breadcrumb">
             <span className="font-bold">{t("fridge.breadcrumbRoot")}</span> <span className="mx-1">›</span>
             <span className="text-primary">{t("fridge.breadcrumb")}</span>
           </nav>
-          <h1 className="mt-1 text-3xl font-extrabold tracking-tight sm:text-display">{t("fridge.title")}</h1>
-          <p className="mt-1 text-sm text-on-surface-variant">{t("fridge.subtitle")}</p>
+          <h1 className="text-2xl font-extrabold tracking-tight sm:mt-1 sm:text-display">{t("fridge.title")}</h1>
+          <p className="text-xs text-on-surface-variant sm:hidden">{t("fridge.breadcrumb")}</p>
+          <p className="mt-1 hidden text-sm text-on-surface-variant sm:block">{t("fridge.subtitle")}</p>
         </div>
-        <div className="grid grid-cols-2 gap-2 sm:flex">
-          <Button variant="outline" disabled title={t("profile.soon")}>
+        <div className="flex gap-2">
+          <Button variant="outline" className="hidden sm:inline-flex" disabled title={t("profile.soon")}>
             <ScanLine className="size-4 text-primary" /> {t("fridge.scan")}
           </Button>
+          {/* F-80: на мобільному та сама кнопка стає FAB «+» над нижньою навігацією */}
           <Button
+            className={cn(
+              "max-sm:fixed max-sm:right-4 max-sm:bottom-[calc(5rem+env(safe-area-inset-bottom))] max-sm:z-20 max-sm:size-14 max-sm:rounded-full max-sm:p-0 max-sm:shadow-modal",
+              selected.length > 0 && "max-sm:hidden",
+            )}
             onClick={() => {
               setEditing(undefined);
               setFormOpen(true);
             }}
           >
-            <Plus className="size-4" /> {t("fridge.add")}
+            <Plus className="size-4 max-sm:size-6" aria-hidden /> <span className="max-sm:sr-only">{t("fridge.add")}</span>
           </Button>
         </div>
       </div>
 
-      {/* ---------- Статистика (B-14) ---------- */}
-      <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
+      {/* ---------- Статистика (B-14); на мобільному — компактний рядок 28 / 4 / 2 ---------- */}
+      <dl className="grid grid-cols-3 gap-2 sm:hidden">
+        {(
+          [
+            ["total", summary.data?.total, "text-on-surface"],
+            ["soon", summary.data?.soon, "text-on-warning-container"],
+            ["expired", summary.data?.expired, "text-error"],
+          ] as const
+        ).map(([key, value, tone]) => (
+          <div key={key} className="flex flex-col-reverse items-center rounded-lg border border-border bg-surface-container-lowest px-2 py-2.5 shadow-card">
+            <dt className="text-2xs text-on-surface-variant">{messages.fridge.statShort[key]}</dt>
+            <dd className={cn("text-2xl leading-8 font-extrabold", tone)}>{value ?? "—"}</dd>
+          </div>
+        ))}
+      </dl>
+      <div className="hidden gap-3 sm:grid sm:grid-cols-3 sm:gap-4">
         <StatCard
           title={t("fridge.statTotal")}
           value={summary.data?.total ?? "—"}
@@ -254,7 +274,7 @@ export function FridgePage() {
 
       {/* ---------- Список продуктів ---------- */}
       {!emptyFridge && (
-        <p className="-mb-2 flex items-center gap-1.5 text-xs text-on-surface-variant">
+        <p className="-mb-2 hidden items-center gap-1.5 text-xs text-on-surface-variant sm:flex">
           <ChefHat className="size-3.5 text-primary" /> {t("fridge.selectHint")}
         </p>
       )}
@@ -335,7 +355,7 @@ export function FridgePage() {
             <Pagination page={page.page} totalPages={page.totalPages} shown={items.length} total={page.total} onPage={(n) => setSearch({ page: n > 1 ? n : undefined }, { resetPage: false })} />
           </Card>
 
-          <ul className={cn("grid gap-3 sm:grid-cols-2 lg:grid-cols-3", view === "table" && "md:hidden", list.isPlaceholderData && "opacity-60")}>
+          <ul className={cn("grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3", view === "table" && "md:hidden", list.isPlaceholderData && "opacity-60")}>
             {items.map((p) => {
               const checked = selected.includes(p.id);
               const blocked = !checked && selected.length >= MAX_SELECTED;
@@ -343,22 +363,24 @@ export function FridgePage() {
                 <li
                   key={p.id}
                   className={cn(
-                    "flex items-start gap-3 rounded-lg border bg-surface-container-lowest p-4 shadow-card transition-colors",
+                    "flex min-w-0 items-center gap-2.5 rounded-lg border bg-surface-container-lowest py-2.5 pr-1 pl-3 shadow-card transition-colors sm:gap-3",
                     checked ? "border-primary bg-primary-container/35" : "border-border",
                   )}
                 >
-                  <Checkbox className="mt-2" checked={checked} disabled={blocked} onChange={() => toggle(p.id)} aria-label={p.name} />
-                  <div className="flex min-w-0 flex-1 flex-col gap-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <ProductCell product={p} />
-                      <RowActions product={p} actions={actions} compact />
-                    </div>
-                    <div className="flex flex-wrap items-center justify-between gap-2 pl-12 text-xs">
-                      <span className="font-semibold">{formatQty(p, i18n)}</span>
-                      <span className="text-on-surface-variant">{formatDate(p.effectiveExpiresAt)}</span>
-                      <FreshnessBadge daysLeft={p.daysLeft} label={freshnessLabel(p.daysLeft, i18n)} />
-                    </div>
+                  {/* На телефоні вибір продуктів для рецепта — у майстрі генератора (F-82), не в списку */}
+                  <Checkbox className="max-sm:hidden" checked={checked} disabled={blocked} onChange={() => toggle(p.id)} aria-label={p.name} />
+                  <ProductIcon category={p.category} className="size-10 rounded-lg sm:size-11" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-bold text-on-surface">{p.name}</p>
+                    <p className="truncate text-2xs text-on-surface-variant">
+                      {formatQty(p, i18n)} · {messages.zonesShort[p.zone]}
+                    </p>
                   </div>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <FreshnessBadge daysLeft={p.daysLeft} label={freshnessLabel(p.daysLeft, i18n)} />
+                    <span className="text-2xs text-muted">{formatShortDate(p.effectiveExpiresAt)}</span>
+                  </div>
+                  <RowActions product={p} actions={actions} compact />
                 </li>
               );
             })}
@@ -369,8 +391,8 @@ export function FridgePage() {
         </>
       )}
 
-      {/* ---------- Зони зберігання ---------- */}
-      <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
+      {/* ---------- Зони зберігання (на мобільному макеті їх немає) ---------- */}
+      <div className="hidden gap-3 sm:grid sm:grid-cols-3 sm:gap-4">
         {(
           [
             ["fresh", Snowflake],
