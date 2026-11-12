@@ -68,7 +68,7 @@ for (const name of ["localStorage", "sessionStorage"] as const) {
 }
 
 // Мок-бекенд імітує мережеві затримки (80–700 мс), а переходи чекають на лоадери маршрутів
-configure({ asyncUtilTimeout: 3000 });
+configure({ asyncUtilTimeout: 5000 }); // із --coverage (інструментований код) моки повільніші
 
 // ---------- Ізоляція тестів ----------
 

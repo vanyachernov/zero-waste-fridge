@@ -264,6 +264,7 @@ SPRING_PROFILES_ACTIVE=prod DB_URL=jdbc:postgresql://host:5432/zwf DB_USER=zwf D
 | `GET /api/notifications/unread-count` | `{count}` для дзвіночка |
 | `POST /api/notifications/{id}/read` · `POST /api/notifications/read-all` | 204 · `{updated}` |
 | `GET / PUT /api/me/notification-settings` | `{inApp, emailDigest, push, digestTime: "HH:mm", quietHours}` |
+| `PUT /api/me/theme` | `{theme: "light" \| "dark" \| "system"}` → 204; тема також приходить у `/api/auth/me` (F-90) |
 | `GET /api/me/push/public-key` | `{publicKey}` (`null` — push вимкнено) |
 | `POST / DELETE /api/me/push-subscriptions` | підписка браузера `{endpoint, keys: {p256dh, auth}}` |
 | `GET /api/household/stream` | SSE: `changed {topic, actor}`, `presence {online}`, `notifications` |
@@ -316,6 +317,15 @@ pnpm test:web
 ```bash
 pnpm --filter @zwf/api test
 ```
+
+Покриття (Q-02) з порогами — збірка падає, якщо воно просяде:
+
+| Що | Команда | Зараз | Поріг |
+|---|---|---|---|
+| Фронт (`apps/web-lms`, `packages/*`) | `pnpm --filter @zwf/web-lms-tests test:coverage` → `tests/web-lms/coverage/index.html` | ≈ 96 % рядків, 88 % гілок | 90 / 80 |
+| Бекенд (unit + інтеграційні разом) | `./gradlew check` (звіт: `./gradlew jacocoTestReport` → `build/reports/jacoco/test/html`) | ≈ 97 % рядків, 88 % гілок | 90 / 80 |
+
+Доступність перевіряє axe-core в `tests/web-lms/integration/a11y` (WCAG 2.1 A/AA на кожній сторінці кабінету).
 
 ## CI (D-03)
 
