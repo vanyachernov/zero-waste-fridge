@@ -46,58 +46,61 @@ export function LoginForm({ onSuccess, forgotLink, initialEmail = "" }: LoginFor
   const invalidCredentials = isApiError(login.error, 401);
 
   return (
-    <form id="auth-panel-login" role="tabpanel" aria-labelledby="auth-tab-login" onSubmit={submit} noValidate className="flex flex-col gap-4">
-      <Field label={t("auth.email")} htmlFor="login-email" error={fieldMessage(errors.email, i18n)}>
-        <Input
-          id="login-email"
-          type="email"
-          inputMode="email"
-          autoComplete="username"
-          autoFocus
-          placeholder={t("auth.emailPlaceholder")}
-          value={email}
-          invalid={!!errors.email || invalidCredentials}
-          aria-describedby={errors.email ? fieldMessageId("login-email") : undefined}
-          leading={<Mail className="size-4" aria-hidden />}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </Field>
+    <div id="auth-panel-login" role="tabpanel" aria-labelledby="auth-tab-login">
+      {/* F-91: role="tabpanel" на <form> недопустима — панель обгортає форму */}
+      <form onSubmit={submit} noValidate className="flex flex-col gap-4">
+        <Field label={t("auth.email")} htmlFor="login-email" error={fieldMessage(errors.email, i18n)}>
+          <Input
+            id="login-email"
+            type="email"
+            inputMode="email"
+            autoComplete="username"
+            autoFocus
+            placeholder={t("auth.emailPlaceholder")}
+            value={email}
+            invalid={!!errors.email || invalidCredentials}
+            aria-describedby={errors.email ? fieldMessageId("login-email") : undefined}
+            leading={<Mail className="size-4" aria-hidden />}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </Field>
 
-      <Field label={t("auth.password")} htmlFor="login-password" error={fieldMessage(errors.password, i18n)} labelAside={forgotLink?.(email.trim())}>
-        <PasswordInput
-          id="login-password"
-          autoComplete="current-password"
-          value={password}
-          invalid={!!errors.password || invalidCredentials}
-          aria-describedby={errors.password ? fieldMessageId("login-password") : undefined}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </Field>
+        <Field label={t("auth.password")} htmlFor="login-password" error={fieldMessage(errors.password, i18n)} labelAside={forgotLink?.(email.trim())}>
+          <PasswordInput
+            id="login-password"
+            autoComplete="current-password"
+            value={password}
+            invalid={!!errors.password || invalidCredentials}
+            aria-describedby={errors.password ? fieldMessageId("login-password") : undefined}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </Field>
 
-      <label className="flex cursor-pointer items-center gap-2 text-xs text-on-surface">
-        <Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
-        {t("auth.remember")}
-      </label>
+        <label className="flex cursor-pointer items-center gap-2 text-xs text-on-surface">
+          <Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
+          {t("auth.remember")}
+        </label>
 
-      <FormAlert message={formError} />
+        <FormAlert message={formError} />
 
-      <Button type="submit" size="lg" className="w-full" disabled={login.isPending} aria-busy={login.isPending}>
-        {login.isPending && <Loader2 className="size-4 animate-spin" aria-hidden />}
-        {t("auth.login")}
-      </Button>
+        <Button type="submit" size="lg" className="w-full" disabled={login.isPending} aria-busy={login.isPending}>
+          {login.isPending && <Loader2 className="size-4 animate-spin" aria-hidden />}
+          {t("auth.login")}
+        </Button>
 
-      {isMockApi() && (
-        <button
-          type="button"
-          className="cursor-pointer text-2xs text-muted underline-offset-2 hover:text-primary hover:underline"
-          onClick={() => {
-            setEmail(DEMO_ACCOUNT.email);
-            setPassword(DEMO_ACCOUNT.password);
-          }}
-        >
-          {t("auth.demo", DEMO_ACCOUNT)}
-        </button>
-      )}
-    </form>
+        {isMockApi() && (
+          <button
+            type="button"
+            className="cursor-pointer text-2xs text-muted underline-offset-2 hover:text-primary hover:underline"
+            onClick={() => {
+              setEmail(DEMO_ACCOUNT.email);
+              setPassword(DEMO_ACCOUNT.password);
+            }}
+          >
+            {t("auth.demo", DEMO_ACCOUNT)}
+          </button>
+        )}
+      </form>
+    </div>
   );
 }

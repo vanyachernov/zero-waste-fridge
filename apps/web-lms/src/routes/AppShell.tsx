@@ -43,6 +43,13 @@ export function AppShell() {
 
   return (
     <div className="flex min-h-dvh flex-col">
+      {/* F-91: перший Tab — одразу до вмісту, повз навігацію */}
+      <a
+        href="#main"
+        className="sr-only z-50 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-on-primary focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+      >
+        {t("a11y.skipToContent")}
+      </a>
       <header className="sticky top-0 z-30 border-b border-border bg-surface-container-lowest/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-app items-center gap-4 px-4 sm:px-6 xl:gap-6">
           <Link to="/" aria-label={messages.brand.name}>
@@ -88,7 +95,7 @@ export function AppShell() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-app flex-1 px-4 pt-5 pb-28 sm:px-6 lg:pb-10">
+      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-app flex-1 outline-none px-4 pt-5 pb-28 sm:px-6 lg:pb-10">
         <Outlet />
       </main>
 

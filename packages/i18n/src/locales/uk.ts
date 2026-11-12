@@ -9,6 +9,7 @@ export const uk = {
     login: "Увійти",
     openApp: "Відкрити кабінет",
   },
+  a11y: { skipToContent: "Перейти до вмісту" },
   navShort: { fridge: "Холодильник", recipes: "Рецепти", stats: "Статистика", shopping: "Покупки", family: "Сім'я" },
   landing: {
     eyebrow: "Розумний облік продуктів",
