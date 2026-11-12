@@ -5,7 +5,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * Щогодини запускає {@link ReminderService} (на 5-й хвилині) і {@link DigestService} (на початку години). У тестах вимкнено
+ * Щогодини запускає {@link ReminderService} (на 5-й хвилині) і щохвилини {@link DigestService}. У тестах вимкнено
  * ({@code zwf.reminders.enabled=false}) — там сервіс викликають напряму.
  */
 @Component
@@ -26,8 +26,8 @@ class ReminderScheduler {
 		reminders.run();
 	}
 
-	/** B-33: на початку кожної години — дайджест тим, хто обрав цю годину. */
-	@Scheduled(cron = "${zwf.reminders.digest-cron:0 0 * * * *}", zone = "${zwf.time-zone:Europe/Kyiv}")
+	/** B-33: щохвилини — дайджест тим, у кого настав обраний час, а лист за сьогодні ще не йшов. */
+	@Scheduled(cron = "${zwf.reminders.digest-cron:0 * * * * *}", zone = "${zwf.time-zone:Europe/Kyiv}")
 	void digest() {
 		digest.run();
 	}

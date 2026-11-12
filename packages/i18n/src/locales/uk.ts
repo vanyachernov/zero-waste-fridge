@@ -390,7 +390,7 @@ export const uk = {
     inAppHint: "Дзвіночок у шапці кабінету",
     emailDigest: "Щоденний лист",
     emailDigestHint: "Список продуктів, що закінчуються сьогодні й завтра — раз на день",
-    digestHour: "Час листа",
+    digestTime: "Час листа",
     push: "Push-сповіщення",
     pushHint: "Навіть коли кабінет закритий — на цьому пристрої",
     pushUnavailable: "Push вимкнено на сервері (немає ключів VAPID).",

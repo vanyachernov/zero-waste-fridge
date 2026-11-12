@@ -32,11 +32,11 @@ describe("mock notifications backend", () => {
   });
 
   it("settings validate like the backend; push is off without VAPID", async () => {
-    expect(await api.notifications.settings()).toEqual({ inApp: true, emailDigest: true, push: false, digestHour: 8, quietHours: null });
-    expect(await codeOf(api.notifications.saveSettings({ inApp: true, emailDigest: true, push: false, digestHour: 24, quietHours: { from: 5, to: 5 } }))).toBe(
-      '400 VALIDATION_FAILED {"digestHour":"Range","quietHours.to":"SAME_AS_FROM"}',
+    expect(await api.notifications.settings()).toEqual({ inApp: true, emailDigest: true, push: false, digestTime: "08:00", quietHours: null });
+    expect(await codeOf(api.notifications.saveSettings({ inApp: true, emailDigest: true, push: false, digestTime: "24:10", quietHours: { from: 5, to: 5 } }))).toBe(
+      '400 VALIDATION_FAILED {"digestTime":"INVALID","quietHours.to":"SAME_AS_FROM"}',
     );
-    const saved = await api.notifications.saveSettings({ inApp: false, emailDigest: true, push: false, digestHour: 20, quietHours: { from: 22, to: 7 } });
+    const saved = await api.notifications.saveSettings({ inApp: false, emailDigest: true, push: false, digestTime: "20:31", quietHours: { from: 22, to: 7 } });
     expect(await api.notifications.settings()).toEqual(saved);
     expect(await api.notifications.pushPublicKey()).toEqual({ publicKey: null });
   });

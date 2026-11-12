@@ -41,7 +41,7 @@ describe("notification bell (F-70)", () => {
 });
 
 describe("settings page (F-71)", () => {
-  it("saves channels, digest hour and quiet hours; push is unavailable without VAPID", async () => {
+  it("saves channels, digest time to the minute and quiet hours; push is unavailable without VAPID", async () => {
     const { user } = renderApp("/settings", { signedIn: true });
 
     expect(await screen.findByRole("heading", { name: "Налаштування" })).toBeVisible();
@@ -49,13 +49,16 @@ describe("settings page (F-71)", () => {
     expect(push).toBeDisabled();
 
     await user.click(screen.getByRole("switch", { name: "У застосунку" }));
-    await user.selectOptions(screen.getByLabelText("Час листа"), "20");
+    const time = screen.getByLabelText("Час листа");
+    expect(time).toHaveValue("08:00");
+    await user.clear(time);
+    await user.type(time, "20:31");
     await user.click(screen.getByRole("switch", { name: "Тиха година" }));
     await user.selectOptions(screen.getByLabelText("До"), "6");
     await user.click(screen.getByRole("button", { name: "Зберегти" }));
 
     expect(await screen.findByText("Налаштування збережено")).toBeVisible();
-    expect(await api.notifications.settings()).toEqual({ inApp: false, emailDigest: true, push: false, digestHour: 20, quietHours: { from: 22, to: 6 } });
+    expect(await api.notifications.settings()).toEqual({ inApp: false, emailDigest: true, push: false, digestTime: "20:31", quietHours: { from: 22, to: 6 } });
   });
 
   it("shows server field errors", async () => {
@@ -65,6 +68,15 @@ describe("settings page (F-71)", () => {
     await user.click(screen.getByRole("button", { name: "Зберегти" }));
 
     expect(await screen.findByText("Кінець тихої години має відрізнятися від початку")).toBeVisible();
+  });
+
+  it("an empty digest time is rejected", async () => {
+    const { user } = renderApp("/settings", { signedIn: true });
+    await user.clear(await screen.findByLabelText("Час листа"));
+    await user.click(screen.getByRole("button", { name: "Зберегти" }));
+
+    expect(await screen.findByText("Невірне значення")).toBeVisible();
+    expect(screen.getByLabelText("Час листа")).toHaveAttribute("aria-invalid", "true");
   });
 });
 

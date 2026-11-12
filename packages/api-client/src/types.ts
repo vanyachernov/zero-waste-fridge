@@ -344,8 +344,8 @@ export interface NotificationSettings {
   inApp: boolean;
   emailDigest: boolean;
   push: boolean;
-  /** 0…23, у поясі користувачів. */
-  digestHour: number;
+  /** Час щоденного листа `"HH:mm"` (24 год), у поясі користувачів. */
+  digestTime: string;
   /** Тиха година, також через північ (22 → 7); `null` — без тиші. */
   quietHours: { from: number; to: number } | null;
 }

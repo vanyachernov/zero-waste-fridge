@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ import java.util.UUID;
 @Table(name = "notification_settings")
 public class NotificationSettings {
 
-	public static final int DEFAULT_DIGEST_HOUR = 8;
+	public static final LocalTime DEFAULT_DIGEST_TIME = LocalTime.of(8, 0);
 
 	@Id
 	@Column(name = "user_id")
@@ -29,8 +30,9 @@ public class NotificationSettings {
 	@Column(nullable = false)
 	private boolean push;
 
-	@Column(name = "digest_hour", nullable = false)
-	private short digestHour;
+	/** Локальний час листа з точністю до хвилини (B-34). */
+	@Column(name = "digest_time", nullable = false)
+	private LocalTime digestTime;
 
 	@Column(name = "quiet_from")
 	private Short quietFrom;
@@ -54,17 +56,17 @@ public class NotificationSettings {
 		settings.inApp = true;
 		settings.emailDigest = true;
 		settings.push = false;
-		settings.digestHour = DEFAULT_DIGEST_HOUR;
+		settings.digestTime = DEFAULT_DIGEST_TIME;
 		settings.updatedAt = Instant.EPOCH;
 		return settings;
 	}
 
-	public void update(boolean inApp, boolean emailDigest, boolean push, int digestHour, Integer quietFrom,
+	public void update(boolean inApp, boolean emailDigest, boolean push, LocalTime digestTime, Integer quietFrom,
 			Integer quietTo, Instant now) {
 		this.inApp = inApp;
 		this.emailDigest = emailDigest;
 		this.push = push;
-		this.digestHour = (short) digestHour;
+		this.digestTime = digestTime.truncatedTo(ChronoUnit.MINUTES);
 		this.quietFrom = quietFrom == null ? null : quietFrom.shortValue();
 		this.quietTo = quietTo == null ? null : quietTo.shortValue();
 		this.updatedAt = now.truncatedTo(ChronoUnit.MICROS);
@@ -83,6 +85,14 @@ public class NotificationSettings {
 	/** Хоч якийсь канал для нагадувань (дзвіночок або push). */
 	public boolean wantsReminders() {
 		return inApp || push;
+	}
+
+	/**
+	 * B-33: лист за {@code date} ще не йшов, а його час уже настав. «Настав або минув», а не «рівно зараз» — щоб пропущена
+	 * хвилина (рестарт, деплой) не з'їдала лист на цілий день.
+	 */
+	public boolean isDigestDue(LocalDate date, LocalTime now) {
+		return emailDigest && !date.equals(digestSentOn) && !now.isBefore(digestTime);
 	}
 
 	public void markDigestSent(LocalDate date) {
@@ -105,8 +115,8 @@ public class NotificationSettings {
 		return push;
 	}
 
-	public int getDigestHour() {
-		return digestHour;
+	public LocalTime getDigestTime() {
+		return digestTime;
 	}
 
 	public Integer getQuietFrom() {

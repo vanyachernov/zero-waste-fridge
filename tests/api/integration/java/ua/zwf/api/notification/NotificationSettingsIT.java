@@ -23,7 +23,7 @@ class NotificationSettingsIT extends IntegrationTest {
 	JdbcTemplate jdbc;
 
 	static final Map<String, Object> DEFAULTS = new HashMap<>(Map.of("inApp", true, "emailDigest", true, "push", false,
-			"digestHour", 8));
+			"digestTime", "08:00"));
 
 	static {
 		DEFAULTS.put("quietHours", null);
@@ -36,17 +36,17 @@ class NotificationSettingsIT extends IntegrationTest {
 		assertThat(client().get("/api/me/notification-settings").status()).isEqualTo(401);
 
 		var saved = client.send("PUT", "/api/me/notification-settings", Map.of("inApp", true, "emailDigest", false,
-				"push", true, "digestHour", 20, "quietHours", Map.of("from", 22, "to", 7)));
+				"push", true, "digestTime", "20:31", "quietHours", Map.of("from", 22, "to", 7)));
 		assertThat(saved.status()).as(saved.body()).isEqualTo(200);
-		assertThat(saved.json()).isEqualTo(Map.of("inApp", true, "emailDigest", false, "push", true, "digestHour", 20,
+		assertThat(saved.json()).isEqualTo(Map.of("inApp", true, "emailDigest", false, "push", true, "digestTime", "20:31",
 				"quietHours", Map.of("from", 22, "to", 7)));
 		assertThat(client.get("/api/me/notification-settings").json()).isEqualTo(saved.json());
 
 		var bad = client.send("PUT", "/api/me/notification-settings",
-				Map.of("inApp", true, "digestHour", 24, "quietHours", Map.of("from", 5, "to", 5)));
+				Map.of("inApp", true, "digestTime", "24:10", "quietHours", Map.of("from", 5, "to", 5)));
 		assertThat(bad.status()).isEqualTo(400);
 		assertThat(bad.json()).containsEntry("errors",
-				Map.of("emailDigest", "NotNull", "push", "NotNull", "digestHour", "Range", "quietHours.to", "SAME_AS_FROM"));
+				Map.of("emailDigest", "NotNull", "push", "NotNull", "digestTime", "INVALID", "quietHours.to", "SAME_AS_FROM"));
 	}
 
 	@Test
