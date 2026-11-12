@@ -14,4 +14,10 @@ public class IntegrationTestConfiguration {
 		return new RecordingMailer();
 	}
 
+	@Bean
+	@Primary
+	RecordingPushSender recordingPushSender() {
+		return new RecordingPushSender();
+	}
+
 }

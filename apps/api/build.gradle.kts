@@ -24,6 +24,14 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-mail")
 	// B-30: шаблони листів (лише рушій, без MVC view resolver — SPA і REST лишаються як є)
 	implementation("org.thymeleaf:thymeleaf")
+	// B-33: Web Push (VAPID, шифрування aes128gcm); BouncyCastle — для ключів P-256
+	implementation("nl.martijndwars:web-push:5.1.2") {
+		exclude(group = "org.bouncycastle")
+	}
+	implementation("org.bouncycastle:bcprov-jdk18on:1.80")
+	// HttpResponse із відповіді web-push (у бібліотеки httpcore лише runtime)
+	implementation("org.apache.httpcomponents:httpcore:4.4.16")
+	implementation("org.bitbucket.b_c:jose4j:0.9.6")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-session-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
