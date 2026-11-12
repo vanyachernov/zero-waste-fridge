@@ -79,6 +79,9 @@ public class Product {
 	@Column(name = "effective_expires_at", nullable = false)
 	private LocalDate effectiveExpiresAt;
 
+	@Column(name = "reminder_sent_for")
+	private LocalDate reminderSentFor;
+
 	@Column(name = "remind_before_days", nullable = false)
 	private short remindBeforeDays;
 
@@ -174,6 +177,15 @@ public class Product {
 		}
 		this.updatedAt = db(now);
 		return written;
+	}
+
+	/** B-31: нагадування про поточний термін надіслано. */
+	public void markReminded() {
+		this.reminderSentFor = effectiveExpiresAt;
+	}
+
+	public LocalDate getReminderSentFor() {
+		return reminderSentFor;
 	}
 
 	public boolean isOpened() {
