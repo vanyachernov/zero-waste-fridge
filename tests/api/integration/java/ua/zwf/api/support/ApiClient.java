@@ -51,6 +51,100 @@ public final class ApiClient {
 		return postRaw(path, body, csrfToken().orElseThrow());
 	}
 
+	/** Відкриває потік Server-Sent Events і читає його у фоні (B-54). */
+	public SseStream stream(String path) {
+		var queue = new java.util.concurrent.LinkedBlockingQueue<String>();
+		var future = http.sendAsync(request(path).timeout(Duration.ofMinutes(5)).header("Accept", "text/event-stream").GET().build(),
+				HttpResponse.BodyHandlers.ofLines());
+		var body = new java.util.concurrent.atomic.AtomicReference<java.util.stream.Stream<String>>();
+		future.thenAccept(response -> {
+			queue.add("status:" + response.statusCode());
+			body.set(response.body());
+			try {
+				response.body().forEach(queue::add);
+			}
+			catch (RuntimeException closed) {
+				// потік закрили з тесту
+			}
+		});
+		return new SseStream(queue, future, body);
+	}
+
+	/** Події SSE: {@code event: <name>} + {@code data: <json>}, розділені порожнім рядком. */
+	public static final class SseStream implements AutoCloseable {
+
+		public record Event(String name, String data) {
+		}
+
+		private final java.util.concurrent.BlockingQueue<String> lines;
+
+		private final java.util.concurrent.CompletableFuture<?> future;
+
+		private final java.util.concurrent.atomic.AtomicReference<java.util.stream.Stream<String>> body;
+
+		SseStream(java.util.concurrent.BlockingQueue<String> lines, java.util.concurrent.CompletableFuture<?> future,
+				java.util.concurrent.atomic.AtomicReference<java.util.stream.Stream<String>> body) {
+			this.lines = lines;
+			this.future = future;
+			this.body = body;
+		}
+
+		/** Наступна подія з такою назвою (інші пропускаються); {@code null} — не прийшла за 5 с. */
+		public Event next(String name) {
+			long deadline = System.currentTimeMillis() + 5000;
+			String event = null;
+			StringBuilder data = new StringBuilder();
+			try {
+				while (System.currentTimeMillis() < deadline) {
+					String line = lines.poll(deadline - System.currentTimeMillis(), java.util.concurrent.TimeUnit.MILLISECONDS);
+					if (line == null) {
+						return null;
+					}
+					if (line.startsWith("event:")) {
+						event = line.substring(6).trim();
+					}
+					else if (line.startsWith("data:")) {
+						data.append(line.substring(5).trim());
+					}
+					else if (line.isEmpty()) {
+						if (name.equals(event)) {
+							return new Event(event, data.toString());
+						}
+						event = null;
+						data.setLength(0);
+					}
+				}
+			}
+			catch (InterruptedException ex) {
+				Thread.currentThread().interrupt();
+			}
+			return null;
+		}
+
+		/** Код відповіді на запит потоку (200 — відкрито, 401 — без сесії). */
+		public int status() {
+			try {
+				String first = lines.poll(5, java.util.concurrent.TimeUnit.SECONDS);
+				return first != null && first.startsWith("status:") ? Integer.parseInt(first.substring(7)) : -1;
+			}
+			catch (InterruptedException ex) {
+				Thread.currentThread().interrupt();
+				return -1;
+			}
+		}
+
+		/** Закриває тіло відповіді — а з ним і TCP-з'єднання, як закрита вкладка браузера. */
+		@Override
+		public void close() {
+			var stream = body.get();
+			if (stream != null) {
+				stream.close();
+			}
+			future.cancel(true);
+		}
+
+	}
+
 	/** PATCH з JSON-тілом і CSRF-заголовком. */
 	public Response patch(String path, Object body) {
 		ensureCsrfCookie();

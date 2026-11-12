@@ -7,3 +7,6 @@ zwf:
   # Тести викликають ReminderService напряму — планувальник не має втручатися
   reminders:
     enabled: false
+  # Закрите SSE-з'єднання виявляється на наступному пінгу — у тестах не чекаємо 25 с
+  realtime:
+    heartbeat: 1s
