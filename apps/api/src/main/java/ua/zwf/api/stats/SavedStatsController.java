@@ -20,7 +20,7 @@ import ua.zwf.api.household.CurrentHousehold;
 import ua.zwf.api.product.ProductEventType;
 import ua.zwf.api.product.WriteOffOutcome;
 
-/** B-24: «Врятовано від смітника: N продуктів цього місяця». */
+/** B-24: «Врятовано від смітника: N продуктів цього місяця»; B-200: огляд для сторінки статистики. */
 @Tag(name = "stats")
 @RestController
 @RequestMapping("/api/stats")
@@ -40,10 +40,24 @@ class SavedStatsController {
 
 	private final Today today;
 
-	SavedStatsController(EntityManager em, CurrentHousehold household, Today today) {
+	private final StatsService stats;
+
+	SavedStatsController(EntityManager em, CurrentHousehold household, Today today, StatsService stats) {
 		this.em = em;
 		this.household = household;
 		this.today = today;
+		this.stats = stats;
+	}
+
+	/** B-200: сторінка «Статистика & Екологія». */
+	@Operation(summary = "Saved vs wasted by month and category, footprint, most wasted products, family contribution")
+	@GetMapping("/overview")
+	StatsService.Overview overview(@AuthenticationPrincipal AppUserPrincipal principal,
+			@RequestParam(defaultValue = "6") int months) {
+		if (months < 1 || months > StatsService.MAX_MONTHS) {
+			throw new ValidationException(Map.of("months", "Range"));
+		}
+		return stats.overview(household.idOf(principal.id()), months);
 	}
 
 	@Operation(summary = "Products saved (eaten or cooked) vs wasted this month")
