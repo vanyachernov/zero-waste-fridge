@@ -32,7 +32,7 @@ export function Menu({ label, trigger, items, align = "right", className }: Menu
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
-  const [position, setPosition] = useState<CSSProperties>({ visibility: "hidden" });
+  const [position, setPosition] = useState<CSSProperties>({ position: "fixed", top: 0, left: 0, visibility: "hidden" });
 
   // Позиція відносно кнопки: під нею або (немає місця) над нею, по правому чи лівому краю
   const place = () => {
@@ -53,7 +53,7 @@ export function Menu({ label, trigger, items, align = "right", className }: Menu
 
   useLayoutEffect(() => {
     if (!open) {
-      setPosition({ visibility: "hidden" });
+      setPosition({ position: "fixed", top: 0, left: 0, visibility: "hidden" });
       return;
     }
     place();

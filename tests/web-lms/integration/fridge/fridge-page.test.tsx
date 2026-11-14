@@ -2,6 +2,7 @@ import { act, screen, waitFor, within } from "@testing-library/react";
 import { api, mockAuthControl } from "@zwf/api-client";
 import { describe, expect, it } from "vitest";
 import { renderApp, waitForPath } from "../../support/render";
+import { pick } from "../../support/select";
 
 /** F-20…F-30 + I-10: «Мій холодильник» на контракті бекенду (через мок, що його дзеркалить). */
 const table = () => screen.getByRole("table");
@@ -40,7 +41,7 @@ describe("fridge page", () => {
     await waitForPath(router, "/?category=dairy");
     await waitFor(() => expect(rowNames()).toEqual(["Грецький йогурт 5%", "Молоко пастеризоване 2.5%", "Сир твердий Гауда 45%"]));
 
-    await user.selectOptions(screen.getByRole("combobox", { name: "Сортування" }), "name");
+    await pick(user, screen.getByRole("combobox", { name: "Сортування" }), "name");
     await waitForPath(router, "/?category=dairy&sort=name");
 
     await user.type(screen.getByRole("searchbox", { name: /Пошук продуктів/ }), "гауда");
@@ -63,10 +64,10 @@ describe("fridge page", () => {
     expect(within(dialog).getByText("Обов'язкове поле")).toBeVisible();
 
     await user.type(within(dialog).getByLabelText("Назва продукту *"), "Кефір 1%");
-    await user.selectOptions(within(dialog).getByLabelText("Категорія *"), "meat");
-    expect(within(dialog).getByLabelText("Місце зберігання")).toHaveValue("fresh");
+    await pick(user, within(dialog).getByLabelText("Категорія *"), "meat");
+    expect(within(dialog).getByLabelText("Місце зберігання")).toHaveTextContent("Зона свіжості");
     expect(within(dialog).getByText("Залишилось 3 дні")).toBeVisible();
-    await user.selectOptions(within(dialog).getByLabelText("Категорія *"), "dairy");
+    await pick(user, within(dialog).getByLabelText("Категорія *"), "dairy");
     await user.clear(within(dialog).getByLabelText("Кількість *"));
     await user.type(within(dialog).getByLabelText("Кількість *"), "0,5");
     await user.click(within(dialog).getByRole("radio", { name: "л" }));

@@ -2,6 +2,7 @@ import { act, screen, waitFor, within } from "@testing-library/react";
 import { api, forceRealtimeForTests, mockNotificationsControl } from "@zwf/api-client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderApp, waitForPath } from "../../support/render";
+import { pick } from "../../support/select";
 
 /** F-70 / F-71 / F-63 + I-60. */
 describe("notification bell (F-70)", () => {
@@ -54,7 +55,7 @@ describe("settings page (F-71)", () => {
     await user.clear(time);
     await user.type(time, "20:31");
     await user.click(screen.getByRole("switch", { name: "Тиха година" }));
-    await user.selectOptions(screen.getByLabelText("До"), "6");
+    await pick(user, screen.getByLabelText("До"), "6");
     await user.click(screen.getByRole("button", { name: "Зберегти" }));
 
     expect(await screen.findByText("Налаштування збережено")).toBeVisible();
@@ -64,7 +65,7 @@ describe("settings page (F-71)", () => {
   it("shows server field errors", async () => {
     const { user } = renderApp("/settings", { signedIn: true });
     await user.click(await screen.findByRole("switch", { name: "Тиха година" }));
-    await user.selectOptions(screen.getByLabelText("До"), "22");
+    await pick(user, screen.getByLabelText("До"), "22");
     await user.click(screen.getByRole("button", { name: "Зберегти" }));
 
     expect(await screen.findByText("Кінець тихої години має відрізнятися від початку")).toBeVisible();
