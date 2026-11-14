@@ -234,6 +234,28 @@ export interface CookResult {
   cooked: { productId: string; name: string; quantity: number; unit: Unit; closed: boolean }[];
 }
 
+/** B-200: «Статистика & Екологія». Лічильники — різні продукти; маса й CO₂e — орієнтовні. */
+export interface StatsOverview {
+  from: string;
+  to: string;
+  /** Від найстаршого до поточного, `month` — «2026-11». */
+  months: { month: string; saved: number; wasted: number }[];
+  current: {
+    month: string;
+    saved: number;
+    wasted: number;
+    /** % врятованого серед списаного; `null` — цього місяця нічого не списано. */
+    saveRate: number | null;
+    savedKg: number;
+    wastedKg: number;
+    co2SavedKg: number;
+    co2WastedKg: number;
+  };
+  byCategory: { category: Category; saved: number; wasted: number }[];
+  topWasted: { name: string; times: number; quantity: number | null; unit: Unit | null }[];
+  members: { userId: string; name: string; saved: number }[];
+}
+
 /** B-24: «Врятовано від смітника» за місяць. */
 export interface SavedStats {
   period: "month";

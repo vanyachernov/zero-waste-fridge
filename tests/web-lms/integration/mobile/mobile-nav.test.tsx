@@ -16,6 +16,7 @@ describe("mobile shell (F-81)", () => {
     await waitFor(() => expect(within(mobile).getByRole("link", { name: "Сім'я" })).toHaveAttribute("aria-current", "page"));
 
     await user.click(within(screen.getByRole("banner")).getByRole("button", { name: "Меню профілю" }));
-    expect(screen.getByRole("menuitem", { name: /Статистика & Екологія/ })).toHaveAttribute("aria-disabled", "true");
+    await user.click(screen.getByRole("menuitem", { name: /Статистика & Екологія/ }));
+    await waitForPath(router, "/stats");
   });
 });

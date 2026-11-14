@@ -6,7 +6,7 @@ import { ForgotPasswordPage } from "./auth/ForgotPasswordPage";
 import { LoginPage } from "./auth/LoginPage";
 import { ResetPasswordPage } from "./auth/ResetPasswordPage";
 import { toProductQuery, validateFridgeSearch } from "./lib/fridgeSearch";
-import { activeProductsQuery, meQuery, productSummaryQuery, productsQuery, recipeQuery, recommendedRecipesQuery } from "./lib/queries";
+import { activeProductsQuery, meQuery, productSummaryQuery, productsQuery, recipeQuery, recommendedRecipesQuery, statsOverviewQuery } from "./lib/queries";
 import { safeRedirect } from "./lib/redirect";
 import { AppErrorScreen, AppPendingScreen, NotFoundScreen, RouteErrorScreen } from "./routes/AppStatusScreens";
 import { AppShell } from "./routes/AppShell";
@@ -17,6 +17,7 @@ import { SettingsPage } from "./routes/SettingsPage";
 import { RecipeDetailPage } from "./routes/RecipeDetailPage";
 import { RecipesPage } from "./routes/RecipesPage";
 import { ShoppingPage } from "./routes/ShoppingPage";
+import { StatsPage } from "./routes/StatsPage";
 
 export interface RouterContext {
   queryClient: QueryClient;
@@ -151,6 +152,25 @@ const recipesRoute = createRoute({
   component: RecipesPage,
 });
 
+export interface StatsSearch {
+  months?: 3 | 12;
+}
+
+/** B-200 / F-200: «Статистика & Екологія». */
+const statsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: "/stats",
+  validateSearch: (search: Record<string, unknown>): StatsSearch => {
+    const months = Number(search.months);
+    return months === 3 || months === 12 ? { months } : {};
+  },
+  loaderDeps: ({ search }) => ({ months: search.months ?? 6 }),
+  loader: ({ context, deps }) => {
+    void context.queryClient.prefetchQuery(statsOverviewQuery(deps.months));
+  },
+  component: StatsPage,
+});
+
 /** F-42: детальний рецепт. */
 const recipeRoute = createRoute({
   getParentRoute: () => appRoute,
@@ -200,7 +220,7 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   forgotPasswordRoute,
   resetPasswordRoute,
-  appRoute.addChildren([fridgeRoute, recipesRoute, recipeRoute, shoppingRoute, familyRoute, joinRoute, settingsRoute]),
+  appRoute.addChildren([fridgeRoute, recipesRoute, recipeRoute, statsRoute, shoppingRoute, familyRoute, joinRoute, settingsRoute]),
 ]);
 
 export function createAppRouter(queryClient: QueryClient, options: { history?: RouterHistory } = {}) {

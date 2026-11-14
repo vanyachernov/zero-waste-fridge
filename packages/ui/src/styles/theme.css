@@ -77,6 +77,10 @@
 
   --container-app: 80rem;    /* 1280px — ширина десктопного макета */
 
+  /* B-200: графіки «Врятовано / Викинуто» (перевірено валідатором палітри: CVD, контраст, світлота) */
+  --color-chart-saved: #00915f;
+  --color-chart-wasted: #c8560a;
+
   /* Модалка: м'яка поява (десктоп) і затемнення фону */
   --animate-dialog-in: dialog-in 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
   --animate-backdrop-in: backdrop-in 200ms ease-out;

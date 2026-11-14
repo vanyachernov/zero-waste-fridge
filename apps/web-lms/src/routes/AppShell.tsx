@@ -14,7 +14,7 @@ import { ProfileMenu } from "./ProfileMenu";
 const NAV = [
   { to: "/", key: "nav.fridge", short: "navShort.fridge", icon: Refrigerator, disabled: false },
   { to: "/recipes", key: "nav.recipes", short: "navShort.recipes", icon: ChefHat, disabled: false },
-  { to: "/stats", key: "nav.stats", short: "navShort.stats", icon: BarChart3, disabled: true }, // розділ ще не реалізовано
+  { to: "/stats", key: "nav.stats", short: "navShort.stats", icon: BarChart3, disabled: false },
   { to: "/shopping", key: "nav.shopping", short: "navShort.shopping", icon: ShoppingCart, disabled: false },
 ] as const;
 

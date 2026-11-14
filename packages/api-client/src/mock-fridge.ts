@@ -184,7 +184,41 @@ function seed() {
     type: "ADDED" as const, at: p.createdAt, actor: p.addedBy, productId: p.id, productName: p.name, outcome: null, quantity: null, unit: null, householdId: p.householdId,
   }));
   events.push({ type: "WRITTEN_OFF", at: ago(26 * 60), actor: sofia, productId: "p-old-2", productName: "Грецький йогурт 5%", outcome: "EATEN", quantity: 350, unit: "g", householdId: "h1" });
+  seedHistory(demo, maksym, sofia);
   seq = 100;
+}
+
+/**
+ * B-200: історія списань за 5 попередніх місяців — щоб «Статистика & Екологія» в демо мала що показати.
+ * Поточного місяця не чіпає (лічильник «Врятовано» й «Остання дія» лишаються як були). Продукти — закриті.
+ */
+function seedHistory(...family: { id: string; name: string }[]) {
+  const now = clock();
+  // [місяців тому, назва, категорія, кількість, одиниця, результат]
+  const history: [number, string, Category, number, Unit, "EATEN" | "COOKED" | "WASTED"][] = [
+    [5, "Молоко 2.5%", "dairy", 1, "l", "WASTED"], [5, "Банани", "fruits", 4, "pcs", "WASTED"], [5, "Хліб житній", "other", 1, "pcs", "WASTED"],
+    [5, "Курячі стегна", "meat", 800, "g", "COOKED"], [5, "Огірки", "vegetables", 500, "g", "EATEN"],
+    [4, "Молоко 2.5%", "dairy", 1, "l", "WASTED"], [4, "Салат айсберг", "vegetables", 1, "pcs", "WASTED"], [4, "Йогурт полуничний", "dairy", 4, "pcs", "EATEN"],
+    [4, "Фарш свинний", "meat", 500, "g", "COOKED"], [4, "Яблука", "fruits", 1, "kg", "EATEN"], [4, "Сметана 15%", "dairy", 350, "g", "COOKED"],
+    [3, "Банани", "fruits", 5, "pcs", "WASTED"], [3, "Помідори", "vegetables", 600, "g", "COOKED"], [3, "Кефір", "dairy", 900, "ml", "EATEN"],
+    [3, "Філе індиче", "meat", 600, "g", "COOKED"], [3, "Сир кисломолочний", "dairy", 400, "g", "COOKED"], [3, "Броколі", "vegetables", 400, "g", "EATEN"],
+    [2, "Молоко 2.5%", "dairy", 1, "l", "WASTED"], [2, "Печериці", "vegetables", 300, "g", "COOKED"], [2, "Груші", "fruits", 4, "pcs", "EATEN"],
+    [2, "Ковбаски гриль", "meat", 400, "g", "COOKED"], [2, "Вершки 10%", "dairy", 200, "ml", "COOKED"], [2, "Кабачки", "vegetables", 2, "pcs", "COOKED"],
+    [2, "Сир Гауда", "dairy", 200, "g", "EATEN"],
+    [1, "Хліб житній", "other", 1, "pcs", "WASTED"], [1, "Шпинат", "vegetables", 150, "g", "COOKED"], [1, "Полуниця", "fruits", 300, "g", "EATEN"],
+    [1, "Лосось слабосолений", "meat", 200, "g", "EATEN"], [1, "Йогурт грецький", "dairy", 350, "g", "COOKED"], [1, "Картопля", "vegetables", 2, "kg", "COOKED"],
+    [1, "Яйця С1", "other", 10, "pcs", "COOKED"], [1, "Морква", "vegetables", 500, "g", "EATEN"],
+  ];
+  history.forEach(([monthsAgo, name, category, quantity, unit, outcome], i) => {
+    const at = new Date(now.getFullYear(), now.getMonth() - monthsAgo, 3 + ((i * 5) % 24), 12).toISOString();
+    const actor = family[i % family.length]!;
+    const id = `p-hist-${i + 1}`;
+    products.push({
+      id, name, brand: null, category, zone: DEFAULT_ZONE[category], quantity, unit, purchasedAt: null, expiresAt: at.slice(0, 10), openedAt: null,
+      openedShelfLifeDays: null, remindBeforeDays: 2, status: outcome === "WASTED" ? "WASTED" : "CONSUMED", addedBy: actor, createdAt: at, updatedAt: at, householdId: "h1",
+    });
+    events.push({ type: "WRITTEN_OFF", at, actor, productId: id, productName: name, outcome, quantity, unit, householdId: "h1" });
+  });
 }
 
 seed();

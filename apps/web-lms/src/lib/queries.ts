@@ -23,6 +23,9 @@ export const recommendedRecipesQuery = (sort: RecipeSort) =>
 
 export const recipeQuery = (id: string) => queryOptions({ queryKey: queryKeys.recipe(id), queryFn: () => api.recipes.get(id) });
 
+export const statsOverviewQuery = (months: number) =>
+  queryOptions({ queryKey: queryKeys.statsOverview(months), queryFn: () => api.stats.overview(months) });
+
 export const savedStatsQuery = queryOptions({ queryKey: queryKeys.savedStats, queryFn: () => api.stats.saved() });
 
 export const shoppingQuery = queryOptions({ queryKey: queryKeys.shoppingList, queryFn: () => api.shoppingList.get() });
