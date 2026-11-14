@@ -1,6 +1,7 @@
 import { configureHttp, http, isApiError, notifyUnauthorized, type ApiError } from "./http";
 import { mockFridge, mockFridgeControl } from "./mock-fridge";
 import { mockRecipes } from "./mock-recipes";
+import { mockStatsOverview } from "./mock-stats";
 import { mockShopping } from "./mock-shopping";
 import { mockHousehold } from "./mock-household";
 import { mockNotifications } from "./mock-notifications";
@@ -32,6 +33,7 @@ import type {
   RecipeDetail,
   RecipeSort,
   SavedStats,
+  StatsOverview,
   RegisterRequest,
   ResetPasswordRequest,
   MoveToFridgeRequest,
@@ -224,8 +226,12 @@ export const api = {
         ? viaMock(async () => mockRecipes.cook(await fridgeForMock(), id, request, (productId, body) => api.products.writeOff(productId, body)))
         : http(`/recipes/${id}/cook`, { method: "POST", body: json(request) }),
   },
-  /** B-24. */
+  /** B-24, B-200. */
   stats: {
+    overview: async (months = 6): Promise<StatsOverview> =>
+      isMockApi("recipes")
+        ? viaMock(async () => mockStatsOverview((await api.auth.me()).householdId, months))
+        : http(`/stats/overview${toQueryString({ months })}`),
     saved: async (): Promise<SavedStats> => {
       if (!isMockApi("recipes")) return http("/stats/saved?period=month");
       return viaMock(async () => {
@@ -371,6 +377,7 @@ export const queryKeys = {
   recommendedRecipes: (sort: string) => ["recipes", "recommended", sort] as const,
   recipe: (id: string) => ["recipes", id] as const,
   savedStats: ["stats", "saved"] as const,
+  statsOverview: (months: number) => ["stats", "overview", months] as const,
   shoppingList: ["shopping-list"] as const,
   shoppingSummary: ["shopping-list", "summary"] as const,
   shoppingSettings: ["shopping-list", "settings"] as const,

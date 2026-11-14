@@ -71,7 +71,8 @@ describe("mock fridge backend", () => {
     const rest = await api.products.writeOff("p3", { outcome: "WASTED", addToShoppingList: true });
     expect(rest).toMatchObject({ writtenOff: { quantity: 250, closed: true }, addedToShoppingList: true, product: { status: "WASTED" } });
     expect((await api.products.list()).total).toBe(10);
-    expect((await api.products.list({ status: "WASTED" })).items.map((p) => p.id)).toEqual(["p3"]);
+    // У демо є й історія минулих місяців (B-200) — серед викинутих тепер і «Грецький йогурт»
+    expect((await api.products.list({ status: "WASTED" })).items.map((p) => p.id)).toContain("p3");
 
     expect(await codeOf(api.products.writeOff("p3", { outcome: "EATEN" }))).toBe("409 PRODUCT_CLOSED {}");
     expect(await codeOf(api.products.writeOff("p4", { outcome: "EATEN", quantity: 9999 }))).toBe('400 VALIDATION_FAILED {"quantity":"EXCEEDS_REMAINING"}');
