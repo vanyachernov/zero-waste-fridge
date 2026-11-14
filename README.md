@@ -1,31 +1,58 @@
-# Zero Waste Fridge — monorepo
+# Zero Waste Fridge
 
-Вебзастосунок для відстеження термінів придатності продуктів: показує, що скоро зіпсується, підбирає рецепти з 3–4 обраних продуктів і формує список покупок.
+**English** · [Українська](README.uk.md)
 
+A web app that helps a family stop throwing food away. It tracks what is in the fridge and when it expires, reminds you about food that is about to spoil, suggests (or generates with AI) recipes from 3–4 products that need to be used first, and keeps a shared shopping list for the whole family.
+
+| | |
+|---|---|
+| **Fridge** | Products with expiry dates, opened-package shelf life, freshness badges, search, filters, write-off (eaten / cooked / wasted) |
+| **Smart recipes** | Recommendations from critical products, a "pick 3–4 products" constructor, AI generation via DeepSeek with a catalog fallback, "Cook and write off" |
+| **Shopping list** | Shared list, stores, priorities, Smart Sync (finished products are added automatically), "Move bought items to the fridge" |
+| **Family** | One shared household, roles (owner / member), invites by email or code, activity feed, live updates and presence |
+| **Notifications** | In-app bell, daily email digest at a chosen time, Web Push, quiet hours |
+| **Statistics & Ecology** | Saved vs wasted by month and category, save rate, estimated kg of food and CO₂e, most wasted products, family contribution |
+| **Everywhere** | Ukrainian UI, light and dark theme (saved in the profile), mobile layout, keyboard and screen-reader accessible (WCAG 2.1 AA) |
+
+## Contents
+
+- [Quick start: demo without a backend](#quick-start-demo-without-a-backend)
+- [Run the full stack locally](#run-the-full-stack-locally)
+- [Configuration](#configuration)
+- [Deployment](#deployment)
+- [AI recipes (DeepSeek)](#ai-recipes-deepseek)
+- [Tests](#tests)
+- [Project structure](#project-structure)
+- [Documentation](#documentation)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+
+## Tech stack
+
+| Part | Technology |
+|---|---|
+| Backend | Java 25, Spring Boot 4.1 (Web MVC, Security, Session JDBC, Data JPA, Mail, Flyway), PostgreSQL 17, Thymeleaf mail templates, SSE, Web Push (VAPID) |
+| User app (`/lms/`) | React 19, Vite, TanStack Router + Query, Tailwind CSS v4 |
+| Landing site (`/`) | Next.js 15 (static export) |
+| Shared packages | `@zwf/ui` (design tokens + components), `@zwf/api-client` (HTTP client + mocks), `@zwf/i18n` |
+| Tooling | pnpm workspaces, Turborepo, Gradle, Vitest + Testing Library + axe-core, JUnit 5 + Testcontainers, JaCoCo, GitHub Actions |
+
+## Requirements
+
+| Tool | Version | Needed for |
+|---|---|---|
+| Node.js | ≥ 20 (22 recommended, see `.nvmrc`) | everything frontend |
+| pnpm | the version pinned in `package.json` (`corepack enable` installs it) | everything frontend |
+| Docker | any recent | PostgreSQL and Mailpit locally, backend integration tests, building without a local JDK |
+| JDK | 25 (e.g. `brew install --cask temurin@25`) | optional — only if you want to run Gradle without Docker |
+
+## Quick start: demo without a backend
+
+The user app ships with in-memory mocks that behave like the real API, so you can try everything in a minute:
+
+```bash
+corepack enable
 ```
-zero-waste-fridge/
-├── apps/
-│   ├── api/             # Бекенд: Spring Boot 4 + PostgreSQL + Flyway + Spring Session (Gradle). Роздає обидва фронти
-│   ├── web-public/      # Вітрина: Next.js (App Router) → static export (out/), SEO, без SSR
-│   └── web-lms/         # Кабінет: Vite + React + TanStack Router + TanStack Query, SPA під /lms/
-├── packages/
-│   ├── ui/              # Дизайн-токени Tailwind v4 (@theme) + спільні React-компоненти
-│   ├── api-client/      # HTTP-клієнт (HttpOnly-cookie + CSRF), моки, конфіг orval
-│   └── i18n/            # Типізовані переклади (uk — основна, en — часткова)
-├── docs/ROADMAP.md      # Задачі B/F/I/D/Q до релізу
-├── tests/               # Тести (зараз — бекенд: unit + integration)
-├── .github/workflows/   # CI (D-03)
-├── turbo.json           # Пайплайни: dev / build / test / typecheck / generate
-└── pnpm-workspace.yaml
-```
-
-## Вимоги
-
-- Node.js ≥ 20 (рекомендовано 22, див. `.nvmrc`)
-- pnpm (версія закріплена в `packageManager` у кореневому `package.json`; `corepack enable` підтягне її автоматично)
-- Для бекенду: JDK 25 (наприклад, `brew install --cask temurin@25`) і Docker (локальний Postgres і Testcontainers)
-
-## Швидкий старт (dev-режим обох застосунків одночасно)
 
 ```bash
 pnpm install
@@ -35,326 +62,190 @@ pnpm install
 pnpm dev
 ```
 
-Turborepo запустить паралельно:
+| What | URL |
+|---|---|
+| Landing site | http://localhost:3000 |
+| User app | http://localhost:5173/lms/ |
 
-| Застосунок | URL | Що це |
-|---|---|---|
-| `@zwf/web-public` | http://localhost:3000 | Вітрина (Next.js dev) |
-| `@zwf/web-lms` | http://localhost:5173/lms/ | Кабінет (Vite dev) |
+Sign in with the demo account **olena@example.com / Secret-pass-123** (the login page has a button that fills it in). The demo family has three members (Olena, Maksym, Sofia — same password), a stocked fridge and five months of history for the statistics page. Mock data lives in memory and resets on reload.
 
-Кнопки «Відкрити кабінет» на вітрині в dev ведуть на `http://localhost:5173/lms/` (див. `apps/web-public/.env.development`).
+## Run the full stack locally
 
-Окремо:
+This runs the real Spring Boot backend with PostgreSQL. Two ways to do it — pick one.
 
-```bash
-pnpm dev:public
-```
-
-```bash
-pnpm dev:lms
-```
-
-### Бекенд
+### Option A: with a local JDK 25
 
 ```bash
 pnpm dev:api
 ```
 
-Це `./gradlew bootRun` з профілем `dev`: Spring Boot сам піднімає Postgres (порт 5433) і Mailpit (SMTP 1026, UI http://localhost:8026) з `apps/api/compose.yaml`, застосовує Flyway-міграції і стартує на http://localhost:8080.
-
-| URL | Що це |
-|---|---|
-| http://localhost:8080/actuator/health | Health-check |
-| http://localhost:8080/swagger-ui.html | Swagger UI (тільки не в `prod`) |
-| http://localhost:8080/v3/api-docs | OpenAPI-специфікація — джерело для orval |
-
-### Моки vs реальний бекенд
-
-За замовчуванням кабінет у dev працює з in-memory моками (`VITE_API_MOCK=true` в `apps/web-lms/.env.development`), тож Spring Boot не потрібен. Моки відтворюють ті самі статуси й коди помилок, що й бекенд B-02…B-06.
-
-Демо-акаунт мока: **olena@example.com / Secret-pass-123**. На сторінці входу є кнопка, що підставляє ці дані. Лист «відновлення пароля» в мок-режимі нікуди не надсилається: посилання з нього показується на сторінці «Перевірте пошту» і в консолі браузера.
-
-`VITE_API_MOCK` — це `true`, `false` або перелік доменів, які лишаються на моках:
-
-| Значення | Що на моках |
-|---|---|
-| `true` (dev за замовчуванням) | усе: вхід, холодильник, покупки, сім'я, рецепти |
-| `recipes` | лише рецепти — решта зі Spring Boot |
-| `data` | холодильник, покупки й рецепти (вхід і сім'я — справжні) |
-| `false` (prod, `apps/web-lms/.env.backend`) | нічого |
-
-Домени: `auth`, `fridge`, `shopping`, `household`, `recipes`, можна через кому. Моки дзеркалять правила бекенду й коди помилок; демо-дані мока — сім'я Кравченків (Олена — власниця, Максим і Софія — члени сім'ї, той самий пароль).
-
-Запустіть бекенд (див. «Бекенд» вище), а потім:
+Spring Boot starts PostgreSQL (port 5433) and Mailpit from `apps/api/compose.yaml` by itself, applies the database migrations and listens on http://localhost:8080. Then, in a second terminal:
 
 ```bash
 pnpm --filter @zwf/web-lms dev:backend
 ```
 
-Vite проксує `/api` на `BACKEND_URL` (за замовчуванням `http://localhost:8080`), тому сесійна cookie лишається first-party. Листи «відновлення пароля» тоді приходять у Mailpit. Для інших налаштувань створіть `apps/web-lms/.env.<mode>.local` і запустіть Vite з `--mode <mode>`.
+### Option B: Docker only (no Java installed)
 
-## Інші команди
+1. Start PostgreSQL and Mailpit:
 
-| Команда | Дія |
+   ```bash
+   docker compose -p zwf -f apps/api/compose.yaml up -d
+   ```
+
+2. Build the backend jar with Gradle inside Docker:
+
+   ```bash
+   docker run --rm -v "$PWD":/work -w /work/apps/api -v zwf-gradle-home:/home/gradle/.gradle gradle:9.8.2-jdk25 gradle --no-daemon -q bootJar
+   ```
+
+3. Run it (remove the `DEEPSEEK_API_KEY` line if you don't have a key — see [AI recipes](#ai-recipes-deepseek)):
+
+   ```bash
+   docker rm -f zwf-api-dev 2>/dev/null; docker run -d --name zwf-api-dev -p 8080:8080 \
+     -v "$PWD/apps/api/build/libs":/app \
+     -e SPRING_PROFILES_ACTIVE=dev -e SPRING_DOCKER_COMPOSE_ENABLED=false \
+     -e DB_URL=jdbc:postgresql://host.docker.internal:5433/zwf \
+     -e SPRING_MAIL_HOST=host.docker.internal -e SPRING_MAIL_PORT=1026 \
+     -e DEEPSEEK_API_KEY="$(cat ~/.zwf-deepseek-key)" \
+     gradle:9.8.2-jdk25 java -jar /app/zwf-api.jar
+   ```
+
+4. Start the user app against it:
+
+   ```bash
+   pnpm --filter @zwf/web-lms dev:backend
+   ```
+
+After rebuilding the jar, repeat steps 2–3.
+
+### Local URLs
+
+| URL | What |
 |---|---|
-| `pnpm build:web` | Збірка лише фронтів: `apps/web-public/out/` і `apps/web-lms/dist/` (JDK не потрібен) |
-| `pnpm build` | Повна збірка: фронти + `apps/api/build/libs/zwf-api.jar` із вбудованою статикою |
-| `pnpm test` | Усі тести: фронтенд (Vitest) + бекенд (`./gradlew check`, потрібні JDK 25 і Docker) |
-| `pnpm test:web` | Лише тести фронтенду (`tests/web-lms`), без Java і Docker |
-| `pnpm typecheck` | `tsc --noEmit` у всіх пакетах |
-| `pnpm api:generate` | Генерація клієнта orval з `packages/api-client/openapi/openapi.yaml` у `src/generated/` |
+| http://localhost:5173/lms/ | User app (Vite dev server, proxies `/api` to the backend) |
+| http://localhost:8080 | Backend (also serves the built frontends, see [Deployment](#deployment)) |
+| http://localhost:8080/swagger-ui.html | Swagger UI (disabled in `prod`) |
+| http://localhost:8080/actuator/health | Health check |
+| http://localhost:8026 | Mailpit — every email the backend sends in dev (password reset, invites, daily digest) |
 
-## Дизайн-система (`packages/ui`)
+### Mocks vs the real backend
 
-Токени взято з Figma (сторінка «Вайфрейм» → UI-Kit, «Мій холодильник», «Розумні рецепти»). Вони описані в [`packages/ui/src/styles/theme.css`](packages/ui/src/styles/theme.css) через `@theme` Tailwind v4, тому кожен токен одразу стає утилітою (`bg-primary`, `text-on-surface-variant`, `rounded-lg`, `shadow-card` …).
+`VITE_API_MOCK` chooses what the user app takes from mocks: `true` (everything, the default for `pnpm dev`), `false` (nothing — used by `dev:backend` and production), or a comma-separated list of domains: `auth`, `fridge`, `shopping`, `household`, `recipes` (`data` = fridge + shopping + recipes). Mocks mirror backend rules and error codes and are covered by tests. Details: [docs/architecture.md](docs/architecture.md#mocks).
 
-| Токен | Значення | Де використовується |
-|---|---|---|
-| `primary` | `#006948` | Основні кнопки, активні чіпи, акценти |
-| `primary-hover` | `#005137` | Hover основної кнопки |
-| `error` | `#ba0035` | Прострочено / списання |
-| `warning` | `#fe932c` | Скоро зіпсується |
-| `outline-variant` | `#bccac0` | Disabled-поверхні, бордери чекбоксів |
-| `surface-container-lowest` | `#ffffff` | Картки, інпути |
-| Шрифт | Inter Variable | Підключається локально через `@fontsource-variable/inter` |
+## Configuration
 
-Темна тема з макетів «— Dark» вмикається класом `.dark` на `<html>`: він перевизначає ті самі CSS-змінні.
+The backend is configured with environment variables. The most important ones:
 
-Підключення в застосунку:
-
-```css
-@import "tailwindcss";
-@import "@zwf/ui/styles.css";
-```
-
-## Сценарій кабінету
-
-1. **Додати продукт**: кнопка «Додати продукт» відкриває модалку (на мобільних це bottom sheet).
-2. **Побачити, що псується**: список відсортовано за терміном, бейджі `Прострочено / Сьогодні / 1–2 дні / Свіже`, статистика вгорі.
-3. **Відмітити 3–4 продукти**: чекбокси в таблиці (на мобільних це картки), понад 4 вибрати не можна. Знизу з'являється панель «Обрано: N з 4».
-4. **Отримати рецепт**: «Підібрати рецепт» відкриває `/lms/recipes?ids=…` — кулінарний конструктор (на телефоні — майстер «Крок 1 з 2»). «Згенерувати ідеальний рецепт» веде на `/lms/recipes/$id`, де відсутнє додається до списку покупок, а «Приготувати і списати» списує використане й рахується у «Врятовано».
-
-## Автентифікація в кабінеті (F-10…F-13)
-
-| Сторінка | Що робить |
-|---|---|
-| `/lms/login`, `/lms/login?tab=register` | Вхід і реєстрація за макетом Figma. Клієнтська валідація з тими ж правилами й кодами, що й на бекенді. Помилки сервера перекладаються за `code` |
-| `/lms/forgot-password?email=…` | Запит посилання для відновлення. Повторно надіслати можна раз на хвилину |
-| `/lms/reset-password?token=…` | Сторінка з листа: новий пароль і його підтвердження |
-| Меню профілю в хедері | Email, сім'я, роль, тема (Світла / Темна / Системна), вихід |
-
-- **Захист маршрутів**: усі сторінки кабінету перевіряють сесію через `GET /api/auth/me`. Без сесії вони ведуть на `/lms/login?redirect=<звідки>`, і після входу користувач повертається туди ж (приймаються лише внутрішні шляхи — захист від open redirect).
-- **Сесія закінчилась посеред роботи**: будь-який 401 від API очищає кеш і веде на вхід, запам'ятавши поточну сторінку.
-- **HTTP-клієнт** (`packages/api-client/src/http.ts`):
-  - сам отримує cookie `XSRF-TOKEN` перед першим POST і додає заголовок `X-XSRF-TOKEN`;
-  - ProblemDetail перетворюється на `ApiError` з `status`, `code` і `fieldErrors`.
-
-## Як бекенд роздає фронтенд (D-02)
-
-Gradle-таск `syncWebStatic` копіює зібрані бандли в jar:
-
-| Звідки | Куди в `classpath:/static/` |
-|---|---|
-| `apps/web-public/out/**` | `/` |
-| `apps/web-public/out/404.html` | `error/404.html` (Spring Boot віддає її на будь-який HTML-404) |
-| `apps/web-lms/dist/**` | `lms/` |
-
-- **SPA fallback**: `GET /lms/<маршрут>` без розширення віддає `lms/index.html`. Відсутній файл з розширенням (`/lms/assets/x.js`) — це 404, а не HTML.
-- **Вітрина**: `/about/` і `/about` віддають `about/index.html` (Next.js `trailingSlash`).
-- **Кешування**: `/lms/assets/**` і `/_next/static/**` кешуються на рік (`immutable`), HTML — `no-cache`.
-- `-PrequireWeb` (його використовують `pnpm build` і CI) зупиняє збірку, якщо бандлів немає. Без цього прапорця бекенд збирається й окремо, лише з попередженням.
-
-Запуск прод-артефакту:
-
-```bash
-SPRING_PROFILES_ACTIVE=prod DB_URL=jdbc:postgresql://host:5432/zwf DB_USER=zwf DB_PASSWORD=*** java -jar apps/api/build/libs/zwf-api.jar
-```
-
-## Автентифікація та API-контракт (B-02…B-06)
-
-Сесійна автентифікація: Spring Security + Spring Session JDBC, HttpOnly-cookie `ZWF_SESSION` (`Secure` у `prod`, `SameSite=Lax`). Клієнт шле запити з `credentials: "include"`, токени в JS не потрапляють.
-
-| Метод і шлях | Доступ | Відповідь |
-|---|---|---|
-| `GET /api/auth/csrf` | усі | 204 + cookie `XSRF-TOKEN` |
-| `POST /api/auth/register` `{name, email, password, rememberMe?}` | усі | 201 + профіль. Створює домогосподарство «Сім'я <прізвище>», роль `OWNER`, і одразу відкриває сесію |
-| `POST /api/auth/login` `{email, password, rememberMe}` | усі | 200 + профіль · 401 `INVALID_CREDENTIALS` |
-| `POST /api/auth/logout` | усі | 204, сесія знищена, новий `XSRF-TOKEN` |
-| `GET /api/auth/me` | сесія | 200 + профіль `{id, name, email, avatarUrl, householdId, householdName, role}` · 401 |
-| `POST /api/auth/password/forgot` `{email}` | усі | завжди 202. Лист із посиланням `…/lms/reset-password?token=…` |
-| `POST /api/auth/password/reset` `{token, password}` | усі | 204 · 400 `INVALID_RESET_TOKEN` / `PASSWORD_POLICY` |
-
-- **CSRF** (B-04): для POST/PUT/PATCH/DELETE потрібен заголовок `X-XSRF-TOKEN` зі значенням cookie `XSRF-TOKEN`. Cookie видається на будь-якому першому запиті й оновлюється після входу та виходу.
-- **Сесії** (B-03): з «Запам'ятати мене» сесія живе 30 днів неактивності з постійною cookie. Без нього — 12 годин, а cookie зникає разом із закриттям браузера. Після входу ідентифікатор сесії змінюється (захист від фіксації сесії).
-- **Пароль**: від 8 символів і не більше 72 байт UTF-8 (ліміт BCrypt). У БД зберігається `{bcrypt}…`.
-- **Відновлення пароля** (B-06): токен на 256 біт, одноразовий, діє 1 годину. У БД зберігається лише його SHA-256. Не більше одного листа на хвилину, новий запит анулює старі посилання. Після скидання пароля завершуються всі сесії користувача.
-- **Без перебору акаунтів**: `login` і `forgot` відповідають однаково для невідомого email і для неправильного пароля.
-- **Формат помилок** `/api` — ProblemDetail (`application/problem+json`) з машинним `code`, а для помилок полів ще й `errors: {поле: код}`. Тексти помилок перекладає фронтенд.
-
-  ```json
-  { "status": 400, "detail": "Request validation failed", "code": "VALIDATION_FAILED",
-    "errors": { "email": "Email", "name": "NotBlank" } }
-  ```
-
-- **OpenAPI**: `/v3/api-docs`. Щоб згенерувати клієнт з бекенду, змініть `input.target` у `packages/api-client/orval.config.ts` і запустіть `pnpm api:generate`.
-
-## Холодильник (B-10…B-16)
-
-Усі ендпоінти потребують сесії і працюють лише з продуктами домогосподарства поточного користувача. Чужий продукт виглядає як неіснуючий (404).
-
-| Метод і шлях | Відповідь |
-|---|---|
-| `GET /api/products?q=&category=&freshness=&status=&sort=&page=&size=` | `{items, page, size, total, totalPages, categoryCounts}`. `category` і `freshness` (`expired`, `today`, `soon`, `fresh`) приймають кілька значень; `sort`: `expiry` (за замовчуванням), `name`, `added`, `category`; `page` з 1, `size` до 100 |
-| `POST /api/products` | 201 + продукт. Обов'язкові `name`, `category`, `quantity`, `unit`, `expiresAt`; `zone` за замовчуванням — типова для категорії, `remindBeforeDays` — 2 |
-| `GET /api/products/{id}` | продукт · 404 `PRODUCT_NOT_FOUND` |
-| `PATCH /api/products/{id}` | продукт. Відсутнє поле не змінюється, `null` очищує `brand` / `purchasedAt` / `openedAt` · 409 `PRODUCT_CLOSED` для списаного |
-| `POST /api/products/{id}/write-off` `{outcome, quantity?, addToShoppingList?}` | `{product, writtenOff, addedToShoppingList}`. `outcome`: `EATEN`, `COOKED`, `WASTED`; `quantity`: `"all"` (за замовчуванням) або число · 400 `EXCEEDS_REMAINING`. `addedToShoppingList: true`, якщо продукт тепер у списку покупок (за прапорцем або через Smart Sync) |
-| `GET /api/products/summary` | `{total, addedThisWeek, soon, today, expired}` |
-| `GET /api/tips/today` | `{date, kind, products, hint}` — продукти, що закінчуються сьогодні або завтра, та ідея страви |
-| `GET /api/dictionaries` | категорії, зони з температурою, одиниці, варіанти нагадування, терміни після відкриття |
-
-- **Коди** категорій, зон і одиниць — ті самі, що й на фронтенді (`dairy`, `door`, `kg`…). Статуси й результати списання — великими літерами (`ACTIVE`, `WASTED`).
-- **Терміни** — календарні дати. `daysLeft` і `freshness` рахуються від «сьогодні» в поясі `zwf.time-zone` (за замовчуванням `Europe/Kyiv`), а не в UTC сервера. «Скоро» — до 48 годин (завтра й післязавтра).
-- **Відкрита упаковка** (B-12): `effectiveExpiresAt = min(expiresAt, openedAt + днів після відкриття)`. Дні беруться з правил за назвою (йогурт — 5, молоко — 3), інакше з типового терміну категорії.
-- **Клієнт для фронтенду**: ручний `packages/api-client/openapi/openapi.yaml` застарів. В I-10 типи краще згенерувати orval з `/v3/api-docs` (там є всі ендпоінти вище).
-- **Помилки полів**: `NotNull`, `NotBlank`, `Size`, `Positive`, `Digits`, `NOT_ALLOWED`, `IN_FUTURE`, `BEFORE_PURCHASE`, `INVALID` (невідомий код, неправильна дата або query-параметр). Зламаний JSON — `MALFORMED_REQUEST`.
-
-## Список покупок (B-40…B-45)
-
-Спільний для всього домогосподарства. Позиції чужого домогосподарства — 404.
-
-| Метод і шлях | Відповідь |
-|---|---|
-| `GET /api/shopping-list?store=&fromFridge=` | `{toBuy, bought}`: спочатку високий пріоритет, далі в порядку додавання; куплені — останні зверху |
-| `POST /api/shopping-list` `{name, quantity?, unit?, category?, priority?, priceEstimate?, storeId?}` | 201 + позиція. Кількість і одиниця — разом або жодної |
-| `PATCH /api/shopping-list/{id}` | позиція (відсутнє поле — без змін, `null` — очистити) |
-| `DELETE /api/shopping-list/{id}` | 204 |
-| `POST /api/shopping-list/{id}/toggle` | позиція: куплено ↔ треба купити, з `boughtBy` |
-| `DELETE /api/shopping-list/bought` | `{deleted}` |
-| `POST /api/shopping-list/move-to-fridge` `{items?: [{id, expiresAt?, zone?, category?}]}` | `{moved, products}`. Без `items` — усі куплені. Термін за замовчуванням — `defaultShelfLifeDays` категорії. Усе або нічого |
-| `GET / PUT /api/shopping-list/settings` `{autoRefill, excludedCategories}` | Smart Sync: повністю списаний продукт → позиція `AUTO`. За замовчуванням увімкнено |
-| `GET / POST / DELETE /api/shopping-list/stores` | магазини домогосподарства · 409 `STORE_EXISTS` |
-| `GET /api/shopping-list/summary` | `{bought, total, estimatedTotal, autoCount}` |
-
-## Рецепти (B-20…B-24)
-
-Каталог — 30 рецептів у [`recipes/catalog.json`](apps/api/src/main/resources/recipes/catalog.json): інгредієнти з ключовими словами («шпинат», «яйц»), за якими знаходиться продукт у холодильнику; базове (сіль, олія) позначено `pantry` і ніколи не «бракує». На старті бекенд додає в БД рецепти, яких ще немає (за `slug`). Прострочене в рецепти не йде; з кількох підходящих продуктів береться той, що зіпсується першим.
-
-| Метод і шлях | Відповідь |
-|---|---|
-| `GET /api/recipes/recommended?sort=critical\|match\|time\|kcal&limit=6` | картки `{id, title, imageUrl, minutes, kcal, servings, difficulty, source, matchPercent, criticalCount, fromFridge[], missing[]}`; критичні (≤ 48 год) — першими |
-| `POST /api/recipes/generate` `{productIds: [3..4]}` | детальний рецепт. З `DEEPSEEK_API_KEY` — генерує DeepSeek і рецепт зберігається для сім'ї (`source: "AI"`), без ключа або при збої — найкращий рецепт каталогу (`CATALOG`). 400 `productIds: Size / INVALID` · 422 `NO_RECIPE` |
-| `GET /api/recipes/{id}` | `{…картка, description, savingsUah, pantry[], steps[{title, text}]}` проти поточного холодильника · 404 `RECIPE_NOT_FOUND` (AI-рецепт іншої сім'ї теж) |
-| `POST /api/recipes/{id}/cook` `{portions?: 1..12, productIds?}` | `{recipeId, portions, cooked[{productId, name, quantity, unit, closed}]}` — списання `COOKED`; кількість з рецепта на порції, г ↔ кг і мл ↔ л, інакше продукт цілком. Усе або нічого |
-| `GET /api/stats/saved?period=month` | `{period, from, to, saved, wasted}` — різні продукти, з'їдені вчасно або приготовані / викинуті за місяць |
-| `GET /api/stats/overview?months=1..12` | B-200, сторінка «Статистика & Екологія»: `{from, to, months[{month, saved, wasted}], current{saved, wasted, saveRate, savedKg, wastedKg, co2SavedKg, co2WastedKg}, byCategory[], topWasted[{name, times, quantity, unit}], members[{userId, name, saved}]}`. Маса й CO₂e — оцінка (типова вага «шт» і коефіцієнти категорій) · 400 `months: Range` |
-
-**DeepSeek.** OpenAI-сумісний `POST https://api.deepseek.com/chat/completions`, модель `deepseek-flash` (thinking вимкнено), JSON mode. Відповідь моделі перевіряється: межі чисел, одиниці, кожен обраний продукт має бути в рецепті. Порожній чи кривий JSON, 429 і 5xx — одна повторна спроба; 401/402/422 — одразу каталог. Налаштування: `zwf.ai.deepseek.{api-key, base-url, model, timeout}`.
-
-## Сім'я (B-50…B-55)
-
-Ролі з макета «Моя сім'я»: `OWNER` може все, `MEMBER` — холодильник, рецепти, список покупок і нагадування, але не керує учасниками. Право перевіряється за роллю з БД, заборонене — 403 `FORBIDDEN`.
-
-| Метод і шлях | Хто | Відповідь |
-|---|---|---|
-| `GET /api/household` | усі | `{id, name, memberCount, role, permissions}` — `permissions` фронтенд використовує, щоб ховати недоступні дії |
-| `PATCH /api/household {name}` | власник | перейменування |
-| `DELETE /api/household {password}` | власник | видалити домогосподарство й усі дані; кожен учасник отримує власне порожнє |
-| `GET /api/household/members` | усі | учасники з роллю та «Останньою дією» |
-| `PATCH /api/household/members/{userId} {role}` | власник | 409 `LAST_OWNER`, якщо це останній власник |
-| `DELETE /api/household/members/{userId}` | власник або сам учасник | видалити / вийти |
-| `GET /api/household/activity?before=&limit=` | усі | стрічка дій, курсор `nextBefore` |
-| `POST /api/household/invites {email, role?}` | власник | лист із посиланням `/lms/join?invite=…` (7 днів, лише для цього email) · 409 `INVITE_EXISTS` / `ALREADY_MEMBER` |
-| `GET /api/household/invites` · `DELETE /invites/{id}` | усі · власник | очікувані запрошення · скасувати |
-| `GET / POST /api/household/invites/code` | власник | код `ZWF-XXXX-XX` на 7 днів; POST генерує новий і анулює старий |
-| `POST /api/household/join {code}` або `{invite}` | усі | вступ: 400 `INVALID_INVITE`, 403 `INVITE_EMAIL_MISMATCH`, 409 `LAST_OWNER` |
-
-Користувач завжди в одному домогосподарстві. Хто вступає в сім'ю, будучи в своєму домогосподарстві сам, переносить туди свої продукти й список покупок (без магазинів), а старе видаляється.
-
-## Сповіщення та реалтайм (B-31…B-34, B-54)
-
-| Метод і шлях | Відповідь |
-|---|---|
-| `GET /api/notifications?limit=` | `{items, unread}` — непрочитані першими |
-| `GET /api/notifications/unread-count` | `{count}` для дзвіночка |
-| `POST /api/notifications/{id}/read` · `POST /api/notifications/read-all` | 204 · `{updated}` |
-| `GET / PUT /api/me/notification-settings` | `{inApp, emailDigest, push, digestTime: "HH:mm", quietHours}` |
-| `PUT /api/me/theme` | `{theme: "light" \| "dark" \| "system"}` → 204; тема також приходить у `/api/auth/me` (F-90) |
-| `GET /api/me/push/public-key` | `{publicKey}` (`null` — push вимкнено) |
-| `POST / DELETE /api/me/push-subscriptions` | підписка браузера `{endpoint, keys: {p256dh, auth}}` |
-| `GET /api/household/stream` | SSE: `changed {topic, actor}`, `presence {online}`, `notifications` |
-| `GET / POST /api/household/presence` | хто онлайн · `{shoppingAt}` — «я в магазині» |
-
-- **Нагадування** (щогодини, на 5-й хвилині): продукт, у якого `effectiveExpiresAt − remindBeforeDays ≤ сьогодні`, отримує одне сповіщення на термін для кожного учасника сім'ї з увімкненим дзвіночком або push.
-- **Щоденний лист** — у вибраний час з точністю до хвилини (наприклад, 20:31; пропущену через рестарт хвилину надолужує того ж дня), раз на день, якщо є прострочене, сьогоднішнє чи завтрашнє. У dev листи видно в Mailpit.
-- **Push** — лише з ключами `VAPID_*`; кабінет реєструє Service Worker `/lms/sw.js` і підписується зі сторінки «Налаштування».
-- Розклад: `zwf.reminders.cron` (щогодини), `zwf.reminders.digest-cron` (щохвилини), вимкнути — `zwf.reminders.enabled=false` (так у тестах).
-
-### Пошта
-
-Листи — шаблони Thymeleaf у `apps/api/src/main/resources/mail/`: `<лист>.html` (зі спільним `layout.html`) і `<лист>.txt`. Є скидання пароля, запрошення до сім'ї та щоденний дайджест термінів.
-
-| Оточення | Як відправляються листи |
-|---|---|
-| `dev` | Mailpit з `apps/api/compose.yaml` піднімається разом з Postgres. Усі листи видно на http://localhost:8026 |
-| тести | `RecordingMailer` у пам'яті (`tests/api/integration/.../support`) |
-| `prod` | SMTP зі змінних оточення (див. нижче) |
-| SMTP не налаштовано | лист не відправляється, а лише логується |
-
-### Змінні оточення для `prod`
-
-| Змінна | Обов'язкова | Опис |
-|---|---|---|
-| `DB_URL`, `DB_USER`, `DB_PASSWORD` | так | PostgreSQL |
-| `PUBLIC_URL` | так | Зовнішня адреса сайту для посилань у листах, напр. `https://zerowastefridge.app` |
-| `SMTP_HOST` | так | SMTP-сервер |
-| `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` | ні | За замовчуванням `587`, без авторизації |
-| `SMTP_AUTH`, `SMTP_STARTTLS` | ні | За замовчуванням `true` |
-| `MAIL_FROM` | ні | Відправник, за замовчуванням `Zero Waste Fridge <no-reply@zerowastefridge.app>` |
-| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | ні | Ключі Web Push (`npx web-push generate-vapid-keys`). Без них push вимкнено, решта сповіщень працює |
-| `DEEPSEEK_API_KEY` | ні | Ключ DeepSeek для генерації рецептів. Без нього рецепт підбирається з каталогу |
-| `DEEPSEEK_MODEL` | ні | За замовчуванням `deepseek-flash` |
-| `VAPID_SUBJECT` | ні | Контакт для push-сервісів, за замовчуванням `mailto:no-reply@zerowastefridge.app` |
-
-## Тести
-
-Усі тести лежать у [`/tests`](tests/README.md):
-
-| Папка | Що всередині |
-|---|---|
-| `tests/api/unit` | JUnit + Mockito, без Spring і Docker |
-| `tests/api/integration` | Spring Boot + PostgreSQL у Testcontainers + справжній HTTP з cookie та CSRF |
-| `tests/web-lms/unit` | Vitest + Testing Library: функції, хуки, окремі компоненти |
-| `tests/web-lms/integration` | Увесь SPA (роутер + Query + i18n) на мок-бекенді: повні сценарії користувача |
-
-```bash
-pnpm test:web
-```
-
-```bash
-pnpm --filter @zwf/api test
-```
-
-Покриття (Q-02) з порогами — збірка падає, якщо воно просяде:
-
-| Що | Команда | Зараз | Поріг |
+| Variable | Required in prod | Default | What it does |
 |---|---|---|---|
-| Фронт (`apps/web-lms`, `packages/*`) | `pnpm --filter @zwf/web-lms-tests test:coverage` → `tests/web-lms/coverage/index.html` | ≈ 96 % рядків, 88 % гілок | 90 / 80 |
-| Бекенд (unit + інтеграційні разом) | `./gradlew check` (звіт: `./gradlew jacocoTestReport` → `build/reports/jacoco/test/html`) | ≈ 97 % рядків, 88 % гілок | 90 / 80 |
+| `SPRING_PROFILES_ACTIVE` | yes (`prod`) | `dev` | `prod` turns on secure cookies, SMTP and hides Swagger |
+| `DB_URL`, `DB_USER`, `DB_PASSWORD` | yes | `jdbc:postgresql://localhost:5433/zwf`, `zwf`, `zwf` | PostgreSQL connection |
+| `PUBLIC_URL` | yes | `http://localhost:8080` | Public address of the site, used in email links |
+| `SMTP_HOST` (+ `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_AUTH`, `SMTP_STARTTLS`) | yes | — | Outgoing mail |
+| `MAIL_FROM` | no | `Zero Waste Fridge <no-reply@zerowastefridge.app>` | Sender |
+| `DEEPSEEK_API_KEY`, `DEEPSEEK_MODEL` | no | —, `deepseek-flash` | AI recipe generation |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | no | — | Web Push notifications |
+| `PORT` | no | `8080` | HTTP port |
 
-Доступність перевіряє axe-core в `tests/web-lms/integration/a11y` (WCAG 2.1 A/AA на кожній сторінці кабінету).
+The full list (time zone, reminder schedules, cookies, frontend variables) is in **[docs/configuration.md](docs/configuration.md)**.
 
-## CI (D-03)
+## Deployment
 
-`.github/workflows/ci.yml` запускається на push і PR у `dev` та `main`:
+The production artifact is **one jar**: `pnpm build` builds both frontends and embeds them into the Spring Boot jar, which then serves the landing site at `/`, the user app at `/lms/` and the API at `/api/`. You need Java 25, PostgreSQL (17 is what development and tests use) and an SMTP account; put HTTPS in front of it (nginx, Caddy, a cloud load balancer). `pnpm build` runs Gradle, so it needs JDK 25 — or build the jar in Docker as shown in the deployment guide.
 
-1. **web** — `pnpm install --frozen-lockfile`, typecheck, тести фронтенду (`tests/web-lms`), build фронтів (з кешем Turborepo), бандли зберігаються як артефакт.
-2. **api** — JDK 25, `gradle test` (unit), `gradle integrationTest` (Testcontainers), `gradle bootJar -PrequireWeb` з бандлами з першого кроку. Готовий `zwf-api.jar` теж зберігається як артефакт.
+```bash
+pnpm install --frozen-lockfile && pnpm build
+```
 
-У CI Gradle не завантажується через `./gradlew`: його копіюють з офіційного Docker-образу `gradle:<версія>-jdk25`. Причина — хостинг дистрибутивів (`services.gradle.org` → GitHub Releases) періодично віддає 504, а Docker Hub із раннерів GitHub стабільний. Версію крок бере з `apps/api/gradle/wrapper/gradle-wrapper.properties`, тож CI і локальний `./gradlew` завжди збігаються. Щоб оновити Gradle, достатньо змінити `distributionUrl` у wrapper. Локально все працює через `./gradlew`.
+```bash
+SPRING_PROFILES_ACTIVE=prod \
+DB_URL=jdbc:postgresql://db-host:5432/zwf DB_USER=zwf DB_PASSWORD=change-me \
+PUBLIC_URL=https://fridge.example.com SMTP_HOST=smtp.example.com SMTP_USERNAME=… SMTP_PASSWORD=… \
+java -jar apps/api/build/libs/zwf-api.jar
+```
 
-## Git flow
+Database migrations run automatically on start. Step-by-step instructions (Docker, systemd, reverse proxy, HTTPS, backups, updates, checklist): **[docs/deployment.md](docs/deployment.md)**.
 
-- `main` — тільки релізи.
-- `dev` — інтеграційна гілка.
-- Задачі робимо в `feature/<ID>-<опис>` від `dev`, PR відкриваємо в `dev`. Список задач — у [docs/ROADMAP.md](docs/ROADMAP.md).
+## AI recipes (DeepSeek)
+
+"Generate the perfect recipe" asks [DeepSeek](https://platform.deepseek.com) for a recipe that uses all selected products. Without a key — or if DeepSeek fails, times out or runs out of balance — the backend picks the best matching recipe from the built-in catalog of 30 recipes, so the feature always works.
+
+1. Create an API key at https://platform.deepseek.com and top up the balance.
+2. Store it outside the repository (the command asks for the key without echoing it):
+
+   ```bash
+   read -s "?DeepSeek key: " K && echo "$K" > ~/.zwf-deepseek-key && chmod 600 ~/.zwf-deepseek-key && unset K
+   ```
+
+   In bash use `read -s -p "DeepSeek key: " K` instead of `read -s "?DeepSeek key: " K`.
+
+3. Pass it to the backend as `DEEPSEEK_API_KEY` (see [Option B](#option-b-docker-only-no-java-installed) above, or your production environment).
+
+The recipe page shows a **"Згенеровано AI"** badge for AI recipes and **"З каталогу рецептів"** for the fallback. If you expected AI and got the catalog, check the backend log for lines starting with `DeepSeek:` (401 — wrong key, 402 — no balance). How it works: [docs/architecture.md](docs/architecture.md#ai-recipes).
+
+## Tests
+
+| Command | What runs | Needs |
+|---|---|---|
+| `pnpm test:web` | Frontend unit + integration tests (Vitest, Testing Library, axe-core) | Node |
+| `pnpm --filter @zwf/web-lms-tests test:coverage` | Same with coverage (gate: 90 % lines / 80 % branches) | Node |
+| `pnpm --filter @zwf/api test` | Backend unit + integration tests (Testcontainers) and JaCoCo coverage gate (90 % / 80 %) | JDK 25 + Docker |
+| `pnpm typecheck` | TypeScript in all packages | Node |
+
+Without a local JDK, run the backend tests in Docker:
+
+```bash
+docker run --rm -v "$PWD":/work -w /work/apps/api -v zwf-gradle-home:/home/gradle/.gradle -v /var/run/docker.sock:/var/run/docker.sock -e TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal -e TESTCONTAINERS_RYUK_DISABLED=true gradle:9.8.2-jdk25 gradle --no-daemon -q check
+```
+
+The tests never call the real DeepSeek: they start a fake server. Conventions: [tests/README.md](tests/README.md).
+
+## Project structure
+
+```
+zero-waste-fridge/
+├── apps/
+│   ├── api/          # Spring Boot backend; serves both frontends from the jar
+│   ├── web-lms/      # User app (SPA under /lms/)
+│   └── web-public/   # Landing site (static Next.js export)
+├── packages/
+│   ├── ui/           # Design tokens (Tailwind v4 @theme) and shared React components
+│   ├── api-client/   # Typed API facade, HTTP client (session cookie + CSRF), mocks
+│   └── i18n/         # Typed translations (Ukrainian; English is partial)
+├── tests/            # All automated tests: tests/api (JUnit), tests/web-lms (Vitest)
+├── docs/             # Guides, API reference, roadmap
+└── .github/workflows # CI
+```
+
+## Documentation
+
+| Document | For whom |
+|---|---|
+| [docs/user-guide.md](docs/user-guide.md) | People using the app: every screen and feature |
+| [docs/configuration.md](docs/configuration.md) | Admins: every setting and environment variable |
+| [docs/deployment.md](docs/deployment.md) | Admins: production deployment step by step |
+| [docs/api.md](docs/api.md) | Developers: REST API reference, error format, realtime stream |
+| [docs/architecture.md](docs/architecture.md) | Developers: how the pieces fit together |
+| [tests/README.md](tests/README.md) | Developers: test layout and conventions |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Team: task list and status (Ukrainian) |
+
+Ukrainian versions: [README.uk.md](README.uk.md), [docs/user-guide.uk.md](docs/user-guide.uk.md), [docs/configuration.uk.md](docs/configuration.uk.md), [docs/deployment.uk.md](docs/deployment.uk.md).
+
+## Troubleshooting
+
+| Symptom | Cause and fix |
+|---|---|
+| `docker: Conflict. The container name "/zwf-api-dev" is already in use` | Remove the old container first: `docker rm -f zwf-api-dev` (the run command above already does it) |
+| User app shows "Something went wrong" / 502 on `/api` | The backend is not running or not on `BACKEND_URL` (default `http://localhost:8080`); check `docker logs zwf-api-dev` |
+| Port 5173 or 8080 is busy | Stop the other process, or change `server.port` / `PORT` and `BACKEND_URL` |
+| Flyway error "Validate failed" on start | The database was migrated by a newer or edited migration; for a local dev database run `docker compose -p zwf -f apps/api/compose.yaml down -v` (deletes local data) and start again |
+| Recipes always say "З каталогу рецептів" | No `DEEPSEEK_API_KEY`, wrong key (401) or no balance (402) — see the backend log |
+| Push switch is disabled in Settings | The backend has no `VAPID_*` keys, or the browser does not support push |
+| No emails | In dev they are in Mailpit (http://localhost:8026); in prod check `SMTP_*` |
+
+## Contributing
+
+- `main` holds releases only; `dev` is the integration branch.
+- Work in `feature/<ID>-<short-name>` branches from `dev` and open pull requests into `dev`. Task IDs come from [docs/ROADMAP.md](docs/ROADMAP.md).
+- Before a PR: `pnpm typecheck`, `pnpm test:web`, backend `check`. CI runs the frontend job on every push; the backend job runs when the repository variable `API_CI` is `true` or on manual dispatch.
