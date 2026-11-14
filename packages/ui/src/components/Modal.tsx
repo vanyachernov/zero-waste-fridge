@@ -84,8 +84,10 @@ export function Modal({
       onClose={onClose}
       onClick={(e) => e.target === ref.current && onClose()}
       className={cn(
-        "m-0 mt-auto max-h-[92dvh] w-full max-w-none overflow-y-auto overscroll-contain rounded-t-xl bg-surface-container-lowest p-0 text-on-surface shadow-modal backdrop:bg-on-surface/40 backdrop:backdrop-blur-[2px]",
-        "max-sm:transition-transform max-sm:motion-safe:animate-sheet-in",
+        "m-0 mt-auto max-h-[92dvh] w-full max-w-none overflow-y-auto overscroll-contain rounded-t-xl bg-surface-container-lowest p-0 text-on-surface shadow-modal",
+        // Затемнення однакове в обох темах (on-surface у темній темі світлий — фон ставав білястим)
+        "backdrop:bg-black/55 backdrop:backdrop-blur-[3px] motion-safe:backdrop:animate-backdrop-in",
+        "max-sm:transition-transform max-sm:motion-safe:animate-sheet-in sm:motion-safe:animate-dialog-in",
         "sm:m-auto sm:rounded-2xl",
         size === "lg" ? "sm:max-w-[600px]" : "sm:max-w-lg",
         className,

@@ -139,6 +139,46 @@ describe("Menu", () => {
     expect(screen.queryByRole("menu")).not.toBeInTheDocument();
     expect(edit).not.toHaveBeenCalled();
   });
+
+  /** Кнопка «⋮» у рядку таблиці з `overflow: hidden` — меню не має обрізатися. */
+  function inClippedTable() {
+    render(
+      <div style={{ overflow: "hidden" }} data-testid="card">
+        <Menu label="Дії" items={[{ label: "Редагувати", onSelect: vi.fn() }]} />
+      </div>,
+    );
+    const button = screen.getByRole("button", { name: "Дії" });
+    return { button, place: (top: number, bottom: number) => (button.getBoundingClientRect = () => ({ top, bottom, left: 900, right: 936, width: 36, height: 36, x: 900, y: top, toJSON: () => ({}) })) };
+  }
+
+  it("renders outside the clipping container and opens below the button", async () => {
+    const user = userEvent.setup();
+    const { button, place } = inClippedTable();
+    place(100, 136);
+    await user.click(button);
+
+    const menu = screen.getByRole("menu");
+    expect(screen.getByTestId("card")).not.toContainElement(menu);
+    expect(menu.parentElement).toBe(document.body);
+    expect(menu.style.position).toBe("fixed");
+    expect(menu.style.top).toBe("140px");
+  });
+
+  it("flips up near the bottom of the screen and closes on page scroll", async () => {
+    const user = userEvent.setup();
+    const { button, place } = inClippedTable();
+    place(window.innerHeight - 40, window.innerHeight - 4);
+    Object.defineProperty(HTMLElement.prototype, "offsetHeight", { configurable: true, get: () => 120 });
+    try {
+      await user.click(button);
+      expect(screen.getByRole("menu").style.top).toBe(`${window.innerHeight - 40 - 120 - 4}px`);
+    } finally {
+      delete (HTMLElement.prototype as { offsetHeight?: number }).offsetHeight;
+    }
+
+    act(() => void window.dispatchEvent(new Event("scroll")));
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+  });
 });
 
 describe("Avatar", () => {

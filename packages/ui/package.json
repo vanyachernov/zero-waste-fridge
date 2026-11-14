@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "sideEffects": ["**/*.css"],
+  "sideEffects": [
+    "**/*.css"
+  ],
   "exports": {
     ".": "./src/index.ts",
     "./styles.css": "./src/styles/index.css",
@@ -20,11 +22,14 @@
   },
   "peerDependencies": {
     "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "tailwindcss": "^4.1.0"
   },
   "devDependencies": {
     "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.5",
     "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.8.3"
   }
