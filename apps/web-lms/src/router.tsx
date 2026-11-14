@@ -1,12 +1,12 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { createRootRouteWithContext, createRoute, createRouter, Outlet, redirect, type RouterHistory } from "@tanstack/react-router";
-import { isApiError } from "@zwf/api-client";
+import { isApiError, type RecipeSort } from "@zwf/api-client";
 import type { AuthTab } from "./auth/AuthTabs";
 import { ForgotPasswordPage } from "./auth/ForgotPasswordPage";
 import { LoginPage } from "./auth/LoginPage";
 import { ResetPasswordPage } from "./auth/ResetPasswordPage";
 import { toProductQuery, validateFridgeSearch } from "./lib/fridgeSearch";
-import { activeProductsQuery, meQuery, productSummaryQuery, productsQuery } from "./lib/queries";
+import { activeProductsQuery, meQuery, productSummaryQuery, productsQuery, recipeQuery, recommendedRecipesQuery } from "./lib/queries";
 import { safeRedirect } from "./lib/redirect";
 import { AppErrorScreen, AppPendingScreen, NotFoundScreen, RouteErrorScreen } from "./routes/AppStatusScreens";
 import { AppShell } from "./routes/AppShell";
@@ -14,6 +14,7 @@ import { FamilyPage } from "./routes/FamilyPage";
 import { FridgePage } from "./routes/FridgePage";
 import { JoinPage } from "./routes/JoinPage";
 import { SettingsPage } from "./routes/SettingsPage";
+import { RecipeDetailPage } from "./routes/RecipeDetailPage";
 import { RecipesPage } from "./routes/RecipesPage";
 import { ShoppingPage } from "./routes/ShoppingPage";
 
@@ -124,7 +125,10 @@ const fridgeRoute = createRoute({
 
 export interface RecipesSearch {
   ids?: string[];
+  sort?: RecipeSort;
 }
+
+const RECIPE_SORTS: readonly RecipeSort[] = ["critical", "match", "time", "kcal"];
 
 const recipesRoute = createRoute({
   getParentRoute: () => appRoute,
@@ -135,10 +139,26 @@ const recipesRoute = createRoute({
       .map(String)
       .filter(Boolean)
       .slice(0, 4);
-    return ids.length ? { ids } : {};
+    const sort = RECIPE_SORTS.find((s) => s === search.sort);
+    return { ...(ids.length ? { ids } : {}), ...(sort && sort !== "critical" ? { sort } : {}) };
   },
-  loader: ({ context }) => context.queryClient.ensureQueryData(activeProductsQuery),
+  // Підвантажуємо паралельно, не блокуючи перехід: на сторінці є скелетони
+  loaderDeps: ({ search }) => ({ sort: search.sort ?? "critical" }),
+  loader: ({ context, deps }) => {
+    void context.queryClient.prefetchQuery(activeProductsQuery);
+    void context.queryClient.prefetchQuery(recommendedRecipesQuery(deps.sort));
+  },
   component: RecipesPage,
+});
+
+/** F-42: детальний рецепт. */
+const recipeRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: "/recipes/$id",
+  loader: ({ context, params }) => {
+    void context.queryClient.prefetchQuery(recipeQuery(params.id));
+  },
+  component: RecipeDetailPage,
 });
 
 const shoppingRoute = createRoute({
@@ -180,7 +200,7 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   forgotPasswordRoute,
   resetPasswordRoute,
-  appRoute.addChildren([fridgeRoute, recipesRoute, shoppingRoute, familyRoute, joinRoute, settingsRoute]),
+  appRoute.addChildren([fridgeRoute, recipesRoute, recipeRoute, shoppingRoute, familyRoute, joinRoute, settingsRoute]),
 ]);
 
 export function createAppRouter(queryClient: QueryClient, options: { history?: RouterHistory } = {}) {

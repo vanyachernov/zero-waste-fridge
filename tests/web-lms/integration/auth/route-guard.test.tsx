@@ -27,7 +27,7 @@ describe("route guard", () => {
 
     await waitForPath(router, "/recipes?ids=%5B%22p2%22%2C%22p3%22%5D");
     expect(await screen.findByRole("heading", { name: "Розумні рецепти проти марнування їжі" })).toBeVisible();
-    expect(screen.getByText("Обрано: 2 з 4")).toBeVisible();
+    expect(await screen.findByText(/Обрано: 2 з 4/)).toBeVisible();
     expect(document.title).toBe("Рецепти із залишків · Zero Waste Fridge");
   });
 

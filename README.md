@@ -79,9 +79,9 @@ pnpm dev:api
 | Значення | Що на моках |
 |---|---|
 | `true` (dev за замовчуванням) | усе: вхід, холодильник, покупки, сім'я, рецепти |
-| `recipes` (`apps/web-lms/.env.backend`) | лише рецепти — решта зі Spring Boot |
+| `recipes` | лише рецепти — решта зі Spring Boot |
 | `data` | холодильник, покупки й рецепти (вхід і сім'я — справжні) |
-| `false` (prod) | нічого |
+| `false` (prod, `apps/web-lms/.env.backend`) | нічого |
 
 Домени: `auth`, `fridge`, `shopping`, `household`, `recipes`, можна через кому. Моки дзеркалять правила бекенду й коди помилок; демо-дані мока — сім'я Кравченків (Олена — власниця, Максим і Софія — члени сім'ї, той самий пароль).
 
@@ -132,7 +132,7 @@ Vite проксує `/api` на `BACKEND_URL` (за замовчуванням `
 1. **Додати продукт**: кнопка «Додати продукт» відкриває модалку (на мобільних це bottom sheet).
 2. **Побачити, що псується**: список відсортовано за терміном, бейджі `Прострочено / Сьогодні / 1–2 дні / Свіже`, статистика вгорі.
 3. **Відмітити 3–4 продукти**: чекбокси в таблиці (на мобільних це картки), понад 4 вибрати не можна. Знизу з'являється панель «Обрано: N з 4».
-4. **Отримати рецепт**: «Підібрати рецепт» відкриває `/lms/recipes?ids=…`, де працює кулінарний конструктор і картки рецептів. Відсутні інгредієнти можна одним кліком додати до списку покупок.
+4. **Отримати рецепт**: «Підібрати рецепт» відкриває `/lms/recipes?ids=…` — кулінарний конструктор (на телефоні — майстер «Крок 1 з 2»). «Згенерувати ідеальний рецепт» веде на `/lms/recipes/$id`, де відсутнє додається до списку покупок, а «Приготувати і списати» списує використане й рахується у «Врятовано».
 
 ## Автентифікація в кабінеті (F-10…F-13)
 
@@ -236,6 +236,20 @@ SPRING_PROFILES_ACTIVE=prod DB_URL=jdbc:postgresql://host:5432/zwf DB_USER=zwf D
 | `GET / POST / DELETE /api/shopping-list/stores` | магазини домогосподарства · 409 `STORE_EXISTS` |
 | `GET /api/shopping-list/summary` | `{bought, total, estimatedTotal, autoCount}` |
 
+## Рецепти (B-20…B-24)
+
+Каталог — 30 рецептів у [`recipes/catalog.json`](apps/api/src/main/resources/recipes/catalog.json): інгредієнти з ключовими словами («шпинат», «яйц»), за якими знаходиться продукт у холодильнику; базове (сіль, олія) позначено `pantry` і ніколи не «бракує». На старті бекенд додає в БД рецепти, яких ще немає (за `slug`). Прострочене в рецепти не йде; з кількох підходящих продуктів береться той, що зіпсується першим.
+
+| Метод і шлях | Відповідь |
+|---|---|
+| `GET /api/recipes/recommended?sort=critical\|match\|time\|kcal&limit=6` | картки `{id, title, imageUrl, minutes, kcal, servings, difficulty, source, matchPercent, criticalCount, fromFridge[], missing[]}`; критичні (≤ 48 год) — першими |
+| `POST /api/recipes/generate` `{productIds: [3..4]}` | детальний рецепт. З `DEEPSEEK_API_KEY` — генерує DeepSeek і рецепт зберігається для сім'ї (`source: "AI"`), без ключа або при збої — найкращий рецепт каталогу (`CATALOG`). 400 `productIds: Size / INVALID` · 422 `NO_RECIPE` |
+| `GET /api/recipes/{id}` | `{…картка, description, savingsUah, pantry[], steps[{title, text}]}` проти поточного холодильника · 404 `RECIPE_NOT_FOUND` (AI-рецепт іншої сім'ї теж) |
+| `POST /api/recipes/{id}/cook` `{portions?: 1..12, productIds?}` | `{recipeId, portions, cooked[{productId, name, quantity, unit, closed}]}` — списання `COOKED`; кількість з рецепта на порції, г ↔ кг і мл ↔ л, інакше продукт цілком. Усе або нічого |
+| `GET /api/stats/saved?period=month` | `{period, from, to, saved, wasted}` — різні продукти, з'їдені вчасно або приготовані / викинуті за місяць |
+
+**DeepSeek.** OpenAI-сумісний `POST https://api.deepseek.com/chat/completions`, модель `deepseek-flash` (thinking вимкнено), JSON mode. Відповідь моделі перевіряється: межі чисел, одиниці, кожен обраний продукт має бути в рецепті. Порожній чи кривий JSON, 429 і 5xx — одна повторна спроба; 401/402/422 — одразу каталог. Налаштування: `zwf.ai.deepseek.{api-key, base-url, model, timeout}`.
+
 ## Сім'я (B-50…B-55)
 
 Ролі з макета «Моя сім'я»: `OWNER` може все, `MEMBER` — холодильник, рецепти, список покупок і нагадування, але не керує учасниками. Право перевіряється за роллю з БД, заборонене — 403 `FORBIDDEN`.
@@ -297,6 +311,8 @@ SPRING_PROFILES_ACTIVE=prod DB_URL=jdbc:postgresql://host:5432/zwf DB_USER=zwf D
 | `SMTP_AUTH`, `SMTP_STARTTLS` | ні | За замовчуванням `true` |
 | `MAIL_FROM` | ні | Відправник, за замовчуванням `Zero Waste Fridge <no-reply@zerowastefridge.app>` |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | ні | Ключі Web Push (`npx web-push generate-vapid-keys`). Без них push вимкнено, решта сповіщень працює |
+| `DEEPSEEK_API_KEY` | ні | Ключ DeepSeek для генерації рецептів. Без нього рецепт підбирається з каталогу |
+| `DEEPSEEK_MODEL` | ні | За замовчуванням `deepseek-flash` |
 | `VAPID_SUBJECT` | ні | Контакт для push-сервісів, за замовчуванням `mailto:no-reply@zerowastefridge.app` |
 
 ## Тести

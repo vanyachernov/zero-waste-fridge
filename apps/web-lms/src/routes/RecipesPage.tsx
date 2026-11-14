@@ -1,242 +1,317 @@
-import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { Link, getRouteApi } from "@tanstack/react-router";
-import { api, queryKeys, type Recipe } from "@zwf/api-client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, getRouteApi, useNavigate } from "@tanstack/react-router";
+import { isApiError, queryKeys, type Product, type RecipeCard, type RecipeSort } from "@zwf/api-client";
+import { api } from "@zwf/api-client";
 import { useI18n } from "@zwf/i18n/react";
-import { Badge, Button, Card, FreshnessBadge, cn } from "@zwf/ui";
-import { ArrowLeft, Check, CheckCircle2, Clock, Flame, Gauge, Lightbulb, ShoppingCart, Sparkles } from "lucide-react";
-import { useMemo, useState } from "react";
-import { freshnessLabel } from "../lib/freshness";
-import { activeProductsQuery, recipesQuery } from "../lib/queries";
+import { Badge, Button, Card, Checkbox, FreshnessBadge, Select, buttonClasses, cn } from "@zwf/ui";
+import { AlertTriangle, ChefHat, CheckCircle2, Clock, Flame, Gauge, Leaf, Lightbulb, RefreshCw, Sparkles } from "lucide-react";
+import { useRef } from "react";
+import { ProductIcon } from "../components/ProductIcon";
+import { RecipeImage } from "../components/RecipeImage";
+import { errorMessage } from "../lib/errors";
+import { formatQty, freshnessLabel } from "../lib/freshness";
+import { activeProductsQuery, productSummaryQuery, recommendedRecipesQuery, savedStatsQuery } from "../lib/queries";
 import { useDocumentTitle } from "../lib/useDocumentTitle";
 
 const route = getRouteApi("/_authenticated/recipes");
-const MAX = 4;
+export const MIN_SELECTED = 3;
+export const MAX_SELECTED = 4;
+const SORTS: RecipeSort[] = ["critical", "match", "time", "kcal"];
 
+/** F-40 / F-41 / F-45 / F-82: «Розумні рецепти» — рекомендації та кулінарний конструктор. */
 export function RecipesPage() {
   const i18n = useI18n();
-  useDocumentTitle(i18n.t("nav.recipes"));
-  const { t } = i18n;
-  const { ids = [] } = route.useSearch();
+  const { t, plural } = i18n;
+  useDocumentTitle(t("nav.recipes"));
+  const { ids = [], sort = "critical" } = route.useSearch();
   const navigate = route.useNavigate();
-  const {
-    data: { items: products },
-  } = useSuspenseQuery(activeProductsQuery);
-  const recipes = useQuery(recipesQuery(ids));
-  const [openId, setOpenId] = useState<string | null>(null);
+  const goTo = useNavigate();
+  const qc = useQueryClient();
 
-  const candidates = useMemo(
-    () =>
-      products.map((p) => ({ ...p, days: p.daysLeft })).filter((p) => p.days >= 0),
-    [products],
-  );
-  const byId = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
+  const products = useQuery(activeProductsQuery);
+  const recommended = useQuery(recommendedRecipesQuery(sort));
+  const saved = useQuery(savedStatsQuery);
+  const summary = useQuery(productSummaryQuery);
 
-  const setIds = (next: string[]) => navigate({ search: next.length ? { ids: next } : {}, replace: true });
+  const listRef = useRef<HTMLDivElement>(null);
+  const candidates = (products.data?.items ?? []).filter((p) => p.daysLeft >= 0);
+  const byId = new Map(candidates.map((p) => [p.id, p]));
+  const selected = ids.filter((id) => byId.has(id));
+  const ready = selected.length >= MIN_SELECTED && selected.length <= MAX_SELECTED;
+
+  const setSearch = (next: { ids?: string[]; sort?: RecipeSort }) =>
+    navigate({
+      search: (prev) => {
+        const merged = { ...prev, ...next };
+        return { ...(merged.ids?.length ? { ids: merged.ids } : {}), ...(merged.sort && merged.sort !== "critical" ? { sort: merged.sort } : {}) };
+      },
+      replace: true,
+    });
   const toggle = (id: string) =>
-    setIds(ids.includes(id) ? ids.filter((x) => x !== id) : ids.length >= MAX ? ids : [...ids, id]);
+    setSearch({ ids: selected.includes(id) ? selected.filter((x) => x !== id) : selected.length >= MAX_SELECTED ? selected : [...selected, id] });
+
+  const generate = useMutation({
+    mutationFn: () => api.recipes.generate(selected),
+    onSuccess: (recipe) => {
+      qc.setQueryData(queryKeys.recipe(recipe.id), recipe);
+      void goTo({ to: "/recipes/$id", params: { id: recipe.id } });
+    },
+  });
+  const noRecipe = isApiError(generate.error) && generate.error.code === "NO_RECIPE";
+  const soon = summary.data?.soon ?? 0;
 
   return (
-    <div className="flex flex-col gap-8">
-      <div>
-        <Link to="/" className="flex w-fit items-center gap-1 text-xs font-medium text-on-surface-variant hover:text-primary">
-          <ArrowLeft className="size-3.5" /> {t("recipes.back")}
-        </Link>
-        <Badge tone="primary" className="mt-3 uppercase">
-          <Sparkles className="size-3" /> {t("recipes.eyebrow")}
-        </Badge>
-        <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">{t("recipes.title")}</h1>
-        <p className="mt-2 max-w-2xl text-sm text-on-surface-variant">{t("recipes.subtitle")}</p>
-      </div>
-
-      {/* ---------- Кулінарний конструктор ---------- */}
-      <Card className="flex flex-col gap-4 p-4 sm:p-6">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-xl font-extrabold sm:text-2xl">Кулінарний конструктор: оберіть від 3 до 4 продуктів</h2>
-            <p className="text-xs text-on-surface-variant">{t("fridge.selectHint")}</p>
-          </div>
-          <Badge tone="primary" dot className="self-start px-3 py-1 text-xs sm:self-auto">
-            {t("fridge.selected", { n: ids.length })}
+    <div className="flex flex-col gap-8 max-sm:pb-24">
+      {/* ---------- Шапка (F-40) ---------- */}
+      <div className="flex flex-col gap-3">
+        <nav aria-label="Breadcrumb" className="hidden text-2xs text-on-surface-variant sm:block">
+          <span className="font-bold">{t("recipes.breadcrumbRoot")}</span> › <span className="text-primary">{t("recipes.breadcrumb")}</span>
+        </nav>
+        <div className="flex flex-wrap gap-2">
+          <Badge tone="primary" className="uppercase">
+            <Sparkles className="size-3" aria-hidden /> {t("recipes.eyebrow")}
           </Badge>
         </div>
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          {candidates.map((p) => {
-            const active = ids.includes(p.id);
-            const blocked = !active && ids.length >= MAX;
-            return (
-              <button
-                key={p.id}
-                type="button"
-                disabled={blocked}
-                onClick={() => toggle(p.id)}
-                aria-pressed={active}
-                className={cn(
-                  "flex items-center justify-between gap-2 rounded-md border px-3 py-2.5 text-left text-xs font-semibold transition-colors",
-                  active
-                    ? "border-primary bg-primary-container/40 text-on-surface"
-                    : "border-border bg-surface-container-low text-on-surface-variant hover:border-outline-variant",
-                  blocked && "cursor-not-allowed opacity-50",
-                )}
-              >
-                <span className="flex min-w-0 items-center gap-2">
-                  {active && <Check className="size-3.5 shrink-0 text-primary" />}
-                  <span className="truncate">{p.name}</span>
-                </span>
-                <FreshnessBadge daysLeft={p.days} label={p.days <= 2 ? freshnessLabel(p.days, i18n) : `${p.days} дн`} />
-              </button>
-            );
-          })}
+        <h1 className="text-2xl font-extrabold tracking-tight sm:text-4xl">{t("recipes.title")}</h1>
+        <p className="max-w-3xl text-sm text-on-surface-variant">{t("recipes.subtitle")}</p>
+        <div className="flex flex-wrap gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-pill bg-primary-container px-3 py-1 text-xs font-semibold text-on-primary-container">
+            <Leaf className="size-3.5" aria-hidden />
+            {t("recipes.savedThisMonth", { n: saved.data?.saved ?? 0, unit: plural(saved.data?.saved ?? 0, ["продукт", "продукти", "продуктів"]) })}
+          </span>
+          {soon > 0 && (
+            <span className="inline-flex items-center gap-1.5 rounded-pill bg-warning-container px-3 py-1 text-xs font-semibold text-on-warning-container">
+              <AlertTriangle className="size-3.5" aria-hidden />
+              {t("recipes.needAttention", { n: soon, unit: plural(soon, ["продукт", "продукти", "продуктів"]) })}
+            </span>
+          )}
         </div>
-        {ids.length > 0 && (
-          <p className="flex items-center gap-2 rounded-md bg-secondary-container px-3 py-2 text-xs text-on-secondary-container">
-            <Lightbulb className="size-4 shrink-0 text-on-warning-container" />
-            Чудово! Ви вибрали {ids.length} {i18n.plural(ids.length, ["складник", "складники", "складників"])}. Рецепти нижче
-            оновлюються автоматично.
-          </p>
-        )}
-      </Card>
+      </div>
 
-      {/* ---------- Результати ---------- */}
-      <section className="flex flex-col gap-4">
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-bold">{t("recipes.fromSelected")}</h2>
-          <Badge tone="primary">{t("recipes.aiBadge")}</Badge>
-        </div>
-
-        {ids.length === 0 ? (
-          <Card className="p-10 text-center text-sm text-muted">{t("recipes.noSelection")}</Card>
-        ) : recipes.isPending ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-busy>
-            {Array.from({ length: 3 }, (_, i) => (
-              <Card key={i} className="h-80 animate-pulse bg-surface-container-low" />
-            ))}
-            <span className="sr-only">{t("recipes.loading")}</span>
+      {/* ---------- Рекомендації (F-40) ---------- */}
+      <section aria-labelledby="recommended-title" className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 id="recommended-title" className="text-lg font-bold sm:text-xl">
+                {t("recipes.recommendedTitle")}
+              </h2>
+              <Badge tone="primary">{t("recipes.aiBadge")}</Badge>
+            </div>
+            <p className="text-xs text-on-surface-variant">{t("recipes.recommendedText")}</p>
           </div>
-        ) : recipes.isError ? (
-          <Card className="flex flex-col items-center gap-3 p-10 text-sm">
-            {t("common.error")}
-            <Button variant="outline" size="sm" onClick={() => recipes.refetch()}>
-              {t("common.retry")}
+          <Select
+            aria-label={t("recipes.sort")}
+            className="h-9 text-xs sm:w-80"
+            value={sort}
+            onChange={(v) => setSearch({ sort: v as RecipeSort })}
+            options={SORTS.map((s) => ({ value: s, label: `${t("recipes.sort")}: ${i18n.messages.recipes.sorts[s]}` }))}
+          />
+        </div>
+        {recommended.isPending ? (
+          <div role="status" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true" aria-label={t("common.loading")}>
+            {Array.from({ length: 3 }, (_, i) => (
+              <Card key={i} className="h-96 animate-pulse bg-surface-container-low" />
+            ))}
+          </div>
+        ) : recommended.isError ? (
+          <Card className="flex flex-col items-center gap-3 p-8 text-center text-sm text-on-surface-variant">
+            {t("recipes.loadError")}
+            <Button variant="outline" size="sm" onClick={() => void recommended.refetch()}>
+              <RefreshCw className="size-4" aria-hidden /> {t("common.retry")}
             </Button>
           </Card>
-        ) : recipes.data.length === 0 ? (
-          <Card className="p-10 text-center text-sm text-muted">{t("recipes.none")}</Card>
+        ) : recommended.data.length === 0 ? (
+          <Card className="p-8 text-center text-sm text-on-surface-variant">{t("recipes.noRecommended")}</Card>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {recipes.data.map((r) => (
-              <RecipeCard
-                key={r.id}
-                recipe={r}
-                open={openId === r.id}
-                onToggle={() => setOpenId(openId === r.id ? null : r.id)}
-                productName={(id) => byId.get(id)?.name}
-              />
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {recommended.data.map((r) => (
+              <li key={r.id} className="min-w-0">
+                <RecommendedCard recipe={r} />
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </section>
+
+      {/* ---------- Кулінарний конструктор (F-41) / мобільний майстер «Крок 1 з 2» (F-82) ---------- */}
+      <section aria-labelledby="constructor-title" ref={listRef}>
+        <Card className="flex flex-col gap-4 p-4 sm:p-6">
+          <div className="flex flex-col gap-1 sm:hidden">
+            <p className="text-2xs font-bold tracking-wide text-primary uppercase">{t("recipes.step", { n: 1 })}</p>
+            <div className="h-1.5 overflow-hidden rounded-pill bg-surface-container" aria-hidden>
+              <div className="h-full w-1/2 rounded-pill bg-primary" />
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 id="constructor-title" className="text-lg font-extrabold sm:text-2xl">
+                <span className="sm:hidden">{t("recipes.wizardHeading")}</span>
+                <span className="max-sm:hidden">{t("recipes.constructorTitle")}</span>
+              </h2>
+              <p className="text-xs text-on-surface-variant">
+                <span className="sm:hidden">{t("recipes.wizardText")}</span>
+                <span className="max-sm:hidden">{t("recipes.constructorText")}</span>
+              </p>
+            </div>
+            <Badge tone={ready ? "primary" : "neutral"} dot className="self-start px-3 py-1 text-xs" aria-live="polite">
+              {t("recipes.selectedCount", { n: selected.length })}
+              {ready ? ` (${t("recipes.readyToGenerate")})` : selected.length > 0 ? ` · ${t("recipes.pickMore", { n: MIN_SELECTED - selected.length })}` : ""}
+            </Badge>
+          </div>
+
+          {products.isPending ? (
+            <div role="status" className="h-40 animate-pulse rounded-lg bg-surface-container-low" aria-busy="true" aria-label={t("common.loading")} />
+          ) : candidates.length === 0 ? (
+            <p className="rounded-lg bg-surface-container-low p-6 text-center text-sm text-on-surface-variant">{t("recipes.noProducts")}</p>
+          ) : (
+            <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4" aria-label={t("recipes.constructorTitle")}>
+              {candidates.map((p) => (
+                <li key={p.id}>
+                  <ProductChoice product={p} checked={selected.includes(p.id)} disabled={!selected.includes(p.id) && selected.length >= MAX_SELECTED} onToggle={() => toggle(p.id)} />
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {ready && !generate.isPending && (
+            <p className="flex items-center gap-2 rounded-md bg-secondary-container px-3 py-2 text-xs text-on-secondary-container max-sm:hidden">
+              <Lightbulb className="size-4 shrink-0 text-on-warning-container" aria-hidden />
+              {t("recipes.readyHint", { n: selected.length, unit: plural(selected.length, ["складову", "складові", "складових"]) })}
+            </p>
+          )}
+
+          {/* F-45: стани генерації */}
+          {generate.isPending && (
+            <div role="status" className="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary-container/40 p-4">
+              <ChefHat className="size-6 shrink-0 animate-bounce text-primary motion-reduce:animate-none" aria-hidden />
+              <div>
+                <p className="text-sm font-bold">{t("recipes.generating")}</p>
+                <p className="text-xs text-on-surface-variant">{t("recipes.generatingText")}</p>
+              </div>
+            </div>
+          )}
+          {generate.isError && (
+            <p role="alert" className="rounded-lg border border-error/30 bg-error-container/40 p-3 text-sm text-on-error-container">
+              {noRecipe ? t("recipes.noRecipe") : isApiError(generate.error, 400) ? errorMessage(generate.error, i18n) : t("recipes.generateError")}
+            </p>
+          )}
+
+          <div className="flex justify-center max-sm:hidden">
+            <Button size="lg" disabled={!ready || generate.isPending} onClick={() => generate.mutate()}>
+              <Sparkles className="size-4" aria-hidden /> {t("recipes.generate")}
+            </Button>
+          </div>
+        </Card>
+      </section>
+
+      {/* F-82: футер майстра на телефоні — обране й «Згенерувати рецепт» */}
+      <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-20 border-t border-border bg-surface-container-lowest/95 px-4 py-3 backdrop-blur sm:hidden">
+        <div className="mb-2 flex items-center justify-between gap-2 text-xs">
+          <span className="min-w-0 truncate text-on-surface-variant">
+            {selected.length ? selected.map((id) => byId.get(id)?.name.split(/\s+/)[0]).join(", ") : t("recipes.selectedCount", { n: 0 })}
+          </span>
+          {selected.length > 0 && (
+            <button type="button" className="touch-hit shrink-0 font-semibold text-primary" onClick={() => listRef.current?.scrollIntoView({ behavior: "smooth" })}>
+              {t("recipes.change")}
+            </button>
+          )}
+        </div>
+        <Button className="w-full" disabled={!ready || generate.isPending} onClick={() => generate.mutate()}>
+          <Sparkles className="size-4" aria-hidden /> {t("recipes.generateShort")}
+        </Button>
+      </div>
     </div>
   );
 }
 
-function RecipeCard({
-  recipe,
-  open,
-  onToggle,
-  productName,
-}: {
-  recipe: Recipe;
-  open: boolean;
-  onToggle: () => void;
-  productName: (id: string) => string | undefined;
-}) {
-  const { t, messages } = useI18n();
-  const qc = useQueryClient();
-  const addMissing = useMutation({
-    mutationFn: async () => {
-      for (const name of recipe.missing) await api.shoppingList.add({ name });
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.shoppingList }),
-  });
-
+function ProductChoice({ product, checked, disabled, onToggle }: { product: Product; checked: boolean; disabled: boolean; onToggle: () => void }) {
+  const i18n = useI18n();
+  const { t } = i18n;
+  const hint =
+    product.daysLeft === 0 ? t("recipes.expiresToday") : product.daysLeft <= 2 ? freshnessLabel(product.daysLeft, i18n) : formatQty(product, i18n);
   return (
-    <Card className={cn("flex flex-col overflow-hidden", open && "ring-2 ring-primary sm:col-span-2 lg:col-span-3")}>
-      <div className={cn("relative bg-surface-container", open ? "aspect-[21/9]" : "aspect-[16/10]")}>
-        {recipe.imageUrl && (
-          <img src={recipe.imageUrl} alt="" loading="lazy" className="absolute inset-0 size-full object-cover" />
-        )}
-        <div className="absolute inset-x-3 top-3 flex justify-between gap-2">
+    <label
+      className={cn(
+        "flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors",
+        checked ? "border-primary bg-primary-container/40" : "border-border bg-surface-container-low hover:border-outline-variant",
+        disabled && "cursor-not-allowed opacity-50",
+      )}
+    >
+      <Checkbox checked={checked} disabled={disabled} onChange={onToggle} aria-label={product.name} />
+      <ProductIcon category={product.category} className="size-9" />
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-semibold">{product.name}</span>
+        <span className="block truncate text-2xs text-on-surface-variant">{hint}</span>
+      </span>
+      <FreshnessBadge daysLeft={product.daysLeft} label={product.daysLeft === 0 ? freshnessLabel(0, i18n) : t("recipes.daysShort", { n: product.daysLeft })} />
+    </label>
+  );
+}
+
+/** «(сьогодні!)», «(1 день)» біля назви продукту. */
+export function daysNote(daysLeft: number, { t, plural }: ReturnType<typeof useI18n>) {
+  return daysLeft === 0 ? `${t("freshness.today").toLowerCase()}!` : `${daysLeft} ${plural(daysLeft, ["день", "дні", "днів"])}`;
+}
+
+function RecommendedCard({ recipe }: { recipe: RecipeCard }) {
+  const i18n = useI18n();
+  const { t, plural, messages } = i18n;
+  return (
+    <Card className="flex h-full flex-col overflow-hidden">
+      <RecipeImage recipe={recipe} className="aspect-[16/10]">
+        <div className="absolute inset-x-3 top-3 flex flex-wrap justify-between gap-2">
           <Badge tone="primary" className="bg-surface-container-lowest/95">
-            <CheckCircle2 className="size-3" /> {t("recipes.match", { n: recipe.matchPercent })}
+            <CheckCircle2 className="size-3" aria-hidden /> {t("recipes.match", { n: recipe.matchPercent })}
           </Badge>
+          {recipe.criticalCount > 0 && (
+            <Badge tone="warning" className="bg-warning-container/95">
+              {t("recipes.critical", { n: recipe.criticalCount, unit: plural(recipe.criticalCount, ["критичний продукт", "критичні продукти", "критичних продуктів"]) })}
+            </Badge>
+          )}
         </div>
-      </div>
+      </RecipeImage>
       <div className="flex flex-1 flex-col gap-3 p-4">
-        <div className="flex flex-wrap gap-x-3 gap-y-1 text-2xs text-on-surface-variant">
-          <span className="inline-flex items-center gap-1"><Clock className="size-3" /> {t("recipes.minutes", { n: recipe.minutes })}</span>
-          <span className="inline-flex items-center gap-1"><Gauge className="size-3" /> {messages.recipes.difficulty[recipe.difficulty]}</span>
-          <span className="inline-flex items-center gap-1"><Flame className="size-3" /> {t("recipes.kcal", { n: recipe.kcal })}</span>
-        </div>
+        <RecipeMeta minutes={recipe.minutes} difficulty={messages.recipes.difficulty[recipe.difficulty]} kcal={recipe.kcal} />
         <h3 className="text-base leading-snug font-bold">{recipe.title}</h3>
-
-        <div className="rounded-md bg-surface-container-low p-3">
-          <p className="mb-2 inline-flex items-center gap-1 text-2xs font-semibold text-primary">
-            <CheckCircle2 className="size-3" /> {t("recipes.fromFridge")}
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {recipe.usedProductIds.map((id) => (
-              <Badge key={id} tone="warning">{productName(id)}</Badge>
+        <div className="rounded-md bg-surface-container-low p-3 text-xs">
+          <p className="mb-2 font-semibold text-primary">{t("recipes.fromFridge")}</p>
+          <ul className="flex flex-wrap gap-1.5">
+            {recipe.fromFridge.map((f) => (
+              <li key={f.productId}>
+                <Badge tone={f.daysLeft <= 2 ? "warning" : "neutral"}>
+                  {f.name.split(/\s+/).slice(0, 2).join(" ")} ({daysNote(f.daysLeft, i18n)})
+                </Badge>
+              </li>
             ))}
-            {recipe.missing.length === 0 ? (
-              <Badge tone="primary">{t("recipes.allInStock")}</Badge>
-            ) : (
-              recipe.missing.map((m) => (
-                <Badge key={m} tone="neutral">+ {m}</Badge>
-              ))
-            )}
-          </div>
+          </ul>
+          <p className="mt-2 text-on-surface-variant">
+            {recipe.missing.length === 0
+              ? t("recipes.allInStock")
+              : t("recipes.missingShort", { items: recipe.missing.map((m) => (m.quantity ? `${m.name} (${m.quantity} ${messages.units[m.unit!]})` : m.name)).join(", ") })}
+          </p>
         </div>
-
-        {open && (
-          <div className="grid gap-6 border-t border-border pt-4 md:grid-cols-[1fr_1.4fr]">
-            <div>
-              <h4 className="mb-2 text-sm font-bold">{t("recipes.ingredients")}</h4>
-              <ul className="space-y-1.5 text-sm text-on-surface-variant">
-                {recipe.ingredients.map((i) => (
-                  <li key={i} className="flex gap-2"><span className="text-primary">•</span>{i}</li>
-                ))}
-              </ul>
-              {recipe.missing.length > 0 && (
-                <Button
-                  variant={addMissing.isSuccess ? "secondary" : "outline"}
-                  size="sm"
-                  className="mt-4"
-                  disabled={addMissing.isPending || addMissing.isSuccess}
-                  onClick={() => addMissing.mutate()}
-                >
-                  {addMissing.isSuccess ? <Check className="size-4" /> : <ShoppingCart className="size-4" />}
-                  {addMissing.isSuccess ? t("recipes.added") : t("recipes.addMissing")}
-                </Button>
-              )}
-            </div>
-            <div>
-              <h4 className="mb-2 text-sm font-bold">{t("recipes.steps")}</h4>
-              <ol className="space-y-3 text-sm">
-                {recipe.steps.map((s, i) => (
-                  <li key={s} className="flex gap-3">
-                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-2xs font-bold text-on-primary">{i + 1}</span>
-                    <span className="pt-0.5 text-on-surface-variant">{s}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </div>
-        )}
-
-        <Button className="mt-auto w-full" variant={open ? "secondary" : "primary"} onClick={onToggle}>
-          {open ? "Згорнути" : "Переглянути рецепт"}
-        </Button>
+        <Link to="/recipes/$id" params={{ id: recipe.id }} className={buttonClasses("outline", "md", "mt-auto w-full")}>
+          {t("recipes.view")}
+        </Link>
       </div>
     </Card>
+  );
+}
+
+export function RecipeMeta({ minutes, difficulty, kcal }: { minutes: number; difficulty: string; kcal: number }) {
+  const { t } = useI18n();
+  return (
+    <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-2xs text-on-surface-variant">
+      <span className="inline-flex items-center gap-1">
+        <Clock className="size-3" aria-hidden /> {t("recipes.minutes", { n: minutes })}
+      </span>
+      <span className="inline-flex items-center gap-1">
+        <Gauge className="size-3" aria-hidden /> {difficulty}
+      </span>
+      <span className="inline-flex items-center gap-1">
+        <Flame className="size-3" aria-hidden /> {t("recipes.kcal", { n: kcal })}
+      </span>
+    </p>
   );
 }

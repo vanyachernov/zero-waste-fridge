@@ -1,6 +1,6 @@
 import { configureHttp, http, isApiError, notifyUnauthorized, type ApiError } from "./http";
-import { mockApi } from "./mock";
-import { mockFridge } from "./mock-fridge";
+import { mockFridge, mockFridgeControl } from "./mock-fridge";
+import { mockRecipes } from "./mock-recipes";
 import { mockShopping } from "./mock-shopping";
 import { mockHousehold } from "./mock-household";
 import { mockNotifications } from "./mock-notifications";
@@ -26,7 +26,12 @@ import type {
   ProductPage,
   ProductQuery,
   ProductSummary,
-  Recipe,
+  CookRequest,
+  CookResult,
+  RecipeCard,
+  RecipeDetail,
+  RecipeSort,
+  SavedStats,
   RegisterRequest,
   ResetPasswordRequest,
   MoveToFridgeRequest,
@@ -47,6 +52,7 @@ export { ApiError, CSRF_COOKIE, CSRF_HEADER, apiUrl, http, isApiError, readCooki
 export { DEMO_ACCOUNT, mockAuthControl } from "./mock-auth";
 export { MOCK_DICTIONARIES, mockFridgeControl, openedShelfLifeDays } from "./mock-fridge";
 export { mockShoppingControl } from "./mock-shopping";
+export { convertQuantity } from "./mock-recipes";
 export { mockHouseholdControl, normalizeJoinCode } from "./mock-household";
 export { mockNotificationsControl } from "./mock-notifications";
 
@@ -56,7 +62,7 @@ export { mockNotificationsControl } from "./mock-notifications";
  * - `fridge` — продукти, підсумки, порада дня, довідники (B-10…B-16);
  * - `shopping` — список покупок (B-40…B-45);
  * - `household` — сім'я, учасники, запрошення (B-50…B-55);
- * - `recipes` — рецепти (B-20…B-24, бекенду ще немає).
+ * - `recipes` — рецепти й «Врятовано» (B-20…B-24).
  */
 export type MockDomain = "auth" | "fridge" | "shopping" | "household" | "recipes";
 export type MockMode = boolean | readonly MockDomain[];
@@ -124,6 +130,11 @@ function viaMock<T>(call: () => Promise<T>, options: { skipUnauthorizedHandler?:
     throw error;
   });
 }
+/** Активні продукти для моку рецептів — з моку холодильника або з бекенду, що б не було на моках. */
+async function fridgeForMock(): Promise<Product[]> {
+  return (await api.products.list({ size: 100 })).items;
+}
+
 /** 401 від auth-ендпоінтів — очікуваний результат (неправильний пароль, немає сесії), а не «сесія закінчилась». */
 const auth = { skipUnauthorizedHandler: true } as const;
 
@@ -194,12 +205,40 @@ export const api = {
   dictionaries: {
     get: (): Promise<Dictionaries> => (isMockApi("fridge") ? viaMock(() => mockFridge.dictionaries()) : http("/dictionaries")),
   },
+  /** B-21…B-23. На моках — той самий каталог і правила підбору, продукти беруться з поточного холодильника. */
   recipes: {
-    /** Бекенду рецептів ще немає (B-20…B-24): мок отримує вже завантажені продукти, звідки б вони не прийшли. */
-    suggest: async (productIds: string[]): Promise<Recipe[]> => {
-      if (!isMockApi("recipes")) return http("/recipes/suggest", { method: "POST", body: json({ productIds }) });
-      const products = await Promise.all(productIds.map((id) => api.products.get(id).catch(() => null)));
-      return viaMock(() => mockApi.suggestRecipes(products.filter((p): p is Product => p !== null)));
+    recommended: async (sort: RecipeSort = "critical", limit = 6): Promise<RecipeCard[]> =>
+      isMockApi("recipes")
+        ? viaMock(async () => mockRecipes.recommended(await fridgeForMock(), sort, limit))
+        : http(`/recipes/recommended${toQueryString({ sort, limit })}`),
+    /** 3–4 продукти; AI на бекенді (DeepSeek), без ключа — найкращий рецепт каталогу. Нічого не підійшло — 422 `NO_RECIPE`. */
+    generate: async (productIds: string[]): Promise<RecipeDetail> =>
+      isMockApi("recipes")
+        ? viaMock(async () => mockRecipes.generate(await fridgeForMock(), productIds))
+        : http("/recipes/generate", { method: "POST", body: json({ productIds }) }),
+    get: async (id: string): Promise<RecipeDetail> =>
+      isMockApi("recipes") ? viaMock(async () => mockRecipes.get(await fridgeForMock(), id)) : http(`/recipes/${id}`),
+    /** «Приготувати і списати» (outcome COOKED). */
+    cook: async (id: string, request: CookRequest = {}): Promise<CookResult> =>
+      isMockApi("recipes")
+        ? viaMock(async () => mockRecipes.cook(await fridgeForMock(), id, request, (productId, body) => api.products.writeOff(productId, body)))
+        : http(`/recipes/${id}/cook`, { method: "POST", body: json(request) }),
+  },
+  /** B-24. */
+  stats: {
+    saved: async (): Promise<SavedStats> => {
+      if (!isMockApi("recipes")) return http("/stats/saved?period=month");
+      return viaMock(async () => {
+        const me = await api.auth.me();
+        const now = new Date();
+        const from = new Date(now.getFullYear(), now.getMonth(), 1);
+        const to = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        const events = isMockApi("fridge") ? mockFridgeControl.events(me.householdId) : [];
+        const inMonth = events.filter((e) => e.type === "WRITTEN_OFF" && new Date(e.at) >= from);
+        const distinct = (outcomes: string[]) => new Set(inMonth.filter((e) => outcomes.includes(e.outcome ?? "")).map((e) => e.productId)).size;
+        return { period: "month", from: iso(from), to: iso(to), saved: distinct(["EATEN", "COOKED"]), wasted: distinct(["WASTED"]) };
+      });
     },
   },
   /** B-40…B-45. */
@@ -328,7 +367,10 @@ export const queryKeys = {
   notifications: ["notifications"] as const,
   unreadCount: ["notifications", "unread"] as const,
   notificationSettings: ["notifications", "settings"] as const,
-  recipes: (ids: string[]) => ["recipes", [...ids].sort()] as const,
+  recipes: ["recipes"] as const,
+  recommendedRecipes: (sort: string) => ["recipes", "recommended", sort] as const,
+  recipe: (id: string) => ["recipes", id] as const,
+  savedStats: ["stats", "saved"] as const,
   shoppingList: ["shopping-list"] as const,
   shoppingSummary: ["shopping-list", "summary"] as const,
   shoppingSettings: ["shopping-list", "settings"] as const,
