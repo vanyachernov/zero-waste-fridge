@@ -61,6 +61,12 @@ zwf:
     public-key: ${VAPID_PUBLIC_KEY:}
     private-key: ${VAPID_PRIVATE_KEY:}
     subject: ${VAPID_SUBJECT:mailto:no-reply@zerowastefridge.app}
+  # B-22: генерація рецептів через DeepSeek. Без ключа — підбір із каталогу рецептів
+  ai:
+    deepseek:
+      api-key: ${DEEPSEEK_API_KEY:}
+      model: ${DEEPSEEK_MODEL:deepseek-flash}
+      timeout: 45s
   auth:
     password-reset-ttl: 1h
     password-reset-cooldown: 1m

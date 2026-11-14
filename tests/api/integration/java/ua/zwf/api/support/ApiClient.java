@@ -252,6 +252,12 @@ public final class ApiClient {
 			return JSON.readValue(body, Map.class);
 		}
 
+		/** Відповідь-масив ({@code GET /api/recipes/recommended}). */
+		@SuppressWarnings("unchecked")
+		public List<Map<String, Object>> jsonList() {
+			return JSON.readValue(body, List.class);
+		}
+
 		public List<String> setCookies() {
 			return headers.allValues("Set-Cookie");
 		}

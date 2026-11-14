@@ -1,0 +1,3018 @@
+{
+ "version": 1,
+ "recipes": [
+  {
+   "slug": "green-smoothie",
+   "title": "Зелений вітамінний смузі зі шпинатом та йогуртом",
+   "description": "Освіжаючий смузі, що рятує зелень і йогурт в останній день: багато заліза, кальцію й жодного цукру.",
+   "imageUrl": "https://images.unsplash.com/photo-1610970881699-44a5587cabec?w=800&q=70",
+   "minutes": 10,
+   "kcal": 210,
+   "servings": 2,
+   "difficulty": "easy",
+   "savingsUah": 90,
+   "ingredients": [
+    {
+     "name": "Шпинат",
+     "quantity": 80,
+     "unit": "g",
+     "keywords": [
+      "шпинат"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "листя салату"
+     ]
+    },
+    {
+     "name": "Грецький йогурт",
+     "quantity": 150,
+     "unit": "g",
+     "keywords": [
+      "йогурт"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "кефір"
+     ]
+    },
+    {
+     "name": "Полуниця",
+     "quantity": 100,
+     "unit": "g",
+     "keywords": [
+      "полуниц"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "банан"
+     ]
+    },
+    {
+     "name": "Банан",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "банан"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "яблуко"
+     ]
+    },
+    {
+     "name": "Мед",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "мед"
+     ],
+     "note": "1 ч. л.",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Підготовка",
+     "text": "Промийте шпинат і полуницю, банан очистьте."
+    },
+    {
+     "title": "Збивання",
+     "text": "Збийте всі інгредієнти в блендері до однорідності, за потреби додайте трохи води."
+    },
+    {
+     "title": "Подача",
+     "text": "Розлийте по склянках і подавайте одразу."
+    }
+   ]
+  },
+  {
+   "slug": "baked-chicken-veg",
+   "title": "Запечене куряче філе з овочами та сирною скоринкою",
+   "description": "Соковите філе під сиром з кабачком і перцем — вечеря в одній формі.",
+   "imageUrl": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=800&q=70",
+   "minutes": 35,
+   "kcal": 420,
+   "servings": 3,
+   "difficulty": "medium",
+   "savingsUah": 160,
+   "ingredients": [
+    {
+     "name": "Філе куряче",
+     "quantity": 400,
+     "unit": "g",
+     "keywords": [
+      "філе куря",
+      "куряч",
+      "курк",
+      "курят"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "індиче філе"
+     ]
+    },
+    {
+     "name": "Кабачок",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "кабач",
+      "цукіні"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "баклажан"
+     ]
+    },
+    {
+     "name": "Сир твердий",
+     "quantity": 100,
+     "unit": "g",
+     "keywords": [
+      "гауда",
+      "пармезан",
+      "моцарел",
+      "чедер",
+      "сир твердий",
+      "твердий сир"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "моцарела"
+     ]
+    },
+    {
+     "name": "Перець болгарський",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "перець болгар",
+      "болгарськ"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "помідор"
+     ]
+    },
+    {
+     "name": "Олія",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "олія"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль і перець",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль і перець"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Нарізка",
+     "text": "Наріжте філе та овочі кубиками приблизно однакового розміру."
+    },
+    {
+     "title": "Форма",
+     "text": "Викладіть у змащену форму, посоліть, поперчіть, збризніть олією."
+    },
+    {
+     "title": "Запікання",
+     "text": "Посипте тертим сиром і запікайте 25 хв при 200°C до золотистої скоринки."
+    }
+   ]
+  },
+  {
+   "slug": "spinach-frittata",
+   "title": "Омлет фріттата зі шпинатом та сиром",
+   "description": "Італійський омлет, у який іде все, що залишилось: зелень, сир, трохи молока.",
+   "imageUrl": "https://images.unsplash.com/photo-1510693206972-df098062cb71?w=800&q=70",
+   "minutes": 20,
+   "kcal": 330,
+   "servings": 2,
+   "difficulty": "easy",
+   "savingsUah": 110,
+   "ingredients": [
+    {
+     "name": "Яйця",
+     "quantity": 4,
+     "unit": "pcs",
+     "keywords": [
+      "яйц",
+      "яйце"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "аквафаба"
+     ]
+    },
+    {
+     "name": "Шпинат",
+     "quantity": 70,
+     "unit": "g",
+     "keywords": [
+      "шпинат"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "кабачок"
+     ]
+    },
+    {
+     "name": "Сир твердий",
+     "quantity": 60,
+     "unit": "g",
+     "keywords": [
+      "гауда",
+      "пармезан",
+      "моцарел",
+      "чедер",
+      "сир твердий",
+      "твердий сир"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Молоко",
+     "quantity": 50,
+     "unit": "ml",
+     "keywords": [
+      "молоко"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "вершки"
+     ]
+    },
+    {
+     "name": "Олія",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "олія"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль і перець",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль і перець"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Заливка",
+     "text": "Збийте яйця з молоком, сіллю та перцем."
+    },
+    {
+     "title": "Зелень",
+     "text": "Обсмажте шпинат 1 хв на олії, залийте яєчною сумішшю."
+    },
+    {
+     "title": "Доведення",
+     "text": "Посипте сиром і готуйте під кришкою 8–10 хв на малому вогні."
+    }
+   ]
+  },
+  {
+   "slug": "pesto-mince-pasta",
+   "title": "Паста з фаршем, кабачком і песто",
+   "description": "Швидка паста, яка використає фарш і кабачок до того, як вони зіпсуються.",
+   "imageUrl": "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800&q=70",
+   "minutes": 25,
+   "kcal": 560,
+   "servings": 4,
+   "difficulty": "medium",
+   "savingsUah": 150,
+   "ingredients": [
+    {
+     "name": "Паста",
+     "quantity": 250,
+     "unit": "g",
+     "keywords": [
+      "макарон",
+      "паста",
+      "спагеті"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "рис"
+     ]
+    },
+    {
+     "name": "Фарш",
+     "quantity": 300,
+     "unit": "g",
+     "keywords": [
+      "фарш"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "куряче філе"
+     ]
+    },
+    {
+     "name": "Кабачок",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "кабач",
+      "цукіні"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Соус песто",
+     "quantity": 60,
+     "unit": "g",
+     "keywords": [
+      "песто"
+     ],
+     "note": "3 ст. л.",
+     "pantry": false,
+     "substitutes": [
+      "вершки з часником"
+     ]
+    },
+    {
+     "name": "Сир твердий",
+     "quantity": 40,
+     "unit": "g",
+     "keywords": [
+      "гауда",
+      "пармезан",
+      "моцарел",
+      "чедер",
+      "сир твердий",
+      "твердий сир"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Олія",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "олія"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Паста",
+     "text": "Відваріть пасту al dente у підсоленій воді."
+    },
+    {
+     "title": "Соус",
+     "text": "Обсмажте фарш до рум'яності, додайте кабачок кубиками й тушкуйте 5 хв."
+    },
+    {
+     "title": "З'єднання",
+     "text": "Змішайте з пастою та песто, посипте тертим сиром."
+    }
+   ]
+  },
+  {
+   "slug": "crustless-quiche",
+   "title": "Теплий кіш без тіста зі шпинатом, йогуртом та сиром Гауда",
+   "description": "Ніжна запіканка без борошняного тіста: йогурт дає соковитість, шпинат — залізо, Гауда — вершкову скоринку.",
+   "imageUrl": null,
+   "minutes": 30,
+   "kcal": 285,
+   "servings": 4,
+   "difficulty": "easy",
+   "savingsUah": 180,
+   "ingredients": [
+    {
+     "name": "Шпинат свіжий",
+     "quantity": 150,
+     "unit": "g",
+     "keywords": [
+      "шпинат"
+     ],
+     "note": "використати негайно",
+     "pantry": false,
+     "substitutes": [
+      "броколі"
+     ]
+    },
+    {
+     "name": "Грецький йогурт",
+     "quantity": 200,
+     "unit": "g",
+     "keywords": [
+      "йогурт"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "сметана"
+     ]
+    },
+    {
+     "name": "Сир твердий Гауда",
+     "quantity": 100,
+     "unit": "g",
+     "keywords": [
+      "гауда",
+      "пармезан",
+      "моцарел",
+      "чедер",
+      "сир твердий",
+      "твердий сир"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Яйця курячі",
+     "quantity": 3,
+     "unit": "pcs",
+     "keywords": [
+      "яйц",
+      "яйце"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "аквафаба"
+     ]
+    },
+    {
+     "name": "Мускатний горіх",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "мускат"
+     ],
+     "note": "1 дрібка, для аромату",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль морська і чорний перець",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль морська і чорний перець"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Підготовка",
+     "text": "Розігрійте духовку до 180°C. Промийте шпинат і злегка просушіть."
+    },
+    {
+     "title": "Заливка",
+     "text": "Збийте йогурт із яйцями, сіллю, перцем і мускатним горіхом."
+    },
+    {
+     "title": "Збирання",
+     "text": "Змішайте шпинат із заливкою, викладіть у форму, посипте тертою Гаудою."
+    },
+    {
+     "title": "Запікання",
+     "text": "Випікайте 25 хв до золотистої скоринки, дайте постояти 5 хв."
+    }
+   ]
+  },
+  {
+   "slug": "strawberry-yogurt-parfait",
+   "title": "Парфе з полуницею, йогуртом і вівсяними пластівцями",
+   "description": "Сніданок за 5 хвилин для ягід, які вже м'якнуть.",
+   "imageUrl": null,
+   "minutes": 5,
+   "kcal": 260,
+   "servings": 2,
+   "difficulty": "easy",
+   "savingsUah": 70,
+   "ingredients": [
+    {
+     "name": "Полуниця",
+     "quantity": 150,
+     "unit": "g",
+     "keywords": [
+      "полуниц"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "будь-які ягоди"
+     ]
+    },
+    {
+     "name": "Грецький йогурт",
+     "quantity": 200,
+     "unit": "g",
+     "keywords": [
+      "йогурт"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Вівсяні пластівці",
+     "quantity": 40,
+     "unit": "g",
+     "keywords": [
+      "вівся",
+      "пластівц"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "гранола"
+     ]
+    },
+    {
+     "name": "Мед",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "мед"
+     ],
+     "note": "1 ч. л.",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Ягоди",
+     "text": "Наріжте полуницю, частину розімніть виделкою."
+    },
+    {
+     "title": "Шари",
+     "text": "Шарами викладіть у склянки йогурт, пластівці та ягоди."
+    },
+    {
+     "title": "Подача",
+     "text": "Полийте медом і подавайте одразу."
+    }
+   ]
+  },
+  {
+   "slug": "avocado-toast-egg",
+   "title": "Тост з авокадо та яйцем",
+   "description": "Стигле авокадо не чекає — тост із пашот-яйцем за 10 хвилин.",
+   "imageUrl": null,
+   "minutes": 10,
+   "kcal": 380,
+   "servings": 2,
+   "difficulty": "easy",
+   "savingsUah": 80,
+   "ingredients": [
+    {
+     "name": "Авокадо",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "авокад"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Хліб",
+     "quantity": 2,
+     "unit": "pcs",
+     "keywords": [
+      "хліб",
+      "батон",
+      "багет"
+     ],
+     "note": "2 скибки",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Яйця",
+     "quantity": 2,
+     "unit": "pcs",
+     "keywords": [
+      "яйц",
+      "яйце"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Лимон",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "лимон"
+     ],
+     "note": "кілька крапель",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль і перець",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль і перець"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Пюре",
+     "text": "Розімніть авокадо з лимонним соком, сіллю й перцем."
+    },
+    {
+     "title": "Яйця",
+     "text": "Зваріть яйця пашот або всмятку."
+    },
+    {
+     "title": "Збирання",
+     "text": "Підсмажте хліб, намажте авокадо, зверху — яйце."
+    }
+   ]
+  },
+  {
+   "slug": "zucchini-fritters",
+   "title": "Оладки з кабачків із сиром",
+   "description": "Хрусткі оладки, у які йдуть кабачки, яйце і залишки сиру.",
+   "imageUrl": null,
+   "minutes": 30,
+   "kcal": 310,
+   "servings": 3,
+   "difficulty": "easy",
+   "savingsUah": 90,
+   "ingredients": [
+    {
+     "name": "Кабачки",
+     "quantity": 2,
+     "unit": "pcs",
+     "keywords": [
+      "кабач",
+      "цукіні"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Яйця",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "яйц",
+      "яйце"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сир твердий",
+     "quantity": 50,
+     "unit": "g",
+     "keywords": [
+      "гауда",
+      "пармезан",
+      "моцарел",
+      "чедер",
+      "сир твердий",
+      "твердий сир"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Борошно",
+     "quantity": 60,
+     "unit": "g",
+     "keywords": [
+      "борошн"
+     ],
+     "note": "3 ст. л.",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сметана",
+     "quantity": 100,
+     "unit": "g",
+     "keywords": [
+      "сметан"
+     ],
+     "note": "для подачі",
+     "pantry": false,
+     "substitutes": [
+      "грецький йогурт"
+     ]
+    },
+    {
+     "name": "Олія",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "олія"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Тісто",
+     "text": "Натріть кабачки, посоліть і відіжміть сік через 10 хв."
+    },
+    {
+     "title": "Замішування",
+     "text": "Додайте яйце, тертий сир і борошно, перемішайте."
+    },
+    {
+     "title": "Смаження",
+     "text": "Смажте оладки на олії по 3 хв з кожного боку, подавайте зі сметаною."
+    }
+   ]
+  },
+  {
+   "slug": "chicken-rice-bowl",
+   "title": "Боул з куркою, рисом і овочами",
+   "description": "Ситний боул, що збере курку й овочі з різних полиць.",
+   "imageUrl": null,
+   "minutes": 30,
+   "kcal": 520,
+   "servings": 2,
+   "difficulty": "easy",
+   "savingsUah": 140,
+   "ingredients": [
+    {
+     "name": "Філе куряче",
+     "quantity": 300,
+     "unit": "g",
+     "keywords": [
+      "філе куря",
+      "куряч",
+      "курк",
+      "курят"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Рис",
+     "quantity": 150,
+     "unit": "g",
+     "keywords": [
+      "рис"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "гречка"
+     ]
+    },
+    {
+     "name": "Огірок",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "огір"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Помідор",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "помідор",
+      "томат",
+      "черрі"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Авокадо",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "авокад"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "кукурудза"
+     ]
+    },
+    {
+     "name": "Соєвий соус",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "соєвий соус"
+     ],
+     "note": "2 ст. л.",
+     "pantry": true,
+     "substitutes": []
+    },
+    {
+     "name": "Олія",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "олія"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Рис",
+     "text": "Відваріть рис."
+    },
+    {
+     "title": "Курка",
+     "text": "Наріжте філе смужками й обсмажте 7–8 хв, полийте соєвим соусом."
+    },
+    {
+     "title": "Збирання",
+     "text": "Викладіть рис, курку й нарізані овочі в миски."
+    }
+   ]
+  },
+  {
+   "slug": "cottage-cheese-pancakes",
+   "title": "Сирники",
+   "description": "Класичні сирники — ідеальний порятунок для кисломолочного сиру.",
+   "imageUrl": null,
+   "minutes": 25,
+   "kcal": 350,
+   "servings": 3,
+   "difficulty": "easy",
+   "savingsUah": 100,
+   "ingredients": [
+    {
+     "name": "Сир кисломолочний",
+     "quantity": 400,
+     "unit": "g",
+     "keywords": [
+      "кисломолоч",
+      "творог",
+      "сир м'який",
+      "домашній сир"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Яйця",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "яйц",
+      "яйце"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Борошно",
+     "quantity": 60,
+     "unit": "g",
+     "keywords": [
+      "борошн"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сметана",
+     "quantity": 100,
+     "unit": "g",
+     "keywords": [
+      "сметан"
+     ],
+     "note": "для подачі",
+     "pantry": false,
+     "substitutes": [
+      "грецький йогурт"
+     ]
+    },
+    {
+     "name": "Цукор",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "цукор"
+     ],
+     "note": "2 ст. л.",
+     "pantry": true,
+     "substitutes": []
+    },
+    {
+     "name": "Олія",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "олія"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Тісто",
+     "text": "Розімніть сир з яйцем і цукром, додайте борошно."
+    },
+    {
+     "title": "Формування",
+     "text": "Сформуйте невеликі шайби, обваляйте в борошні."
+    },
+    {
+     "title": "Смаження",
+     "text": "Смажте на середньому вогні по 3–4 хв з кожного боку."
+    }
+   ]
+  },
+  {
+   "slug": "kefir-pancakes",
+   "title": "Оладки на кефірі",
+   "description": "Пишні оладки з кефіру, що ось-ось перекисне.",
+   "imageUrl": null,
+   "minutes": 30,
+   "kcal": 330,
+   "servings": 4,
+   "difficulty": "easy",
+   "savingsUah": 60,
+   "ingredients": [
+    {
+     "name": "Кефір",
+     "quantity": 500,
+     "unit": "ml",
+     "keywords": [
+      "кефір"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "йогурт з водою"
+     ]
+    },
+    {
+     "name": "Яйця",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "яйц",
+      "яйце"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Борошно",
+     "quantity": 250,
+     "unit": "g",
+     "keywords": [
+      "борошн"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Яблуко",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "яблук"
+     ],
+     "note": "за бажанням",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сода",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сода"
+     ],
+     "note": "0,5 ч. л.",
+     "pantry": true,
+     "substitutes": []
+    },
+    {
+     "name": "Цукор",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "цукор"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    },
+    {
+     "name": "Олія",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "олія"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Тісто",
+     "text": "Змішайте теплий кефір, яйце, цукор і соду, всипте борошно."
+    },
+    {
+     "title": "Яблуко",
+     "text": "За бажанням додайте натерте яблуко."
+    },
+    {
+     "title": "Смаження",
+     "text": "Смажте на олії під кришкою до рум'яності."
+    }
+   ]
+  },
+  {
+   "slug": "milk-pancakes",
+   "title": "Тонкі млинці на молоці",
+   "description": "Молоко з терміном «сьогодні» — привід для млинців.",
+   "imageUrl": null,
+   "minutes": 35,
+   "kcal": 290,
+   "servings": 4,
+   "difficulty": "medium",
+   "savingsUah": 70,
+   "ingredients": [
+    {
+     "name": "Молоко",
+     "quantity": 500,
+     "unit": "ml",
+     "keywords": [
+      "молоко"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Яйця",
+     "quantity": 2,
+     "unit": "pcs",
+     "keywords": [
+      "яйц",
+      "яйце"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Борошно",
+     "quantity": 200,
+     "unit": "g",
+     "keywords": [
+      "борошн"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Масло вершкове",
+     "quantity": 30,
+     "unit": "g",
+     "keywords": [
+      "масло вершк"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "олія"
+     ]
+    },
+    {
+     "name": "Цукор",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "цукор"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Тісто",
+     "text": "Збийте яйця з цукром і сіллю, влийте молоко, поступово всипте борошно."
+    },
+    {
+     "title": "Відпочинок",
+     "text": "Дайте тісту постояти 15 хв, додайте розтоплене масло."
+    },
+    {
+     "title": "Смаження",
+     "text": "Смажте тонкі млинці на гарячій сковороді."
+    }
+   ]
+  },
+  {
+   "slug": "tomato-cucumber-salad",
+   "title": "Літній салат з помідорів і огірків зі сметаною",
+   "description": "Найпростіший салат — рятує овочі, що втрачають пружність.",
+   "imageUrl": null,
+   "minutes": 10,
+   "kcal": 140,
+   "servings": 2,
+   "difficulty": "easy",
+   "savingsUah": 60,
+   "ingredients": [
+    {
+     "name": "Помідори",
+     "quantity": 3,
+     "unit": "pcs",
+     "keywords": [
+      "помідор",
+      "томат",
+      "черрі"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Огірки",
+     "quantity": 2,
+     "unit": "pcs",
+     "keywords": [
+      "огір"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Цибуля",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "цибул"
+     ],
+     "note": "червона або зелена",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сметана",
+     "quantity": 80,
+     "unit": "g",
+     "keywords": [
+      "сметан"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "олія"
+     ]
+    },
+    {
+     "name": "Сіль",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Нарізка",
+     "text": "Наріжте помідори, огірки й цибулю."
+    },
+    {
+     "title": "Заправка",
+     "text": "Посоліть і заправте сметаною."
+    },
+    {
+     "title": "Подача",
+     "text": "Подавайте одразу, поки овочі хрусткі."
+    }
+   ]
+  },
+  {
+   "slug": "mince-stuffed-peppers",
+   "title": "Перець, фарширований фаршем і рисом",
+   "description": "Класика, яка використає і фарш, і перець, і помідори.",
+   "imageUrl": null,
+   "minutes": 60,
+   "kcal": 410,
+   "servings": 4,
+   "difficulty": "medium",
+   "savingsUah": 170,
+   "ingredients": [
+    {
+     "name": "Перець болгарський",
+     "quantity": 4,
+     "unit": "pcs",
+     "keywords": [
+      "перець болгар",
+      "болгарськ"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Фарш",
+     "quantity": 400,
+     "unit": "g",
+     "keywords": [
+      "фарш"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Рис",
+     "quantity": 100,
+     "unit": "g",
+     "keywords": [
+      "рис"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Помідори",
+     "quantity": 3,
+     "unit": "pcs",
+     "keywords": [
+      "помідор",
+      "томат",
+      "черрі"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "томатна паста"
+     ]
+    },
+    {
+     "name": "Цибуля",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "цибул"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Морква",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "морк"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сметана",
+     "quantity": 100,
+     "unit": "g",
+     "keywords": [
+      "сметан"
+     ],
+     "note": "для подачі",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль і перець",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль і перець"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Начинка",
+     "text": "Змішайте фарш, напівготовий рис, тертану моркву й цибулю."
+    },
+    {
+     "title": "Фарширування",
+     "text": "Наповніть перці начинкою."
+    },
+    {
+     "title": "Тушкування",
+     "text": "Тушкуйте в соусі з тертих помідорів 40 хв під кришкою."
+    }
+   ]
+  },
+  {
+   "slug": "mince-cutlets",
+   "title": "Домашні котлети з фаршу",
+   "description": "Котлети, у які піде і черствий хліб, і фарш, і цибуля.",
+   "imageUrl": null,
+   "minutes": 40,
+   "kcal": 450,
+   "servings": 4,
+   "difficulty": "medium",
+   "savingsUah": 160,
+   "ingredients": [
+    {
+     "name": "Фарш",
+     "quantity": 500,
+     "unit": "g",
+     "keywords": [
+      "фарш"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Хліб",
+     "quantity": 2,
+     "unit": "pcs",
+     "keywords": [
+      "хліб",
+      "батон",
+      "багет"
+     ],
+     "note": "2 скибки, можна черствий",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Молоко",
+     "quantity": 100,
+     "unit": "ml",
+     "keywords": [
+      "молоко"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "вода"
+     ]
+    },
+    {
+     "name": "Яйця",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "яйц",
+      "яйце"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Цибуля",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "цибул"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Олія",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "олія"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль і перець",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль і перець"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Хліб",
+     "text": "Замочіть хліб у молоці."
+    },
+    {
+     "title": "Фарш",
+     "text": "Змішайте фарш, віджатий хліб, яйце, терту цибулю, сіль і перець."
+    },
+    {
+     "title": "Смаження",
+     "text": "Сформуйте котлети й смажте по 5 хв з кожного боку, потім 10 хв під кришкою."
+    }
+   ]
+  },
+  {
+   "slug": "potato-gratin",
+   "title": "Картопляний гратен з вершками і сиром",
+   "description": "Запечена картопля у вершках — для картоплі, що вже проростає, і вершків, що закінчуються.",
+   "imageUrl": null,
+   "minutes": 60,
+   "kcal": 430,
+   "servings": 4,
+   "difficulty": "medium",
+   "savingsUah": 120,
+   "ingredients": [
+    {
+     "name": "Картопля",
+     "quantity": 800,
+     "unit": "g",
+     "keywords": [
+      "картопл"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Вершки",
+     "quantity": 200,
+     "unit": "ml",
+     "keywords": [
+      "вершк"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "молоко"
+     ]
+    },
+    {
+     "name": "Сир твердий",
+     "quantity": 100,
+     "unit": "g",
+     "keywords": [
+      "гауда",
+      "пармезан",
+      "моцарел",
+      "чедер",
+      "сир твердий",
+      "твердий сир"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Часник",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "часник"
+     ],
+     "note": "2 зубчики",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль і мускатний горіх",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль і мускатний горіх"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Картопля",
+     "text": "Наріжте картоплю тонкими кружальцями."
+    },
+    {
+     "title": "Форма",
+     "text": "Викладіть шарами у форму, кожен шар посоліть, залийте вершками з часником."
+    },
+    {
+     "title": "Запікання",
+     "text": "Посипте сиром і запікайте 45 хв при 190°C."
+    }
+   ]
+  },
+  {
+   "slug": "buckwheat-mushrooms",
+   "title": "Гречка з печерицями та цибулею",
+   "description": "Ароматна гречка, що врятує гриби до того, як вони потемніють.",
+   "imageUrl": null,
+   "minutes": 30,
+   "kcal": 360,
+   "servings": 3,
+   "difficulty": "easy",
+   "savingsUah": 80,
+   "ingredients": [
+    {
+     "name": "Гречка",
+     "quantity": 200,
+     "unit": "g",
+     "keywords": [
+      "гречк"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Печериці",
+     "quantity": 300,
+     "unit": "g",
+     "keywords": [
+      "печериц",
+      "гриб"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Цибуля",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "цибул"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Масло вершкове",
+     "quantity": 30,
+     "unit": "g",
+     "keywords": [
+      "масло вершк"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "олія"
+     ]
+    },
+    {
+     "name": "Сіль",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Гречка",
+     "text": "Відваріть гречку."
+    },
+    {
+     "title": "Гриби",
+     "text": "Обсмажте цибулю й нарізані гриби до випаровування рідини."
+    },
+    {
+     "title": "З'єднання",
+     "text": "Змішайте з гречкою та маслом."
+    }
+   ]
+  },
+  {
+   "slug": "fish-lemon-bake",
+   "title": "Запечена риба з лимоном і овочами",
+   "description": "Ніжна риба з лимоном — коли філе треба приготувати сьогодні.",
+   "imageUrl": null,
+   "minutes": 30,
+   "kcal": 320,
+   "servings": 2,
+   "difficulty": "easy",
+   "savingsUah": 200,
+   "ingredients": [
+    {
+     "name": "Філе риби",
+     "quantity": 400,
+     "unit": "g",
+     "keywords": [
+      "лосос",
+      "сьомг",
+      "форел",
+      "риба",
+      "філе риб",
+      "хек"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Лимон",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "лимон"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Кабачок",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "кабач",
+      "цукіні"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "броколі"
+     ]
+    },
+    {
+     "name": "Помідори черрі",
+     "quantity": 150,
+     "unit": "g",
+     "keywords": [
+      "помідор",
+      "томат",
+      "черрі"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Олія",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "олія"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль і перець",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль і перець"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Маринад",
+     "text": "Посоліть рибу, збризніть лимонним соком."
+    },
+    {
+     "title": "Форма",
+     "text": "Викладіть з нарізаними овочами й скибочками лимона."
+    },
+    {
+     "title": "Запікання",
+     "text": "Запікайте 20 хв при 200°C."
+    }
+   ]
+  },
+  {
+   "slug": "chicken-soup",
+   "title": "Курячий суп з овочами",
+   "description": "Легкий суп, у який підуть курка, картопля, морква й цибуля.",
+   "imageUrl": null,
+   "minutes": 50,
+   "kcal": 240,
+   "servings": 6,
+   "difficulty": "easy",
+   "savingsUah": 130,
+   "ingredients": [
+    {
+     "name": "Курка",
+     "quantity": 400,
+     "unit": "g",
+     "keywords": [
+      "філе куря",
+      "куряч",
+      "курк",
+      "курят"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Картопля",
+     "quantity": 3,
+     "unit": "pcs",
+     "keywords": [
+      "картопл"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Морква",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "морк"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Цибуля",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "цибул"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Вермішель",
+     "quantity": 60,
+     "unit": "g",
+     "keywords": [
+      "макарон",
+      "паста",
+      "спагеті"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "рис"
+     ]
+    },
+    {
+     "name": "Сіль і лавровий лист",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль і лавровий лист"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Бульйон",
+     "text": "Варіть курку 25 хв, зніміть піну."
+    },
+    {
+     "title": "Овочі",
+     "text": "Додайте картоплю, моркву й цибулю, варіть 15 хв."
+    },
+    {
+     "title": "Вермішель",
+     "text": "Додайте вермішель і варіть ще 5 хв."
+    }
+   ]
+  },
+  {
+   "slug": "borscht",
+   "title": "Червоний борщ",
+   "description": "Борщ збирає все: буряк, капусту, картоплю, моркву й шматок м'яса.",
+   "imageUrl": null,
+   "minutes": 90,
+   "kcal": 280,
+   "servings": 8,
+   "difficulty": "hard",
+   "savingsUah": 220,
+   "ingredients": [
+    {
+     "name": "Буряк",
+     "quantity": 2,
+     "unit": "pcs",
+     "keywords": [
+      "буряк"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Капуста",
+     "quantity": 300,
+     "unit": "g",
+     "keywords": [
+      "капуст"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Картопля",
+     "quantity": 3,
+     "unit": "pcs",
+     "keywords": [
+      "картопл"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Морква",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "морк"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Цибуля",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "цибул"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Фарш або м'ясо",
+     "quantity": 300,
+     "unit": "g",
+     "keywords": [
+      "фарш",
+      "свинин",
+      "ялович"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "квасоля"
+     ]
+    },
+    {
+     "name": "Помідори",
+     "quantity": 2,
+     "unit": "pcs",
+     "keywords": [
+      "помідор",
+      "томат",
+      "черрі"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "томатна паста"
+     ]
+    },
+    {
+     "name": "Сметана",
+     "quantity": 150,
+     "unit": "g",
+     "keywords": [
+      "сметан"
+     ],
+     "note": "для подачі",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль, лавровий лист, часник",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль, лавровий лист, часник"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Бульйон",
+     "text": "Зваріть бульйон з м'ясом (40 хв)."
+    },
+    {
+     "title": "Овочі",
+     "text": "Додайте картоплю й капусту, тим часом пасеруйте буряк, моркву, цибулю з помідорами."
+    },
+    {
+     "title": "Борщ",
+     "text": "З'єднайте все, варіть 10 хв, дайте настоятися."
+    },
+    {
+     "title": "Подача",
+     "text": "Подавайте зі сметаною й часником."
+    }
+   ]
+  },
+  {
+   "slug": "cabbage-stew",
+   "title": "Тушкована капуста з ковбасками",
+   "description": "Простий обід для капусти і ковбасок, що лежать надто довго.",
+   "imageUrl": null,
+   "minutes": 40,
+   "kcal": 390,
+   "servings": 4,
+   "difficulty": "easy",
+   "savingsUah": 110,
+   "ingredients": [
+    {
+     "name": "Капуста",
+     "quantity": 600,
+     "unit": "g",
+     "keywords": [
+      "капуст"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Ковбаски",
+     "quantity": 300,
+     "unit": "g",
+     "keywords": [
+      "ковбас",
+      "сосиск",
+      "шинк"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Морква",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "морк"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Цибуля",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "цибул"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Помідори",
+     "quantity": 2,
+     "unit": "pcs",
+     "keywords": [
+      "помідор",
+      "томат",
+      "черрі"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "томатна паста"
+     ]
+    },
+    {
+     "name": "Олія",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "олія"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль і перець",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль і перець"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Пасерування",
+     "text": "Обсмажте цибулю й моркву."
+    },
+    {
+     "title": "Капуста",
+     "text": "Додайте нашатковану капусту й помідори, тушкуйте 20 хв."
+    },
+    {
+     "title": "Ковбаски",
+     "text": "Додайте нарізані ковбаски й тушкуйте ще 10 хв."
+    }
+   ]
+  },
+  {
+   "slug": "broccoli-cheese-bake",
+   "title": "Броколі під сирним соусом",
+   "description": "Броколі, що жовтіє, запечена з молочним соусом і сиром.",
+   "imageUrl": null,
+   "minutes": 30,
+   "kcal": 290,
+   "servings": 3,
+   "difficulty": "easy",
+   "savingsUah": 100,
+   "ingredients": [
+    {
+     "name": "Броколі",
+     "quantity": 400,
+     "unit": "g",
+     "keywords": [
+      "броколі"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "цвітна капуста"
+     ]
+    },
+    {
+     "name": "Молоко",
+     "quantity": 300,
+     "unit": "ml",
+     "keywords": [
+      "молоко"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сир твердий",
+     "quantity": 100,
+     "unit": "g",
+     "keywords": [
+      "гауда",
+      "пармезан",
+      "моцарел",
+      "чедер",
+      "сир твердий",
+      "твердий сир"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Масло вершкове",
+     "quantity": 30,
+     "unit": "g",
+     "keywords": [
+      "масло вершк"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Борошно",
+     "quantity": 30,
+     "unit": "g",
+     "keywords": [
+      "борошн"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль і мускатний горіх",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль і мускатний горіх"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Броколі",
+     "text": "Бланшуйте броколі 3 хв."
+    },
+    {
+     "title": "Соус",
+     "text": "Обсмажте борошно на маслі, влийте молоко, варіть до загустіння, додайте половину сиру."
+    },
+    {
+     "title": "Запікання",
+     "text": "Залийте броколі соусом, посипте сиром і запікайте 15 хв."
+    }
+   ]
+  },
+  {
+   "slug": "veggie-omelette",
+   "title": "Омлет з помідорами й перцем",
+   "description": "Сніданок для овочів, що лишились після вечері.",
+   "imageUrl": null,
+   "minutes": 15,
+   "kcal": 300,
+   "servings": 2,
+   "difficulty": "easy",
+   "savingsUah": 70,
+   "ingredients": [
+    {
+     "name": "Яйця",
+     "quantity": 4,
+     "unit": "pcs",
+     "keywords": [
+      "яйц",
+      "яйце"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Помідор",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "помідор",
+      "томат",
+      "черрі"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Перець болгарський",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "перець болгар",
+      "болгарськ"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Молоко",
+     "quantity": 50,
+     "unit": "ml",
+     "keywords": [
+      "молоко"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сир твердий",
+     "quantity": 40,
+     "unit": "g",
+     "keywords": [
+      "гауда",
+      "пармезан",
+      "моцарел",
+      "чедер",
+      "сир твердий",
+      "твердий сир"
+     ],
+     "note": "за бажанням",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Олія",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "олія"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Овочі",
+     "text": "Обсмажте перець і помідор 3 хв."
+    },
+    {
+     "title": "Яйця",
+     "text": "Залийте збитими з молоком яйцями."
+    },
+    {
+     "title": "Доведення",
+     "text": "Посипте сиром і готуйте під кришкою 5 хв."
+    }
+   ]
+  },
+  {
+   "slug": "pesto-chicken-sandwich",
+   "title": "Сендвіч з куркою, песто і моцарелою",
+   "description": "Гарячий сендвіч на обід для залишків курки й соусу.",
+   "imageUrl": null,
+   "minutes": 15,
+   "kcal": 480,
+   "servings": 2,
+   "difficulty": "easy",
+   "savingsUah": 90,
+   "ingredients": [
+    {
+     "name": "Хліб",
+     "quantity": 4,
+     "unit": "pcs",
+     "keywords": [
+      "хліб",
+      "батон",
+      "багет"
+     ],
+     "note": "4 скибки",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Філе куряче",
+     "quantity": 200,
+     "unit": "g",
+     "keywords": [
+      "філе куря",
+      "куряч",
+      "курк",
+      "курят"
+     ],
+     "note": "готове або залишки",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Соус песто",
+     "quantity": 40,
+     "unit": "g",
+     "keywords": [
+      "песто"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сир",
+     "quantity": 80,
+     "unit": "g",
+     "keywords": [
+      "гауда",
+      "пармезан",
+      "моцарел",
+      "чедер",
+      "сир твердий",
+      "твердий сир"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Помідор",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "помідор",
+      "томат",
+      "черрі"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Збирання",
+     "text": "Намажте хліб песто, викладіть курку, помідор і сир."
+    },
+    {
+     "title": "Підсмажування",
+     "text": "Підсмажте на сухій сковороді під пресом 3 хв з кожного боку."
+    }
+   ]
+  },
+  {
+   "slug": "banana-oat-cookies",
+   "title": "Вівсяне печиво з бананами",
+   "description": "Печиво з двох складників для бананів у плямах.",
+   "imageUrl": null,
+   "minutes": 25,
+   "kcal": 180,
+   "servings": 4,
+   "difficulty": "easy",
+   "savingsUah": 50,
+   "ingredients": [
+    {
+     "name": "Банани",
+     "quantity": 2,
+     "unit": "pcs",
+     "keywords": [
+      "банан"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Вівсяні пластівці",
+     "quantity": 150,
+     "unit": "g",
+     "keywords": [
+      "вівся",
+      "пластівц"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Корица",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "корица"
+     ],
+     "note": "0,5 ч. л.",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Тісто",
+     "text": "Розімніть банани й змішайте з пластівцями та корицею."
+    },
+    {
+     "title": "Формування",
+     "text": "Викладіть ложкою на пергамент."
+    },
+    {
+     "title": "Випікання",
+     "text": "Випікайте 15 хв при 180°C."
+    }
+   ]
+  },
+  {
+   "slug": "apple-charlotte",
+   "title": "Шарлотка з яблуками",
+   "description": "Пиріг, що рятує м'які яблука.",
+   "imageUrl": null,
+   "minutes": 55,
+   "kcal": 260,
+   "servings": 8,
+   "difficulty": "easy",
+   "savingsUah": 70,
+   "ingredients": [
+    {
+     "name": "Яблука",
+     "quantity": 4,
+     "unit": "pcs",
+     "keywords": [
+      "яблук"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Яйця",
+     "quantity": 3,
+     "unit": "pcs",
+     "keywords": [
+      "яйц",
+      "яйце"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Борошно",
+     "quantity": 150,
+     "unit": "g",
+     "keywords": [
+      "борошн"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Цукор",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "цукор"
+     ],
+     "note": "150 г",
+     "pantry": true,
+     "substitutes": []
+    },
+    {
+     "name": "Корица",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "корица"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Тісто",
+     "text": "Збийте яйця з цукром до пишності, вмішайте борошно."
+    },
+    {
+     "title": "Яблука",
+     "text": "Наріжте яблука, викладіть у форму й залийте тістом."
+    },
+    {
+     "title": "Випікання",
+     "text": "Випікайте 40 хв при 180°C."
+    }
+   ]
+  },
+  {
+   "slug": "avocado-salmon-salad",
+   "title": "Салат з лососем, авокадо та огірком",
+   "description": "Свіжий салат, коли риба й авокадо мають короткий термін.",
+   "imageUrl": null,
+   "minutes": 15,
+   "kcal": 370,
+   "servings": 2,
+   "difficulty": "easy",
+   "savingsUah": 210,
+   "ingredients": [
+    {
+     "name": "Лосось",
+     "quantity": 150,
+     "unit": "g",
+     "keywords": [
+      "лосос",
+      "сьомг",
+      "форел",
+      "риба",
+      "філе риб",
+      "хек"
+     ],
+     "note": "слабосолений",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Авокадо",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "авокад"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Огірок",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "огір"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Лимон",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "лимон"
+     ],
+     "note": "сік половини",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Олія",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "олія"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль і перець",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль і перець"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Нарізка",
+     "text": "Наріжте лосось, авокадо й огірок кубиками."
+    },
+    {
+     "title": "Заправка",
+     "text": "Заправте лимонним соком і олією."
+    },
+    {
+     "title": "Подача",
+     "text": "Перемішайте й подавайте одразу."
+    }
+   ]
+  },
+  {
+   "slug": "creamy-mushroom-pasta",
+   "title": "Паста з печерицями у вершковому соусі",
+   "description": "Вершки й гриби з коротким терміном — у швидкій пасті.",
+   "imageUrl": null,
+   "minutes": 25,
+   "kcal": 540,
+   "servings": 3,
+   "difficulty": "easy",
+   "savingsUah": 130,
+   "ingredients": [
+    {
+     "name": "Паста",
+     "quantity": 250,
+     "unit": "g",
+     "keywords": [
+      "макарон",
+      "паста",
+      "спагеті"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Печериці",
+     "quantity": 250,
+     "unit": "g",
+     "keywords": [
+      "печериц",
+      "гриб"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Вершки",
+     "quantity": 200,
+     "unit": "ml",
+     "keywords": [
+      "вершк"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": [
+      "сметана з молоком"
+     ]
+    },
+    {
+     "name": "Сир твердий",
+     "quantity": 50,
+     "unit": "g",
+     "keywords": [
+      "гауда",
+      "пармезан",
+      "моцарел",
+      "чедер",
+      "сир твердий",
+      "твердий сир"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Цибуля",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "цибул"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль і перець",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль і перець"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Паста",
+     "text": "Відваріть пасту."
+    },
+    {
+     "title": "Соус",
+     "text": "Обсмажте цибулю й гриби, влийте вершки, проваріть 3 хв."
+    },
+    {
+     "title": "З'єднання",
+     "text": "Змішайте з пастою, посипте сиром."
+    }
+   ]
+  },
+  {
+   "slug": "potato-pancakes",
+   "title": "Деруни зі сметаною",
+   "description": "Деруни для картоплі, що вже проростає.",
+   "imageUrl": null,
+   "minutes": 35,
+   "kcal": 400,
+   "servings": 4,
+   "difficulty": "medium",
+   "savingsUah": 80,
+   "ingredients": [
+    {
+     "name": "Картопля",
+     "quantity": 800,
+     "unit": "g",
+     "keywords": [
+      "картопл"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Цибуля",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "цибул"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Яйця",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "яйц",
+      "яйце"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Борошно",
+     "quantity": 40,
+     "unit": "g",
+     "keywords": [
+      "борошн"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сметана",
+     "quantity": 150,
+     "unit": "g",
+     "keywords": [
+      "сметан"
+     ],
+     "note": "для подачі",
+     "pantry": false,
+     "substitutes": [
+      "грецький йогурт"
+     ]
+    },
+    {
+     "name": "Олія",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "олія"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Тісто",
+     "text": "Натріть картоплю й цибулю, відіжміть, додайте яйце, борошно й сіль."
+    },
+    {
+     "title": "Смаження",
+     "text": "Смажте на олії по 3–4 хв з кожного боку."
+    },
+    {
+     "title": "Подача",
+     "text": "Подавайте гарячими зі сметаною."
+    }
+   ]
+  },
+  {
+   "slug": "greek-yogurt-sauce-chicken",
+   "title": "Курка в йогуртовому маринаді з огірковим соусом",
+   "description": "Йогурт працює двічі: маринад для курки і соус дзадзикі.",
+   "imageUrl": null,
+   "minutes": 40,
+   "kcal": 390,
+   "servings": 3,
+   "difficulty": "medium",
+   "savingsUah": 150,
+   "ingredients": [
+    {
+     "name": "Філе куряче",
+     "quantity": 450,
+     "unit": "g",
+     "keywords": [
+      "філе куря",
+      "куряч",
+      "курк",
+      "курят"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Грецький йогурт",
+     "quantity": 250,
+     "unit": "g",
+     "keywords": [
+      "йогурт"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Огірок",
+     "quantity": 1,
+     "unit": "pcs",
+     "keywords": [
+      "огір"
+     ],
+     "note": null,
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Лимон",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "лимон"
+     ],
+     "note": "сік половини",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Часник",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "часник"
+     ],
+     "note": "2 зубчики",
+     "pantry": false,
+     "substitutes": []
+    },
+    {
+     "name": "Сіль, паприка",
+     "quantity": null,
+     "unit": null,
+     "keywords": [
+      "сіль, паприка"
+     ],
+     "note": "за смаком",
+     "pantry": true,
+     "substitutes": []
+    }
+   ],
+   "steps": [
+    {
+     "title": "Маринад",
+     "text": "Змішайте половину йогурту з паприкою й сіллю, замаринуйте курку на 20 хв."
+    },
+    {
+     "title": "Соус",
+     "text": "Натріть огірок, змішайте з рештою йогурту, часником і лимоном."
+    },
+    {
+     "title": "Курка",
+     "text": "Запечіть або обсмажте курку 15–18 хв, подавайте із соусом."
+    }
+   ]
+  }
+ ]
+}
