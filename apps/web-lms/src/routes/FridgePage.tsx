@@ -65,6 +65,8 @@ export function FridgePage() {
         return next;
       },
       replace: true,
+      // Фільтр / вибір у URL — не стрибати на початок сторінки
+      resetScroll: false,
     });
 
   // ---------- Пошук: поле живе локально, у URL — із затримкою ----------
@@ -304,7 +306,7 @@ export function FridgePage() {
         <Card className="flex flex-col items-center gap-3 p-10 text-center text-sm text-muted">
           {t("fridge.empty")}
           {filtered && (
-            <Button variant="outline" size="sm" onClick={() => navigate({ search: {}, replace: true })}>
+            <Button variant="outline" size="sm" onClick={() => navigate({ search: {}, replace: true, resetScroll: false })}>
               {t("fridge.resetFilters")}
             </Button>
           )}

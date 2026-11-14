@@ -2,6 +2,7 @@ import { screen, waitFor, within } from "@testing-library/react";
 import { api } from "@zwf/api-client";
 import { describe, expect, it } from "vitest";
 import { renderApp } from "../../support/render";
+import { pick } from "../../support/select";
 
 /** F-50…F-53 + I-40: «Розумний список покупок». */
 const section = (name: string) => within(screen.getByRole("heading", { name: new RegExp(name) }).closest("section")!);
@@ -68,8 +69,8 @@ describe("shopping list page", () => {
     await waitFor(() => expect(names("Треба купити")).toHaveLength(6));
 
     await user.type(screen.getByRole("textbox", { name: "Що купити" }), "Кефір 1% 2 л");
-    await user.selectOptions(screen.getByRole("combobox", { name: "Категорія" }), "dairy");
-    await user.selectOptions(screen.getByRole("combobox", { name: "Магазин" }), "st2");
+    await pick(user, screen.getByRole("combobox", { name: "Категорія" }), "dairy");
+    await pick(user, screen.getByRole("combobox", { name: "Магазин" }), "st2");
     await user.click(screen.getByRole("button", { name: "Додати до списку" }));
 
     expect(await screen.findByText("«Кефір 1%» додано до списку")).toBeVisible();
@@ -86,7 +87,7 @@ describe("shopping list page", () => {
     const dialog = await screen.findByRole("dialog", { name: "Перенести в холодильник" });
     const bread = within(dialog).getByLabelText("Термін придатності: Хліб цільнозерновий на заквасці");
     await waitFor(() => expect(bread).not.toHaveValue(""));
-    await user.selectOptions(within(dialog).getByLabelText("Місце зберігання: Хліб цільнозерновий на заквасці"), "freezer");
+    await pick(user, within(dialog).getByLabelText("Місце зберігання: Хліб цільнозерновий на заквасці"), "freezer");
     await user.click(within(dialog).getByRole("button", { name: "Перенести (4)" }));
 
     expect(await screen.findByText("4 продукти перенесено в холодильник")).toBeVisible();

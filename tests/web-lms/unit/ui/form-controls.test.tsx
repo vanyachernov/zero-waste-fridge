@@ -84,24 +84,89 @@ describe("RadioCardGroup", () => {
 });
 
 describe("Select", () => {
-  it("reports typed value", async () => {
+  const OPTIONS = [
+    { value: "dairy", label: "Молочні продукти" },
+    { value: "meat", label: "М'ясо & Риба" },
+    { value: "fruits", label: "Фрукти & Ягоди", disabled: true },
+    { value: "other", label: "Інше" },
+  ];
+
+  function Category({ onChange = vi.fn() }: { onChange?: (v: string) => void }) {
+    const [value, setValue] = useState("dairy");
+    return (
+      <div style={{ overflow: "hidden" }} data-testid="card">
+        <Select
+          aria-label="Категорія"
+          value={value}
+          leading="🥛"
+          options={OPTIONS}
+          onChange={(v) => {
+            setValue(v);
+            onChange(v);
+          }}
+        />
+      </div>
+    );
+  }
+
+  it("is a combobox with a listbox outside clipping containers; click picks an option", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    render(
-      <Select
-        aria-label="Категорія"
-        value="dairy"
-        onChange={onChange}
-        leading="🥛"
-        options={[
-          { value: "dairy", label: "Молочні продукти" },
-          { value: "meat", label: "М'ясо & Риба" },
-        ]}
-      />,
-    );
+    render(<Category onChange={onChange} />);
 
-    await user.selectOptions(screen.getByRole("combobox", { name: "Категорія" }), "meat");
+    const combobox = screen.getByRole("combobox", { name: "Категорія" });
+    expect(combobox).toHaveTextContent("Молочні продукти");
+    expect(combobox).toHaveAttribute("aria-expanded", "false");
+
+    await user.click(combobox);
+    const listbox = screen.getByRole("listbox", { name: "Категорія" });
+    expect(screen.getByTestId("card")).not.toContainElement(listbox);
+    expect(screen.getByRole("option", { name: "Молочні продукти" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("option", { name: "Фрукти & Ягоди" })).toHaveAttribute("aria-disabled", "true");
+
+    await user.click(screen.getByRole("option", { name: "Фрукти & Ягоди" }));
+    expect(onChange).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("option", { name: "М'ясо & Риба" }));
     expect(onChange).toHaveBeenCalledWith("meat");
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(combobox).toHaveTextContent("М'ясо & Риба");
+  });
+
+  it("keyboard: arrows skip disabled options, Enter picks, Escape closes, typing jumps", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Category onChange={onChange} />);
+    const combobox = screen.getByRole("combobox", { name: "Категорія" });
+    combobox.focus();
+
+    await user.keyboard("{ArrowDown}");
+    expect(combobox).toHaveAttribute("aria-expanded", "true");
+    const active = () => document.getElementById(combobox.getAttribute("aria-activedescendant")!)?.textContent;
+    expect(active()).toBe("Молочні продукти");
+    await user.keyboard("{ArrowDown}{ArrowDown}");
+    expect(active()).toBe("Інше");
+    await user.keyboard("{Escape}");
+    expect(combobox).toHaveAttribute("aria-expanded", "false");
+    expect(onChange).not.toHaveBeenCalled();
+    expect(combobox).toHaveFocus();
+
+    await user.keyboard("{ArrowDown}{End}{Enter}");
+    expect(onChange).toHaveBeenLastCalledWith("other");
+
+    // Закритий список: літера обирає наступний пункт на неї (після «Інше» по колу — «Молочні»)
+    await user.keyboard("м");
+    expect(onChange).toHaveBeenLastCalledWith("dairy");
+  });
+
+  it("shows the placeholder until something is chosen and closes on outside click", async () => {
+    const user = userEvent.setup();
+    render(<Select aria-label="Магазин" value="" placeholder="Будь-який" onChange={vi.fn()} options={OPTIONS} />);
+    const combobox = screen.getByRole("combobox", { name: "Магазин" });
+    expect(combobox).toHaveTextContent("Будь-який");
+    await user.click(combobox);
+    expect(screen.getByRole("listbox")).toBeVisible();
+    await user.click(document.body);
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
 });
 

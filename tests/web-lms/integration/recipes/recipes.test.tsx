@@ -1,7 +1,8 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { api, mockAuthControl } from "@zwf/api-client";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { renderApp, waitForPath } from "../../support/render";
+import { pick } from "../../support/select";
 
 /** F-40…F-45, F-82, F-83 на мок-бекенді, що дзеркалить B-20…B-24. */
 describe("recipes", () => {
@@ -19,7 +20,7 @@ describe("recipes", () => {
     expect(within(cards[0]!).getByText(/критичн/)).toBeVisible();
     expect(within(cards[0]!).getByRole("link", { name: "Переглянути рецепт" })).toBeVisible();
 
-    await user.selectOptions(screen.getByRole("combobox", { name: "Сортування" }), "time");
+    await pick(user, screen.getByRole("combobox", { name: "Сортування" }), "time");
     await waitForPath(router, "/recipes?sort=time");
   });
 
@@ -99,5 +100,16 @@ describe("recipes", () => {
     expect(footerButton).toBeDisabled();
     await user.click(await screen.findByRole("checkbox", { name: "Сир твердий Гауда 45%" }));
     expect(footerButton).toBeEnabled();
+  });
+
+  it("picking products keeps the scroll position (no jump to the top)", async () => {
+    const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    const { router, user } = renderApp("/recipes", { signedIn: true });
+    await user.click(await screen.findByRole("checkbox", { name: "Шпинат Baby свіжий" }));
+    await waitFor(() => expect(router.state.location.search).toEqual({ ids: ["p2"] }));
+    scrollTo.mockClear();
+    await user.click(screen.getByRole("checkbox", { name: "Грецький йогурт 5%" }));
+    await waitFor(() => expect(router.state.location.search).toEqual({ ids: ["p2", "p3"] }));
+    expect(scrollTo).not.toHaveBeenCalled();
   });
 });

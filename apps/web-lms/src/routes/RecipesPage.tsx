@@ -46,6 +46,8 @@ export function RecipesPage() {
         return { ...(merged.ids?.length ? { ids: merged.ids } : {}), ...(merged.sort && merged.sort !== "critical" ? { sort: merged.sort } : {}) };
       },
       replace: true,
+      // Фільтр / вибір у URL — не стрибати на початок сторінки
+      resetScroll: false,
     });
   const toggle = (id: string) =>
     setSearch({ ids: selected.includes(id) ? selected.filter((x) => x !== id) : selected.length >= MAX_SELECTED ? selected : [...selected, id] });
