@@ -1,33 +1,26 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { RouterProvider } from "@tanstack/react-router";
-import { configureApi } from "@zwf/api-client";
-import { I18nProvider } from "@zwf/i18n/react";
+import { configureApi, parseMockMode } from "@zwf/api-client";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { AppProviders, createQueryClient, createUnauthorizedHandler } from "./app";
+import { initTheme } from "./lib/theme";
 import { createAppRouter } from "./router";
 import "./styles.css";
 
+initTheme();
+
+const queryClient = createQueryClient();
+const router = createAppRouter(queryClient);
+
 configureApi({
   baseUrl: "/api",
-  mock: import.meta.env.VITE_API_MOCK === "true",
-  // Сесія (HttpOnly-cookie) протухла → на сторінку логіну Spring Security
-  onUnauthorized: () => window.location.assign(`/login?redirect=${encodeURIComponent(window.location.pathname)}`),
+  // true — усе на моках, false — усе на бекенді, data — справжній auth + моки продуктів/покупок
+  mock: parseMockMode(import.meta.env.VITE_API_MOCK),
+  // Сесія (HttpOnly-cookie) закінчилась посеред роботи → на вхід, потім назад
+  onUnauthorized: createUnauthorizedHandler(router, queryClient),
 });
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { staleTime: 30_000, retry: 1, refetchOnWindowFocus: false },
-  },
-});
-
-const router = createAppRouter(queryClient);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <I18nProvider locale="uk">
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
-    </I18nProvider>
+    <AppProviders router={router} queryClient={queryClient} />
   </StrictMode>,
 );

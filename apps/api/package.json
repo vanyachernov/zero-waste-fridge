@@ -1,0 +1,19 @@
+{
+  "name": "@zwf/api",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Spring Boot backend (Gradle). Скрипти — обгортки, щоб Turborepo бачив бекенд як звичайний workspace.",
+  "scripts": {
+    "dev": "./gradlew bootRun --args='--spring.profiles.active=dev'",
+    "build": "./gradlew bootJar -PrequireWeb",
+    "test": "./gradlew check",
+    "clean": "./gradlew clean && rm -rf .turbo",
+    "build:api-only": "./gradlew bootJar",
+    "test:unit": "./gradlew test",
+    "test:integration": "./gradlew integrationTest"
+  },
+  "devDependencies": {
+    "@zwf/web-lms": "workspace:*",
+    "@zwf/web-public": "workspace:*"
+  }
+}

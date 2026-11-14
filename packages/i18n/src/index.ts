@@ -53,5 +53,15 @@ export function createTranslator(locale: Locale = defaultLocale) {
 
   const dateFmt = new Intl.DateTimeFormat(locale === "uk" ? "uk-UA" : "en-GB", { day: "numeric", month: "short", year: "numeric" });
 
-  return { t, plural, messages, locale, formatDate: (d: Date | string) => dateFmt.format(new Date(d)) };
+  const shortFmt = new Intl.DateTimeFormat(locale === "uk" ? "uk-UA" : "en-GB", { day: "numeric", month: "short" });
+
+  return {
+    t,
+    plural,
+    messages,
+    locale,
+    formatDate: (d: Date | string) => dateFmt.format(new Date(d)),
+    /** Без року — для компактних карток: «14 лист.». */
+    formatShortDate: (d: Date | string) => shortFmt.format(new Date(d)),
+  };
 }

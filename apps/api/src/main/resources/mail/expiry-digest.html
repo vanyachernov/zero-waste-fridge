@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head><meta charset="UTF-8"><title th:text="${subject}">Дайджест термінів</title></head>
+<body style="margin:0;padding:24px;background:#f6f9f7;font:400 15px/1.5 Inter,Arial,sans-serif;color:#171d1a">
+<div style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:12px;padding:32px">
+  <th:block th:replace="~{layout.html :: header}"></th:block>
+  <p>Вітаємо, <span th:text="${name}">Олена</span>! Ось що в холодильнику «<span th:text="${household}">Сім'я Кравченко</span>» варто використати найближчим часом:</p>
+  <table role="presentation" style="width:100%;border-collapse:collapse;margin:16px 0">
+    <tr th:each="p : ${products}" style="border-bottom:1px solid #e3e9e5">
+      <td style="padding:8px 0" th:text="${p.name}">Грецький йогурт</td>
+      <td style="padding:8px 0;text-align:right;font-weight:600"
+          th:style="${p.daysLeft < 0} ? 'padding:8px 0;text-align:right;font-weight:600;color:#ba0035' : 'padding:8px 0;text-align:right;font-weight:600;color:#9a5a00'"
+          th:text="${p.label}">завтра</td>
+    </tr>
+  </table>
+  <th:block th:replace="~{layout.html :: button(${link}, 'Відкрити холодильник')}"></th:block>
+  <th:block th:replace="~{layout.html :: footer}"></th:block>
+</div>
+</body>
+</html>

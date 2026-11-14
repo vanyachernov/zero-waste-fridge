@@ -26,6 +26,10 @@
   --color-on-primary-container: #00513a;
   --color-primary-fixed-dim: #8bd8b2;
 
+  /* Фірмовий зелений, однаковий у світлій і темній темі (панель входу на макетах «— Dark» теж темно-зелена) */
+  --color-brand: #006948;
+  --color-on-brand: #ffffff;
+
   --color-secondary-container: #e3e7f7;     /* банер «Розумна порада дня», вторинні кнопки */
   --color-on-secondary-container: #3a4060;
 
@@ -54,7 +58,7 @@
 
   --color-on-surface: #171c1f;
   --color-on-surface-variant: #3e4942;
-  --color-muted: #6e7a72;
+  --color-muted: #66726a; /* F-90/F-91: ≥ 4.5:1 і на білому, і на surface-container-low */
 
   --color-outline: #6e7a72;
   --color-outline-variant: #bccac0;           /* Disabled Surface */
@@ -72,4 +76,41 @@
   --shadow-modal: 0 24px 48px -12px rgb(23 28 31 / 0.25);
 
   --container-app: 80rem;    /* 1280px — ширина десктопного макета */
+
+  /* B-200: графіки «Врятовано / Викинуто» (перевірено валідатором палітри: CVD, контраст, світлота) */
+  --color-chart-saved: #00915f;
+  --color-chart-wasted: #c8560a;
+
+  /* Модалка: м'яка поява (десктоп) і затемнення фону */
+  --animate-dialog-in: dialog-in 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-backdrop-in: backdrop-in 200ms ease-out;
+  @keyframes dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes backdrop-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* F-84: bottom sheet виїжджає знизу */
+  --animate-sheet-in: sheet-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  @keyframes sheet-in {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
 }

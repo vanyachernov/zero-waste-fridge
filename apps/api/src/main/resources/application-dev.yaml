@@ -1,0 +1,19 @@
+# Локальна розробка: Postgres піднімається з compose.yaml автоматично
+spring:
+  docker:
+    compose:
+      enabled: true
+      file: ./compose.yaml
+      lifecycle-management: start-only
+  # Mailpit з compose.yaml: усі листи — у веб-інтерфейсі http://localhost:8026
+  mail:
+    host: localhost
+    port: 1026
+
+zwf:
+  # Посилання з листів відкривають SPA з Vite dev-сервера
+  public-url: http://localhost:5173
+
+logging:
+  level:
+    ua.zwf: debug

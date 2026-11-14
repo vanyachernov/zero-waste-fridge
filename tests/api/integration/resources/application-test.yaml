@@ -1,0 +1,16 @@
+spring:
+  docker:
+    compose:
+      enabled: false
+
+zwf:
+  # Тести викликають ReminderService напряму — планувальник не має втручатися
+  reminders:
+    enabled: false
+  # Закрите SSE-з'єднання виявляється на наступному пінгу — у тестах не чекаємо 25 с
+  realtime:
+    heartbeat: 1s
+  # B-22: без ключа — підбір із каталогу; AI-шлях перевіряє RecipeAiIT із фейковим сервером DeepSeek
+  ai:
+    deepseek:
+      api-key: ""

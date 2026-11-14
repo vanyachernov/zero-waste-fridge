@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head><meta charset="UTF-8"><title th:text="${subject}">Запрошення до сім'ї</title></head>
+<body style="margin:0;padding:24px;background:#f6f9f7;font:400 15px/1.5 Inter,Arial,sans-serif;color:#171d1a">
+<div style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:12px;padding:32px">
+  <th:block th:replace="~{layout.html :: header}"></th:block>
+  <p><b th:text="${inviter}">Олена Кравченко</b> запрошує вас до «<b th:text="${household}">Сім'я Кравченко</b>» у Zero Waste Fridge —
+    спільний холодильник, рецепти із залишків і список покупок для всієї родини.</p>
+  <p>Роль: <span th:text="${roleLabel}">Член сім'ї</span>.</p>
+  <th:block th:replace="~{layout.html :: button(${link}, 'Приєднатися до сімʼї')}"></th:block>
+  <p style="color:#6e7a72">Запрошення діє до <span th:text="${#temporals.format(expiresAt, 'd MMMM yyyy', #locale)}">16 листопада 2026</span>.
+    Якщо ви не знаєте відправника — просто проігноруйте лист.</p>
+  <th:block th:replace="~{layout.html :: footer}"></th:block>
+</div>
+</body>
+</html>

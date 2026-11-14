@@ -24,6 +24,9 @@
   --color-on-secondary-container: #d3d9f0;
 
   --color-error: #ff8f9a;
+  --color-on-error: #3b0711;
+  --color-chart-saved: #20a070;
+  --color-chart-wasted: #dc7024;
   --color-error-container: #4a0f1b;
   --color-on-error-container: #ffb3b8;
   --color-warning-container: #47290a;
@@ -45,6 +48,25 @@
   --color-outline: #8c9891;
   --color-outline-variant: #3c4842;
   --color-border: #263039;
+}
+
+/*
+ * F-84: зона тапу ≥ 44×44 px (вимога UI-Kit) без зміни розміру самої кнопки —
+ * невидима «подушка» навколо елемента лише на сенсорних екранах.
+ */
+@utility touch-hit {
+  position: relative;
+  @media (pointer: coarse) {
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: max(100%, 44px);
+      height: max(100%, 44px);
+      transform: translate(-50%, -50%);
+    }
+  }
 }
 
 @layer base {
