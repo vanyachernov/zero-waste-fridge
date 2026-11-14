@@ -247,6 +247,7 @@ SPRING_PROFILES_ACTIVE=prod DB_URL=jdbc:postgresql://host:5432/zwf DB_USER=zwf D
 | `GET /api/recipes/{id}` | `{…картка, description, savingsUah, pantry[], steps[{title, text}]}` проти поточного холодильника · 404 `RECIPE_NOT_FOUND` (AI-рецепт іншої сім'ї теж) |
 | `POST /api/recipes/{id}/cook` `{portions?: 1..12, productIds?}` | `{recipeId, portions, cooked[{productId, name, quantity, unit, closed}]}` — списання `COOKED`; кількість з рецепта на порції, г ↔ кг і мл ↔ л, інакше продукт цілком. Усе або нічого |
 | `GET /api/stats/saved?period=month` | `{period, from, to, saved, wasted}` — різні продукти, з'їдені вчасно або приготовані / викинуті за місяць |
+| `GET /api/stats/overview?months=1..12` | B-200, сторінка «Статистика & Екологія»: `{from, to, months[{month, saved, wasted}], current{saved, wasted, saveRate, savedKg, wastedKg, co2SavedKg, co2WastedKg}, byCategory[], topWasted[{name, times, quantity, unit}], members[{userId, name, saved}]}`. Маса й CO₂e — оцінка (типова вага «шт» і коефіцієнти категорій) · 400 `months: Range` |
 
 **DeepSeek.** OpenAI-сумісний `POST https://api.deepseek.com/chat/completions`, модель `deepseek-flash` (thinking вимкнено), JSON mode. Відповідь моделі перевіряється: межі чисел, одиниці, кожен обраний продукт має бути в рецепті. Порожній чи кривий JSON, 429 і 5xx — одна повторна спроба; 401/402/422 — одразу каталог. Налаштування: `zwf.ai.deepseek.{api-key, base-url, model, timeout}`.
 
