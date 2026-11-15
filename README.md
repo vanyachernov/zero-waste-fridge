@@ -14,10 +14,13 @@ A web app that helps a family stop throwing food away. It tracks what is in the 
 | **Statistics & Ecology** | Saved vs wasted by month and category, save rate, estimated kg of food and CO₂e, most wasted products, family contribution |
 | **Everywhere** | Ukrainian UI, light and dark theme (saved in the profile), mobile layout, keyboard and screen-reader accessible (WCAG 2.1 AA) |
 
+**Live demo:** https://vanyachernov.github.io/zero-waste-fridge/lms/ — runs entirely in the browser on demo data (no backend), sign in with **olena@example.com / Secret-pass-123**. Details: [Demo on GitHub Pages](#demo-on-github-pages).
+
 ## Contents
 
 - [Quick start: demo without a backend](#quick-start-demo-without-a-backend)
 - [Run the full stack locally](#run-the-full-stack-locally)
+- [Demo on GitHub Pages](#demo-on-github-pages)
 - [Configuration](#configuration)
 - [Deployment](#deployment)
 - [AI recipes (DeepSeek)](#ai-recipes-deepseek)
@@ -132,6 +135,18 @@ After rebuilding the jar, repeat steps 2–3.
 ### Mocks vs the real backend
 
 `VITE_API_MOCK` chooses what the user app takes from mocks: `true` (everything, the default for `pnpm dev`), `false` (nothing — used by `dev:backend` and production), or a comma-separated list of domains: `auth`, `fridge`, `shopping`, `household`, `recipes` (`data` = fridge + shopping + recipes). Mocks mirror backend rules and error codes and are covered by tests. Details: [docs/architecture.md](docs/architecture.md#mocks).
+
+## Demo on GitHub Pages
+
+https://vanyachernov.github.io/zero-waste-fridge/ is a public demo built from `main` by `.github/workflows/pages.yml`. GitHub Pages only serves static files, so the demo is the landing site plus the user app in mock mode (`VITE_API_MOCK=true`): every API call is answered in the browser on the demo family's data. There is no database, email, push or DeepSeek; data is per visitor and resets on reload.
+
+Build it locally:
+
+```bash
+pnpm build:demo
+```
+
+The result is `demo-site/` for the base path `/zero-waste-fridge` (`DEMO_BASE_PATH` to change it): the landing site at the root, the app under `lms/`, and a copy of the app as `404.html`, so deep links like `/zero-waste-fridge/lms/recipes` work after a reload. To enable it in a fork: Settings → Pages → Build and deployment → Source: **GitHub Actions**, then push to `main` or run the workflow by hand.
 
 ## Configuration
 

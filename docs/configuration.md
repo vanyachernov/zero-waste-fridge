@@ -99,6 +99,8 @@ Templates (Thymeleaf, HTML + plain text) are in `apps/api/src/main/resources/mai
 | `apps/web-lms` | `VITE_API_MOCK` | `true` in `.env.development`, `false` in `.env.backend` and `.env.production` | `true` / `false` / comma-separated domains (`auth`, `fridge`, `shopping`, `household`, `recipes`, or `data`) served from in-memory mocks |
 | `apps/web-lms` | `BACKEND_URL` | `http://localhost:8080` | Where the Vite dev server proxies `/api` (dev only) |
 | `apps/web-public` | `NEXT_PUBLIC_LMS_URL` | `/lms/` | Where "Open the app" links go (dev: `http://localhost:5173/lms/`) |
+| `apps/web-lms` | `LMS_BASE` | `/lms/` | Base path of the build (the GitHub Pages demo uses `/zero-waste-fridge/lms/`) |
+| `apps/web-public` | `NEXT_PUBLIC_BASE_PATH` | empty | Base path of the landing site (demo: `/zero-waste-fridge`) |
 
 For a custom local setup create `apps/web-lms/.env.<mode>.local` and run `vite --mode <mode>`; `*.local` files are not committed.
 

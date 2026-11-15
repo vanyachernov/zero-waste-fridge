@@ -99,6 +99,8 @@ npx web-push generate-vapid-keys --json > ~/.zwf-vapid.json
 | `apps/web-lms` | `VITE_API_MOCK` | `true` у `.env.development`, `false` у `.env.backend` і `.env.production` | `true` / `false` / домени через кому (`auth`, `fridge`, `shopping`, `household`, `recipes` або `data`), які беруться з in-memory моків |
 | `apps/web-lms` | `BACKEND_URL` | `http://localhost:8080` | Куди Vite dev-сервер проксує `/api` (лише dev) |
 | `apps/web-public` | `NEXT_PUBLIC_LMS_URL` | `/lms/` | Куди ведуть посилання «Відкрити кабінет» (у dev — `http://localhost:5173/lms/`) |
+| `apps/web-lms` | `LMS_BASE` | `/lms/` | Базовий шлях збірки (демо на GitHub Pages — `/zero-waste-fridge/lms/`) |
+| `apps/web-public` | `NEXT_PUBLIC_BASE_PATH` | порожньо | Базовий шлях вітрини (демо — `/zero-waste-fridge`) |
 
 Для власного локального налаштування створіть `apps/web-lms/.env.<mode>.local` і запустіть `vite --mode <mode>`; файли `*.local` не комітяться.
 
