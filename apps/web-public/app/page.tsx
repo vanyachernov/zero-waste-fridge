@@ -24,7 +24,7 @@ export default function HomePage() {
     <>
       <header className="sticky top-0 z-30 border-b border-border bg-surface-container-lowest/85 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-app items-center justify-between gap-4 px-4 sm:px-6">
-          <a href="/" aria-label={m.brand.name}>
+          <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/`} aria-label={m.brand.name}>
             <Logo />
           </a>
           <nav className="hidden items-center gap-8 text-sm font-medium text-on-surface-variant md:flex">

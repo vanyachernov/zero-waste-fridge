@@ -12,6 +12,7 @@
     "dev:api": "turbo run dev --filter=@zwf/api",
     "build": "turbo run build",
     "build:web": "turbo run build --filter=@zwf/web-public --filter=@zwf/web-lms",
+    "build:demo": "node tools/demo-pages/build.mjs",
     "test": "turbo run test",
     "test:web": "turbo run test --filter=@zwf/web-lms-tests",
     "typecheck": "turbo run typecheck",
