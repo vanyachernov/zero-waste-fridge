@@ -13,3 +13,7 @@ coverage
 .claude/
 .idea/
 .vscode/
+
+# D-16: демо для GitHub Pages
+dist-demo
+demo-site
