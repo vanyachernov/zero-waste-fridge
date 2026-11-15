@@ -5,10 +5,12 @@ import { defineConfig, loadEnv } from "vite";
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const backend = env.BACKEND_URL ?? "http://localhost:8080";
+  // D-16: демо на GitHub Pages живе під /<repo>/lms/; у jar і dev — /lms/
+  const base = env.LMS_BASE ?? "/lms/";
 
   return {
     // SPA живе під /lms/ — і в dev, і після деплою у Spring Boot (classpath:/static/lms/)
-    base: "/lms/",
+    base,
     plugins: [react(), tailwindcss()],
     server: {
       port: 5173,

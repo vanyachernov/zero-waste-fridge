@@ -9,7 +9,8 @@ import "./styles.css";
 initTheme();
 
 const queryClient = createQueryClient();
-const router = createAppRouter(queryClient);
+// Базовий шлях збірки Vite («/lms/» або «/zero-waste-fridge/lms/» для демо на GitHub Pages)
+const router = createAppRouter(queryClient, { basepath: import.meta.env.BASE_URL.replace(/\/$/, "") });
 
 configureApi({
   baseUrl: "/api",

@@ -223,10 +223,10 @@ const routeTree = rootRoute.addChildren([
   appRoute.addChildren([fridgeRoute, recipesRoute, recipeRoute, statsRoute, shoppingRoute, familyRoute, joinRoute, settingsRoute]),
 ]);
 
-export function createAppRouter(queryClient: QueryClient, options: { history?: RouterHistory } = {}) {
+export function createAppRouter(queryClient: QueryClient, options: { history?: RouterHistory; basepath?: string } = {}) {
   return createRouter({
     routeTree,
-    basepath: "/lms",
+    basepath: options.basepath ?? "/lms",
     context: { queryClient },
     history: options.history,
     defaultPreload: "intent",
