@@ -56,6 +56,11 @@ export function FridgePage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Product | undefined>();
   const [writingOff, setWritingOff] = useState<Product | null>(null);
+  // Нове додавання завжди з порожньою формою — інакше відкриється останній редагований (навіть уже списаний) продукт
+  const openAdd = () => {
+    setEditing(undefined);
+    setFormOpen(true);
+  };
 
   const setSearch = (patch: Partial<FridgeSearch>, options: { resetPage?: boolean } = { resetPage: true }) =>
     navigate({
@@ -153,10 +158,7 @@ export function FridgePage() {
               "max-sm:fixed max-sm:right-4 max-sm:bottom-[calc(5rem+env(safe-area-inset-bottom))] max-sm:z-20 max-sm:size-14 max-sm:rounded-full max-sm:p-0 max-sm:shadow-modal",
               selected.length > 0 && "max-sm:hidden",
             )}
-            onClick={() => {
-              setEditing(undefined);
-              setFormOpen(true);
-            }}
+            onClick={openAdd}
           >
             <Plus className="size-4 max-sm:size-6" aria-hidden /> <span className="max-sm:sr-only">{t("fridge.add")}</span>
           </Button>
@@ -298,7 +300,7 @@ export function FridgePage() {
           </span>
           <h2 className="text-lg font-bold">{t("fridge.emptyFridgeTitle")}</h2>
           <p className="max-w-sm text-sm text-on-surface-variant">{t("fridge.emptyFridgeText")}</p>
-          <Button onClick={() => setFormOpen(true)}>
+          <Button onClick={openAdd}>
             <Plus className="size-4" /> {t("fridge.emptyFridgeCta")}
           </Button>
         </Card>

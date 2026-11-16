@@ -155,6 +155,8 @@ function afterWriteOff(product: Product, written: number, request: WriteOffReque
     addFromProduct(product, "WRITE_OFF", written);
     return true;
   }
+  // Галочку знято явно — Smart Sync теж не додає
+  if (request.addToShoppingList === false) return false;
   const s = settingsOf(householdId());
   if (product.status !== "ACTIVE" && s.autoRefill && !s.excludedCategories.includes(product.category)) {
     addFromProduct(product, "AUTO", written);

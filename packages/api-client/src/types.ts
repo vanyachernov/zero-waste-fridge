@@ -135,6 +135,7 @@ export interface WriteOffRequest {
   outcome: WriteOffOutcome;
   /** `"all"` або частина в одиницях продукту. */
   quantity?: "all" | number;
+  /** `true` — додати; `false` — явно ні (Smart Sync теж); відсутнє — вирішує Smart Sync. */
   addToShoppingList?: boolean;
 }
 

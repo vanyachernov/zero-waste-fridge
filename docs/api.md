@@ -59,7 +59,7 @@ Passwords: 8+ characters, at most 72 bytes UTF-8. Reset tokens: 256 bits, single
 | `POST /api/products` | 201 + product. Required: `name`, `category`, `quantity`, `unit`, `expiresAt`; `zone` defaults to the category's, `remindBeforeDays` to 2 |
 | `GET /api/products/{id}` | product |
 | `PATCH /api/products/{id}` | product · 409 `PRODUCT_CLOSED` for a written-off product |
-| `POST /api/products/{id}/write-off` `{outcome, quantity?, addToShoppingList?}` | `{product, writtenOff, addedToShoppingList}`. `outcome`: `EATEN`, `COOKED`, `WASTED`; `quantity`: `"all"` (default) or a number |
+| `POST /api/products/{id}/write-off` `{outcome, quantity?, addToShoppingList?}` | `{product, writtenOff, addedToShoppingList}`. `outcome`: `EATEN`, `COOKED`, `WASTED`; `quantity`: `"all"` (default) or a number; `addToShoppingList`: `true` adds a `WRITE_OFF` item, `false` adds nothing (Smart Sync is skipped too), absent lets Smart Sync decide |
 | `GET /api/products/summary` | `{total, addedThisWeek, soon, today, expired}` |
 | `GET /api/tips/today` | `{date, kind, products, hint}` — tip of the day |
 | `GET /api/dictionaries` | categories, zones with temperatures, units, reminder options, opened-package rules |

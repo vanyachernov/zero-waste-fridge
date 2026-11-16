@@ -2,6 +2,7 @@ import { act, screen, waitFor, within } from "@testing-library/react";
 import { api, mockAuthControl } from "@zwf/api-client";
 import { describe, expect, it } from "vitest";
 import { renderApp, waitForPath } from "../../support/render";
+import { todayIso } from "@lms/lib/freshness";
 import { pick } from "../../support/select";
 
 /** F-20…F-30 + I-10: «Мій холодильник» на контракті бекенду (через мок, що його дзеркалить). */
@@ -166,6 +167,45 @@ describe("fridge page", () => {
     expect(screen.queryByRole("region", { name: "Розумна порада дня" })).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Додати перший продукт" }));
     expect(await screen.findByRole("dialog", { name: "Додати продукт" })).toBeVisible();
+  });
+
+  it("the empty-fridge button opens an empty add form, not the last edited product", async () => {
+    mockAuthControl.signIn();
+    await api.auth.register({ name: "Тарас", email: "taras@zwf.app", password: "Secret-pass-1" });
+    const yogurt = await api.products.create({ name: "йогурт", category: "dairy", quantity: 1, unit: "l", expiresAt: todayIso() });
+    const { user, queryClient } = renderApp("/");
+
+    // Редагуємо, закриваємо, списуємо — холодильник порожніє
+    await waitFor(() => expect(rowNames()).toEqual(["йогурт"]));
+    await user.click(desktop().getByRole("button", { name: "Дії з продуктом йогурт" }));
+    await user.click(screen.getByRole("menuitem", { name: "Редагувати" }));
+    const edit = await screen.findByRole("dialog", { name: "Редагувати продукт" });
+    await user.click(within(edit).getByRole("button", { name: "Скасувати" }));
+    await api.products.writeOff(yogurt.id, { outcome: "EATEN", addToShoppingList: false });
+    await act(() => queryClient.invalidateQueries());
+
+    await user.click(await screen.findByRole("button", { name: "Додати перший продукт" }));
+    const dialog = await screen.findByRole("dialog", { name: "Додати продукт" });
+    expect(within(dialog).getByLabelText("Назва продукту *")).toHaveValue("");
+    expect(within(dialog).queryByText("Продукт уже списано.")).not.toBeInTheDocument();
+  });
+
+  it("unchecked add-to-list keeps a finished product out of the shopping list", async () => {
+    const { router, user } = renderApp("/", { signedIn: true });
+    await waitFor(() => expect(rowNames()).toHaveLength(8));
+
+    await user.click(desktop().getByRole("button", { name: "Дії з продуктом Кабачки / Цукіні" }));
+    await user.click(screen.getByRole("menuitem", { name: "Списати" }));
+    const dialog = await screen.findByRole("dialog", { name: "Списати продукт" });
+    await user.click(within(dialog).getByRole("checkbox"));
+    expect(within(dialog).getByRole("checkbox")).not.toBeChecked();
+    await user.click(within(dialog).getByRole("button", { name: "Списати продукт" }));
+    expect(await screen.findByText("Списано: Кабачки / Цукіні")).toBeVisible();
+
+    // Вихід зі сторінки надсилає відкладене списання одразу
+    await act(() => router.navigate({ to: "/shopping" }));
+    await waitFor(async () => expect((await api.products.get("p10")).status).not.toBe("ACTIVE"));
+    expect((await api.shoppingList.get()).toBuy.some((i) => i.sourceProduct?.id === "p10")).toBe(false);
   });
 
   it("dismissed tip stays hidden for the day", async () => {

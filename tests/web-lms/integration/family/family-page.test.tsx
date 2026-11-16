@@ -15,7 +15,9 @@ describe("family page — owner", () => {
     await waitFor(() => expect(table.getByText("Софія Кравченко")).toBeVisible());
     expect(table.getByText(/Сім'я Кравченко» · 3 учасники, 1 запрошення/)).toBeVisible();
     expect(table.getByText(/olena@example.com · Ви/)).toBeVisible();
-    expect(table.getByText("Користувач")).toBeVisible();
+    // Роль власника в таблиці — «Власник», як у меню зміни ролі (не «Користувач»)
+    expect(table.getByText("Власник")).toBeVisible();
+    expect(table.queryByText("Користувач")).not.toBeInTheDocument();
     expect(table.getAllByText("Член сім'ї")).toHaveLength(2);
     expect(table.getByText(/Додано «Молоко пастеризоване 2.5%» · 10 хв тому/)).toBeVisible();
     // «вчора» / «позавчора» залежить від години запуску (подія 26 год тому) — перевіряємо саму подію
@@ -24,6 +26,7 @@ describe("family page — owner", () => {
     expect(table.getByText("Очікує")).toBeVisible();
 
     const matrix = within(screen.getByRole("heading", { name: "Ролі та права доступу" }).closest("div.overflow-hidden") as HTMLElement);
+    expect(matrix.getByRole("columnheader", { name: "Власник" })).toBeVisible();
     const row = matrix.getByText("Запрошувати та видаляти учасників").closest("tr")!;
     expect(within(row).getByRole("img", { name: "Дозволено" })).toBeVisible();
     expect(within(row).getByRole("img", { name: "Недоступно" })).toBeVisible();
@@ -73,7 +76,7 @@ describe("family page — owner", () => {
     await user.click(table.getByRole("button", { name: "Дії з учасником Максим Кравченко" }));
     await user.click(screen.getByRole("menuitem", { name: "Зробити власником" }));
     expect(await screen.findByText("Роль змінено")).toBeVisible();
-    await waitFor(() => expect(table.getAllByText("Користувач")).toHaveLength(2));
+    await waitFor(() => expect(table.getAllByText("Власник")).toHaveLength(2));
 
     await user.click(table.getByRole("button", { name: "Дії з учасником Софія Кравченко" }));
     await user.click(screen.getByRole("menuitem", { name: "Видалити з сім'ї" }));

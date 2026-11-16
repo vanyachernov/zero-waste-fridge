@@ -55,6 +55,14 @@ describe("mock shopping list backend", () => {
     expect(await api.shoppingList.settings()).toEqual({ autoRefill: true, excludedCategories: ["meat"] });
   });
 
+  it("unchecked add-to-list wins over Smart Sync, absent flag leaves it to Smart Sync", async () => {
+    const zucchini = await api.products.writeOff("p10", { outcome: "EATEN", addToShoppingList: false });
+    expect(zucchini.addedToShoppingList).toBe(false);
+    expect((await api.shoppingList.get()).toBuy.some((i) => i.sourceProduct?.id === "p10")).toBe(false);
+
+    expect((await api.products.writeOff("p6", { outcome: "EATEN" })).addedToShoppingList).toBe(true);
+  });
+
   it("moves bought items to the fridge all or nothing", async () => {
     expect(await codeOf(api.shoppingList.moveToFridge({ items: [{ id: "s7" }, { id: "s1" }] }))).toBe("409 ITEM_NOT_BOUGHT {}");
     expect(await codeOf(api.shoppingList.moveToFridge({ items: [{ id: "s7", expiresAt: "2000-01-01" }] }))).toBe(

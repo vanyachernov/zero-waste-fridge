@@ -46,6 +46,25 @@ class SmartSyncIT extends IntegrationTest {
 	}
 
 	@Test
+	void uncheckedAddToListSkipsSmartSync() {
+		var client = Accounts.signUp(client(), "Олена");
+		var yogurt = product(client, "Йогурт", "dairy");
+		var kefir = product(client, "Кефір", "dairy");
+
+		// Галочку «Додати до списку покупок» знято явно — продукт не з'являється в списку навіть зі Smart Sync
+		var unchecked = client.post("/api/products/" + yogurt + "/write-off",
+				Map.of("outcome", "EATEN", "addToShoppingList", false));
+		assertThat(unchecked.status()).as(unchecked.body()).isEqualTo(200);
+		assertThat(unchecked.json()).containsEntry("addedToShoppingList", false);
+		assertThat(ShoppingListIT.section(client, "toBuy")).isEmpty();
+
+		// Без поля (як «Приготувати» в рецепті) — і далі вирішує Smart Sync
+		assertThat(client.post("/api/products/" + kefir + "/write-off", Map.of("outcome", "EATEN")).json())
+			.containsEntry("addedToShoppingList", true);
+		assertThat(ShoppingListIT.names(ShoppingListIT.section(client, "toBuy"))).containsExactly("Кефір");
+	}
+
+	@Test
 	void excludedCategoriesAndSwitchOff() {
 		var client = Accounts.signUp(client(), "Олена");
 

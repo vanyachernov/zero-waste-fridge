@@ -140,10 +140,14 @@ public class ShoppingListService implements WriteOffListener {
 	@Override
 	@Transactional
 	public boolean afterWriteOff(Product product, UUID userId, WriteOffOutcome outcome, BigDecimal written,
-			boolean requested) {
-		if (requested) {
+			Boolean requested) {
+		if (Boolean.TRUE.equals(requested)) {
 			addFromProduct(product, userId, ShoppingSource.WRITE_OFF, written);
 			return true;
+		}
+		// Галочку знято явно — не підсовуємо продукт у список через Smart Sync
+		if (Boolean.FALSE.equals(requested)) {
+			return false;
 		}
 		if (!product.isActive() && settings.of(product.getHousehold().getId()).refills(product.getCategory())) {
 			addFromProduct(product, userId, ShoppingSource.AUTO, written);

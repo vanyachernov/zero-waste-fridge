@@ -50,7 +50,7 @@ public class WriteOffService {
 		events.save(ProductEvent.writtenOff(product, users.getReferenceById(userId), request.outcome(), written, now));
 
 		boolean inShoppingList = listener.afterWriteOff(product, userId, request.outcome(), written,
-				Boolean.TRUE.equals(request.addToShoppingList()));
+				request.addToShoppingList());
 
 		var writtenOff = new WriteOffResponse.WrittenOff(request.outcome(), ProductResponse.plain(written),
 				product.getUnit(), !product.isActive());
